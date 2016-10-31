@@ -1,0 +1,13 @@
+﻿PROGRESS LOG
+
+31.10.2016
++ Reworked Blocks
++ Reworked map system
++ Added to github
+
+30.10.2016
++ Foreground (Blocks) draft
+
+29.10.2016
++ Started progress log
++ Background draft
