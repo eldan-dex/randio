@@ -1,0 +1,11 @@
+﻿ISSUES:
+- Player movement tear - rewrite the gradual slowdown code
+
+
+TODO:
+- Add textwirter
+- Actually implement texture generation
+
+
+IDEAS:
+- Tile blending - for each tile, blend it's edges into surrounding tiles' textures -> keeps tile textures spearated, but blended
