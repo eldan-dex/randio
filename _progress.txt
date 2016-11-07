@@ -1,4 +1,7 @@
 ﻿PROGRESS LOG
+ 
+7.11.2016
+Rewriting from scratch because I'm stupid
 
 1.11.2016
 + Player draft
