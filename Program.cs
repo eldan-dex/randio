@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Randio {
+namespace Randio_2 {
 #if WINDOWS || LINUX
     /// <summary>
     /// The main class.

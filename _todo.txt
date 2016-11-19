@@ -1,10 +1,6 @@
 ﻿ISSUES:
-- Player movement tear - rewrite the gradual slowdown code
-
-
-TODO:
-- Add textwirter
-- Actually implement texture generation
+- player texture is not moving along with player (?!)
+- block texture is drawn across the whole screen (?!)
 
 
 IDEAS:

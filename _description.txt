@@ -1,0 +1,85 @@
+Základní myšlenka hry:
+	Adventura, kde je co nejvíce vìcí náhodnì generovaných. Žádné pøedem dané assety.
+
+Žánr:
+	Adventura, skákaèka.
+
+Styl:
+	2D, retro "8-bit" grafika
+
+Herní èas:
+	Odhad v rámci jednotek èi desítek minut na splnìní jedné mapy.
+
+Prùbìh hry:
+	Hráè se objeví na "startu" a postupnì prochází svìtem až do "cíle". Celá cesta je generovaná náhodnì - vzhled pozadí, uspoøádání cesty (plošin), typy a vzhled nepøátel, zbranì, itemy, objective (úkol, který je nutné splnit k úspìšnému dokonèení).
+
+Koncept:
+	Náhoda založená na tzv. rulesetech - souborech pravidel definujících jak mùže algoritmus pro generování daného objektu/vlastnosti/textury pracovat (napø. postava hráèe nesmí být vyšší než 30px, širší než 20px a musí obsahovat minimálnì tøi barvy a mít èerný okraj).
+	Hra pøed startem vygeneruje všechny potøebné textury a mechaniky a poté už se jen nechá hrát
+
+Grafika:
+- Pozadí:
+	Svìt bude rozdìlený na náhodnì vybrané a seskládané sekce, každá bude mít svùj ruleset (napø. sekce lesa, sekce mìsta, sekce abstraktních flekù).
+	Sekce se skládají z prvkù. Prvky: Budova (Stavba), Pøíroda, Zemì (nebo jen pøíroda bez výrazných prvkù?), Nebe, Geometrie (pravidelný bordel), Abstrakce (nepravidelný bordel)
+
+- Popøedí:
+	Plošiny (jako napø. v Mario World), rùzná bludištì a pøekážky. Podmínkou je možnost hráèe úspìšnì projít level až do konce
+
+- Hráè
+	Vzhled v závislosti na vlastnostech, nebo vlastnosti v závislosti na vzhledu?
+
+- NPC
+
+- Itemy
+
+
+Entity:
+- Hráè:
+	Musí být vizuálnì rozlišitelný od všeho ostatního (do urèité míry)
+	Vhodné umožnit animaci
+
+ -- Vlastnosti:
+	HP
+	Rychlost
+	Rozmìry
+	Inventáø
+
+- NPC:
+	Podobnì jako hráè, asi ruleset pro generování rulesetù (X typù postav - zvíøata, nepøátelé, pomocné postavy, každý typ svùj ruleset)
+
+ -- Vlastnosti:
+	HP
+	Rychlost
+	Rozmìry
+
+
+Itemy:
+- Zbranì:
+	Textura generovaná pøes Syntex z nìjakého základu?
+
+ -- Vlastnosti:
+	Síla
+	(stav/výdrž?)
+
+- Pomocné itemy
+
+ -- Vlastnosti:
+	Skriptované akce & bonusy? (jak na to náhodnì?)
+
+
+Úkoly:
+- Hlavní cíl:
+	Pravdìpodobnì ve stylu "dojít sem, získat tenhle item, zabít tohohle nepøítele", samozøejmì zase založené na rulesetech
+
+
+
+- Ponechat pro každý prvek hry velmi malou pravdìpodobnost, že pøi poèáteèním generování poruší ruleset a hra tímpádem v jednom z velkého množství pøípadù ztratí kontrolu a "rozbije se" -> fun, fun, fun!
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+TODO:
+- BG:
+	Algoritmus pro generování pozadí
+	Ruleset pro pozadí
+	Blending sekcí (pøechody)	[nápad: ConvChain prolínání s klesající intenzitou vzhledem ke vzdálenosti od mateøské sekce]
+- 

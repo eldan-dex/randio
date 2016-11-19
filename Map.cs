@@ -1,98 +1,153 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
-using Randio.Graphics;
-
-namespace Randio {
+namespace Randio_2 {
     class Map {
+
+        private List<Tile> tiles;
+        public Player Player { get; private set; }
+        public bool ReachedExit { get; private set; }
         public int Width { get; private set; }
         public int Height { get; private set; }
-        public List<Tile> Tiles { get; private set; }
-        public List<Block> Blocks { get; private set; }
 
-        private GraphicsDevice device;
+        private Vector2 start; //useful?
 
         public Map(GraphicsDevice graphicsDevice, int width, int height) {
-            device = graphicsDevice;
-            Tiles = new List<Tile>();
             Width = width;
-            Height = height;        
-            InitTiles();
-            InitBlocks();
+            Height = height;
+            CreatePlayer(graphicsDevice);
+            CreateTiles(graphicsDevice);
         }
 
-        //TODO: Maybe return whole Tile instead of just TileType?
-        public Tile GetTile(int X) {
-            var pos = 0;
-            foreach (Tile tile in Tiles) {
-                if (pos == X || pos < X && pos + tile.Coords.Width > X)
-                    return tile;
-            }
-            throw new MissingMemberException("No tile at this x coordinate!");
+        private void CreatePlayer(GraphicsDevice graphicsDevice) {
+            Player = new Player(graphicsDevice, this, Vector2.Zero); //generate position
+            CameraToPlayer();
         }
 
-        //TODO: rewrite this with rulesets
-        private void InitTiles() {
-            Random rnd = new Random((int)DateTime.Now.Ticks);
+        private void CameraToPlayer() {
+            //TBI: set camera so that is centered on the player
+        }
 
-            //TODO: sizes from ruleset
-            var minTileWidth = 300;
-            var maxTileWidth = 800;
-            if (Width / 4 > minTileWidth)
-                maxTileWidth = Width / 4;
-            var totalWidth = 0;
+        private void CreateTiles(GraphicsDevice graphicsDevice) {
+            if (Width % Block.Width > 0 || Height % Block.Height > 0)
+                throw new ArgumentException("Map dimensions must be divisible by Block dimensions!");
+
+            Random rnd = AlgorithmHelper.GetNewRandom();
+            tiles = new List<Tile>();
+
+            //Temporary algorithm, will be upgraded
+            int minWidth = Game.WIDTH;
+            int maxWidth = 3 * Game.WIDTH;
+            int totalWidth = 0;
 
             while (totalWidth < Width) {
-                //If we're generating the last tile, try to adjust maxTileWidth so that it would fit
-                if (Width - totalWidth < maxTileWidth) {
-                    maxTileWidth = Width - totalWidth;
-                    if (minTileWidth > maxTileWidth)
-                        minTileWidth = maxTileWidth;
-                }
-
                 //Generate a random width for the next tile
-                var newWidth = rnd.Next(minTileWidth, maxTileWidth);
+                int newWidth = rnd.Next(minWidth, maxWidth + 1);
 
                 //If last tile wouldn't be able to fit, extend this one instead
+                int testWidth = totalWidth + newWidth;
+                if (Width - testWidth < minWidth)
+                    newWidth = Width - totalWidth;
+
+                //Generate TileType
+                var type = (Tile.TileType)rnd.Next(0, 4);
+
+                //Create and add Tile
+                tiles.Add(new Tile(graphicsDevice, type, new Rectangle(totalWidth, 0, newWidth, Height)));
+
                 totalWidth += newWidth;
-                if (Width - totalWidth < minTileWidth)
-                    newWidth += Width - totalWidth;
-
-                //Create and add tile
-                var type = (Tile.TileType)rnd.Next(0, 4); //pick a random TileType
-                Tiles.Add(new Tile(device, totalWidth-newWidth, 0, newWidth, Height, type));
             }
         }
 
-        //Generate all blocks, ensure a valid path exists from start to end
-        private void InitBlocks() {
-            //placeholder, one block
-            int x = 10;
-            int y = 10;
-            int width = 32;
-            int height = 32;
-            Blocks = new List<Block>();
-            Blocks.Add(new Block(device, GetTile(x), x, y, width, height));
+        public int CheckOutOfMap(int y) {
+            if (y < 0) //y is above the map
+                return 1;
+
+            else if (y > Height) //y is below the map
+                return -1;
+
+            else return 0; //y is on the map
         }
 
-        public void DrawVisibleTiles(SpriteBatch spriteBatch, int x) {
-            //Spacing will be defined elsewhere and better, this is just for testing
-            //X here is player's left edge
-            //Only here until I implement a movable camera
-            int leftEdge = 0;
-            int rightEdge = 1280;
+        public void Update(GameTime gameTime, KeyboardState keyboardState) {
+            Player.Update(gameTime, keyboardState);
+            UpdateEntities(gameTime);
 
-            //Iterate over all tiles from which at least 1px is visible
-            int currentX = leftEdge;
-            int relativeOffset = 0;
-            while (currentX < rightEdge) {
-                var t = GetTile(currentX);
-                t.Draw(spriteBatch, relativeOffset);
-                currentX += t.Coords.Width;
-                relativeOffset += t.Coords.Width;
+            if (CheckOutOfMap((int)Player.Position.Y) == -1) {
+                //player fell down, reset player
+                Player.Reset();
+                CameraToPlayer();
             }
+        }
+
+        private void UpdateEntities(GameTime gameTime) {
+            var visibleTiles = GetVisibleTiles();
+            foreach (Tile tile in visibleTiles)
+                tile.Update(gameTime);
+        }
+
+        public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
+            foreach (Tile t in GetVisibleTiles())
+                t.Draw(spriteBatch);
+
+            Player.Draw(gameTime, spriteBatch);
+
+            //draw entities?
+        }
+
+        private Tile[] GetVisibleTiles() {
+            List<Tile> visibleTiles = new List<Tile>();
+
+            var pX = Player.Position.X;
+            var leftBound = pX - Game.WIDTH + Player.SafeBoundary;
+            var rightBound = pX + Player.Width + Game.WIDTH - Player.SafeBoundary;
+
+            //Bounds cannot be outside the map
+            if (leftBound < 0)
+                leftBound = 0;
+            if (rightBound > Width)
+                rightBound = Width;
+
+
+            int currentX = (int)leftBound;
+            while (currentX <= rightBound) {
+                var tile = GetTileForX(currentX);
+                if (tile != null) {
+                    currentX += tile.Coords.Width;
+                    visibleTiles.Add(tile);
+                }
+                else { //if no tile was found, something is wrong.
+                    currentX += Width / Block.Width / 10; //Minimal tile width
+                }
+            }
+
+            return visibleTiles.ToArray();
+        }
+
+        //returns a tile which contains the given X coordinate
+        public Tile GetTileForX(int x) {
+            foreach (Tile t in tiles) {
+                if (t.Coords.Left <= x && t.Coords.Right >= x)
+                    return t;
+            }
+            return null;
+        }
+
+        //translate global position into an offset from the left boundary of the parent tile
+        //untested, but should work
+        public Vector2 GlobalToTileCoordinates(Vector2 global) {
+            int globalOffset = 0;
+            foreach (Tile t in tiles) {
+                if (t.Coords.Left <= (int)global.X && t.Coords.Right >= (int)global.X)
+                    break;
+                else
+                    globalOffset += t.Coords.Width;
+            }
+            return new Vector2(global.X - globalOffset, global.Y);
         }
     }
 }

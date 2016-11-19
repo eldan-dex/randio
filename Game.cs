@@ -1,21 +1,26 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.Collections.Generic;
 
-namespace Randio {
+namespace Randio_2 {
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
     public class Game : Microsoft.Xna.Framework.Game {
         GraphicsDeviceManager graphics;
-        SpriteBatch backgroundSpriteBatch;
-        SpriteBatch foregroundSpriteBatch;
-        Map map;
-        Player player;
+        SpriteBatch levelSpriteBatch;
+
+        private Map map;
+        private Camera camera;
+
+        private KeyboardState keyboardState;
+
+        public const int WIDTH = 1280;
+        public const int HEIGHT = 736;
 
         public Game() {
             graphics = new GraphicsDeviceManager(this);
+            Content.RootDirectory = "Content";
         }
 
         /// <summary>
@@ -25,16 +30,18 @@ namespace Randio {
         /// and initialize them as well.
         /// </summary>
         protected override void Initialize() {
-            graphics.PreferredBackBufferWidth = 1280; //X
-            graphics.PreferredBackBufferHeight = 720; //Y
+            graphics.PreferredBackBufferWidth = WIDTH; //X
+            graphics.PreferredBackBufferHeight = HEIGHT; //Y
             graphics.ApplyChanges();
 
-            //WFC.ExpandBitmap(new System.Drawing.Bitmap("City.png"), 3, 100, 100, true,  2, -1);
-            map = new Map(GraphicsDevice, 12800, 720); //TODO: Generate map size randomly
-            player = new Player(GraphicsDevice, 10, 10, true, 5);
-
+            camera = new Camera(GraphicsDevice.Viewport);
+            CreateMap();
 
             base.Initialize();
+        }
+
+        private void CreateMap() {
+            map = new Map(GraphicsDevice, 12800, 736); //parameters
         }
 
         /// <summary>
@@ -43,8 +50,7 @@ namespace Randio {
         /// </summary>
         protected override void LoadContent() {
             // Create a new SpriteBatch, which can be used to draw textures.
-            backgroundSpriteBatch = new SpriteBatch(GraphicsDevice);
-            foregroundSpriteBatch = new SpriteBatch(GraphicsDevice);
+            levelSpriteBatch = new SpriteBatch(GraphicsDevice);
 
         }
 
@@ -53,6 +59,7 @@ namespace Randio {
         /// game-specific content.
         /// </summary>
         protected override void UnloadContent() {
+            
         }
 
         /// <summary>
@@ -61,20 +68,12 @@ namespace Randio {
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime) {
-            KeyboardState state = Keyboard.GetState();
-            if (state.IsKeyDown(Keys.Escape))
-                Exit();
+            ProcessInputs();
 
-            if (state.IsKeyDown(Keys.Left))
-                player.SetMoveLeft();
+            map.Update(gameTime, keyboardState);
 
-            if (state.IsKeyDown(Keys.Right))
-                player.SetMoveRight();
-
-            if (state.IsKeyDown(Keys.Up))
-                player.SetMoveUp();
-
-            player.Update();
+            if (map.ReachedExit)
+                Exit(); //temporary. Normally this would reinitialize everything and create a new level
 
             base.Update(gameTime);
         }
@@ -84,15 +83,25 @@ namespace Randio {
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime) {
-            GraphicsDevice.Clear(Color.White);
-            backgroundSpriteBatch.Begin();
-            map.DrawVisibleTiles(backgroundSpriteBatch, player.X);
-            backgroundSpriteBatch.End();
+            GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            foregroundSpriteBatch.Begin();
-            player.Draw(foregroundSpriteBatch);
-            foregroundSpriteBatch.End();
+            var viewMatrix = camera.GetViewMatrix();
+
+            levelSpriteBatch.Begin(transformMatrix: viewMatrix);
+            map.Draw(gameTime, levelSpriteBatch);
+            levelSpriteBatch.End();
+
             base.Draw(gameTime);
+        }
+
+        private void ProcessInputs() {
+            keyboardState = Keyboard.GetState();
+
+            if (keyboardState.IsKeyDown(Keys.Escape))
+                Exit();
+                
+            //Additional global keyboard inputs - global menu key, etc
+
         }
     }
 }

@@ -1,7 +1,10 @@
 ﻿PROGRESS LOG
+
+19.11.2016
+* Rewrite from scratch in progress, first new commit
  
 7.11.2016
-Rewriting from scratch because I'm stupid
+* Rewriting from scratch because I'm stupid
 
 1.11.2016
 + Player draft

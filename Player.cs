@@ -2,93 +2,218 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
-namespace Randio {
+namespace Randio_2 {
     class Player {
-        public int X { get; private set; }
-        public int Y { get; private set; }
-        public bool Grounded { get; private set; }
-        public bool InMotion { get; private set; }
 
-        public bool Direction { get; private set; } //true = Right, false = Left
-        public int Speed { get; private set; }
-        public int SpeedY { get; private set; }
-        public int DefaultSpeed { get; private set; }
+        public Vector2 Origin { get; private set; }
+
+        public Vector2 Position
+        {
+            get { return position; }
+        }
+        Vector2 position;
+
+        public Vector2 Velocity
+        {
+            get { return velocity; }
+        }
+        Vector2 velocity;
 
         public Texture2D Texture { get; private set; }
+        public int SafeBoundary { get; private set; } //how close to the border can player go before the camera starts moving;
 
-        private GraphicsDevice device;
+        public const int Width = 32;
+        public const int Height = 48;
 
-        public Player(GraphicsDevice graphicsDevice, int startingX, int startingY, bool direction, int defaultSpeed) {
-            device = graphicsDevice;
-            X = startingX;
-            Y = startingY;
-            Grounded = true; // = IsOnBlock();
-            InMotion = false;
-            Direction = direction;
-            DefaultSpeed = defaultSpeed;
-            Texture = Graphics.Entity.GeneratePlayer(graphicsDevice, 24, 24);
+        private Map map;
+
+        //rewrite this, remove what's unneccessary
+        //Also, will be generated, not hardcoded
+
+        // Constants for controling horizontal movement
+        private const float MoveAcceleration = 13000.0f;
+        private const float MaxMoveSpeed = 1750.0f;
+        private const float GroundDragFactor = 0.48f;
+        private const float AirDragFactor = 0.58f;
+
+        // Constants for controlling vertical movement
+        private const float MaxJumpTime = 0.35f;
+        private const float JumpLaunchVelocity = -3500.0f;
+        private const float GravityAcceleration = 3400.0f;
+        private const float MaxFallSpeed = 550.0f;
+        private const float JumpControlPower = 0.14f;
+
+        // Input configuration
+        private const float moveStickScale = 1.0f;
+        private const float accelerometerScale = 1.5f;
+        private const Keys jumpButton = Keys.W; //keys will be assigned randomly
+        private const Keys leftButton = Keys.A;
+        private const Keys rightButton = Keys.D;
+        private const Keys crouchButton = Keys.S;
+
+        //Current state
+        private float movement;
+        private float jumpTime;
+        private bool isOnGround;
+        private bool isJumping;
+        private bool wasJumping;
+
+        public Player(GraphicsDevice graphicsDevice, Map map, Vector2 position) {
+            this.map = map;
+            this.position = position;
+            Origin = position;
+            velocity = Vector2.Zero;
+            Texture = CreateTexture(graphicsDevice, Width, Height);
+            SafeBoundary = 80;
         }
 
-        public void SetMoveRight() {
-            if (Grounded) {
-                if (!Direction)
-                    Direction = true;
-                if (!InMotion) {
-                    Speed = DefaultSpeed;
-                    InMotion = true;
+        public void Reset() {
+            position = Origin;
+            //reset everything else too
+        }
+
+        public Rectangle BoundingRectangle
+        {
+            //come up with a way to get int for player's position on map (in px)
+            get
+            {
+                return new Rectangle((int)Position.X, (int)Position.Y, Width, Height); //this seems really stupid
+            }
+        }
+
+        public void Update(GameTime gameTime, KeyboardState keyboardState) {
+            GetInput(keyboardState);
+            ApplyPhysics(gameTime);
+
+            if (isOnGround) {
+                if (Math.Abs(Velocity.X) - 0.02f > 0) {
+                    //player is moving [GFX]
+                }
+                else {
+                    //player is still [GFX]
                 }
             }
+
+            //reset movement
+            movement = 0.0f;
+            isJumping = false;
         }
 
-        public void SetMoveLeft() {
-            if (Grounded) {
-                if (Direction)
-                    Direction = false;
-                if (!InMotion) {
-                    Speed = -1 * DefaultSpeed;
-                    InMotion = true;
+        private Texture2D CreateTexture(GraphicsDevice graphicsDevice, int width, int height) {
+            var texture = new Texture2D(graphicsDevice, width, height);
+
+            //Temporary placeholder code, will call texture generation here
+            GraphicsHelper.FillRectangle(texture, Color.Blue);
+            GraphicsHelper.OutlineRectangle(texture, Color.Black, 2);
+
+            return texture;
+        }
+
+        private void GetInput(KeyboardState keyboardState) {
+            movement = 0;
+            if (Math.Abs(movement) < 0.5f)
+                movement = 0.0f;
+
+            if (keyboardState.IsKeyDown(leftButton))
+                movement = -1.0f;
+            else if (keyboardState.IsKeyDown(rightButton))
+                movement = 1.0f;
+
+            isJumping = keyboardState.IsKeyDown(jumpButton);
+        }
+
+        private void ApplyPhysics(GameTime gameTime) {
+            float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            Vector2 lastPosition = position;
+
+            velocity.X += movement * MoveAcceleration * elapsed;
+            velocity.Y = MathHelper.Clamp(velocity.Y + GravityAcceleration * elapsed, -MaxFallSpeed, MaxFallSpeed);
+            velocity.Y = CheckJump(velocity.Y, gameTime);
+
+            if (isOnGround)
+                velocity.X *= GroundDragFactor;
+            else
+                velocity.X *= AirDragFactor;
+
+            velocity.X = MathHelper.Clamp(velocity.X, -MaxMoveSpeed, MaxMoveSpeed);
+
+            position += velocity * elapsed;
+            position.X = (float)Math.Round(position.X);
+            position.Y = (float)Math.Round(position.Y);
+
+            DoCollisions();
+
+            if (position.X == lastPosition.X)
+                velocity.X = 0;
+
+            if (position.Y == lastPosition.Y)
+                velocity.Y = 0;
+        }
+
+        private float CheckJump(float velocity, GameTime gameTime) {
+            if (isJumping) {
+                if ((!wasJumping && isOnGround) || jumpTime > 0.0f) {
+                    jumpTime += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    //player is jumping [GFX]
                 }
-            }
-        }
 
-        //Values subject to change according to rulesets
-        public void SetMoveUp() {
-            if (Grounded) {
-                SpeedY = DefaultSpeed / 2;
-                Grounded = false;
-            }
-        }
+                if (jumpTime > 0.0f && jumpTime < MaxJumpTime)
+                    velocity = JumpLaunchVelocity * (1.0f - (float)Math.Pow(jumpTime / MaxJumpTime, JumpControlPower));
 
-        //Values subject to change according to rulesets
-        public void Update() {
-            if (InMotion) {
-                if (Grounded)
-                    X += Speed;
                 else
-                    X += Speed / 2;
-
-                if (Speed > 0)
-                    Speed -= 1;
-
-                if (Speed < 0)
-                    Speed += 1;
+                    jumpTime = 0.0f;
             }
+            else
+                jumpTime = 0.0f;
 
-            if (!Grounded) {
-                Y += SpeedY;
-                SpeedY -= 1;
-            }
+            wasJumping = isJumping;
 
-            if (Speed == 0)
-                InMotion = false;
-
-            //if (IsOnBlock()) Grounded = true; SpeedY = 0;
+            return velocity;
         }
 
-        //Maybe hold separate widht and height values for player?
-        public void Draw(SpriteBatch spriteBatch) {
-            spriteBatch.Draw(Texture, new Rectangle(X, Y, Texture.Width, Texture.Height), Color.White);
+        private void DoCollisions() {
+            Rectangle bounds = BoundingRectangle;
+            Tile tile = map.GetTileForX((int)position.X);
+            Vector2 playerTilePos = map.GlobalToTileCoordinates(position);
+            int wblocks = tile.Coords.Width / Block.Width;
+            int hblocks = tile.Coords.Height / Block.Height;
+
+            //Math.Min(sth, block count in that dimension-1) limits the indexes for searching adjacent blocks. It player gets out of bounds, he'll be considered as being on the last tile in that dimension
+            int leftBlockX = Math.Min((int)Math.Ceiling(playerTilePos.X / Block.Width), wblocks-1); //get the X coordinate for neighbouring blocks on the left
+            int rightBlockX = Math.Min(leftBlockX + (int)Math.Floor((double)Width / Block.Width), wblocks-1);
+
+            int topBlockY = Math.Min((int)Math.Ceiling(playerTilePos.Y / Block.Height), hblocks-1);
+            int bottomBlockY = Math.Min(topBlockY + (int)Math.Floor((double)Height / Block.Height), hblocks-1);
+
+            for (int x = leftBlockX; x <= rightBlockX; ++x) {
+                if (tile.Blocks[x, topBlockY] != null) {
+                    //top collision
+                }
+                if (tile.Blocks[x, bottomBlockY] != null) {
+                    //bottom colision
+                }
+            }
+
+            for (int y = topBlockY; y <= bottomBlockY; ++y) {
+                if (tile.Blocks[leftBlockX, y] != null) {
+                    //left collision
+                }
+                if (tile.Blocks[rightBlockX, y] != null) {
+                    //right collision
+                }
+            }
+
+        }
+
+        public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
+            SpriteEffects effect = SpriteEffects.None;
+            if (Velocity.X > 0)
+                effect = SpriteEffects.FlipHorizontally;
+
+            spriteBatch.Draw(Texture, position, BoundingRectangle, Color.White, 0.0f, Vector2.Zero, 1.0f, effect, 0.0f);
         }
     }
 }
