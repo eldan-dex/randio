@@ -7,7 +7,7 @@ namespace Randio_2 {
     class GraphicsHelper {
         public static void FillRectangle(Texture2D texture, Color fill) {
             Color[] color = new Color[texture.Width * texture.Height];
-            texture.GetData(color);
+            texture.GetData(color); //AAAAAAAA
 
             for (int i = 0; i < texture.Width * texture.Height; ++i)
                 color[i] = fill;

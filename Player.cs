@@ -25,7 +25,7 @@ namespace Randio_2 {
         public int SafeBoundary { get; private set; } //how close to the border can player go before the camera starts moving;
 
         public const int Width = 32;
-        public const int Height = 48;
+        public const int Height = 32;
 
         private Map map;
 
@@ -59,6 +59,7 @@ namespace Randio_2 {
         private bool isOnGround;
         private bool isJumping;
         private bool wasJumping;
+        private float oldBottom;
 
         public Player(GraphicsDevice graphicsDevice, Map map, Vector2 position) {
             this.map = map;
@@ -76,7 +77,6 @@ namespace Randio_2 {
 
         public Rectangle BoundingRectangle
         {
-            //come up with a way to get int for player's position on map (in px)
             get
             {
                 return new Rectangle((int)Position.X, (int)Position.Y, Width, Height); //this seems really stupid
@@ -85,16 +85,22 @@ namespace Randio_2 {
 
         public void Update(GameTime gameTime, KeyboardState keyboardState) {
             GetInput(keyboardState);
-            ApplyPhysics(gameTime);
 
-            if (isOnGround) {
-                if (Math.Abs(Velocity.X) - 0.02f > 0) {
+
+            if (isOnGround)
+            {
+                if (Math.Abs(Velocity.X) - 0.02f > 0)
+                {
                     //player is moving [GFX]
                 }
-                else {
+                else
+                {
                     //player is still [GFX]
                 }
             }
+
+            ApplyPhysics(gameTime);
+
 
             //reset movement
             movement = 0.0f;
@@ -106,7 +112,7 @@ namespace Randio_2 {
 
             //Temporary placeholder code, will call texture generation here
             GraphicsHelper.FillRectangle(texture, Color.Blue);
-            GraphicsHelper.OutlineRectangle(texture, Color.Black, 2);
+            GraphicsHelper.OutlineRectangle(texture, Color.Green, 2);
 
             return texture;
         }
@@ -143,6 +149,10 @@ namespace Randio_2 {
             position += velocity * elapsed;
             position.X = (float)Math.Round(position.X);
             position.Y = (float)Math.Round(position.Y);
+
+            //Limit the player to stay on the map horizontally
+            if (position.X <= 0)
+                position.X = 0;
 
             DoCollisions();
 
@@ -182,30 +192,42 @@ namespace Randio_2 {
             int hblocks = tile.Coords.Height / Block.Height;
 
             //Math.Min(sth, block count in that dimension-1) limits the indexes for searching adjacent blocks. It player gets out of bounds, he'll be considered as being on the last tile in that dimension
-            int leftBlockX = Math.Min((int)Math.Ceiling(playerTilePos.X / Block.Width), wblocks-1); //get the X coordinate for neighbouring blocks on the left
+            int leftBlockX = Math.Min((int)Math.Floor(playerTilePos.X / Block.Width), wblocks-1); //get the X coordinate for neighbouring blocks on the left
             int rightBlockX = Math.Min(leftBlockX + (int)Math.Floor((double)Width / Block.Width), wblocks-1);
 
-            int topBlockY = Math.Min((int)Math.Ceiling(playerTilePos.Y / Block.Height), hblocks-1);
+            int topBlockY = Math.Max(Math.Min((int)Math.Floor(playerTilePos.Y / Block.Height), hblocks - 1), 0); //Math.Max so that we don't check for blocks above the top edge (there are none)
             int bottomBlockY = Math.Min(topBlockY + (int)Math.Floor((double)Height / Block.Height), hblocks-1);
 
-            for (int x = leftBlockX; x <= rightBlockX; ++x) {
-                if (tile.Blocks[x, topBlockY] != null) {
-                    //top collision
-                }
-                if (tile.Blocks[x, bottomBlockY] != null) {
-                    //bottom colision
-                }
-            }
 
+            //THIS IS STILL BROKEN
             for (int y = topBlockY; y <= bottomBlockY; ++y) {
-                if (tile.Blocks[leftBlockX, y] != null) {
-                    //left collision
-                }
-                if (tile.Blocks[rightBlockX, y] != null) {
-                    //right collision
+                for (int x = leftBlockX; x <= rightBlockX; ++x) {
+                    if (tile.Blocks[x, y] != null) {
+                        Rectangle otherElement = new Rectangle(x * Block.Width, y * Block.Height, Block.Width, Block.Height);
+
+                        Vector2 depth = GeometryHelper.GetIntersectionDepth(bounds, otherElement);
+
+                        //We hit a box underneath us, we're grounded
+                        if ((bounds.Top < otherElement.Top) && (bounds.Bottom > otherElement.Top)) {
+                            isOnGround = true;
+                            position = new Vector2(Position.X, Position.Y + depth.Y);
+                            bounds = BoundingRectangle;
+                        }
+
+                        //We hit a box above us, we're jumping
+                        /*else if ((bounds.Bottom > otherElement.Bottom) && (bounds.Top < otherElement.Bottom)) {
+                            position = new Vector2(Position.X, Position.Y + depth.Y);
+                            jumpTime = MaxJumpTime; //we reached the apex of our jump
+                        }*/
+                        else {
+                            position = new Vector2(Position.X + depth.X, Position.Y);
+                            bounds = BoundingRectangle;
+                        }
+                    }
                 }
             }
 
+            oldBottom = bounds.Bottom;
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {

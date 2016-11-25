@@ -18,6 +18,9 @@ namespace Randio_2 {
         public const int WIDTH = 1280;
         public const int HEIGHT = 736;
 
+        private bool nextFrame = false;
+        private bool pEnabled = false;
+
         public Game() {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
@@ -70,7 +73,11 @@ namespace Randio_2 {
         protected override void Update(GameTime gameTime) {
             ProcessInputs();
 
-            map.Update(gameTime, keyboardState);
+            //For step-by-step physics
+            if (nextFrame) {
+                map.Update(gameTime, keyboardState);
+                nextFrame = false;
+            }
 
             if (map.ReachedExit)
                 Exit(); //temporary. Normally this would reinitialize everything and create a new level
@@ -99,6 +106,15 @@ namespace Randio_2 {
 
             if (keyboardState.IsKeyDown(Keys.Escape))
                 Exit();
+
+            //Step-by-step physics for debugging
+            if (keyboardState.IsKeyDown(Keys.P) && pEnabled) {
+                pEnabled = false;
+                nextFrame = true;
+            }
+            else
+                pEnabled = true;
+            
                 
             //Additional global keyboard inputs - global menu key, etc
 

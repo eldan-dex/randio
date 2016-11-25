@@ -48,14 +48,14 @@ namespace Randio_2 {
             TileTexture = new Texture2D(graphicsDevice, Coords.Width, Coords.Height);
 
             GraphicsHelper.FillRectangle(TileTexture, Color.Gray);
-            GraphicsHelper.OutlineRectangle(TileTexture, Color.Black, 3);
+            //GraphicsHelper.OutlineRectangle(TileTexture, Color.Black, 3);
         }
 
         private void CreateBlockTexture(GraphicsDevice graphicsDevice) {
             BlockTexture = new Texture2D(graphicsDevice, Block.Width, Block.Height);
 
-            GraphicsHelper.FillRectangle(TileTexture, Color.LightYellow);
-            GraphicsHelper.OutlineRectangle(TileTexture, Color.Black, 2);
+            GraphicsHelper.FillRectangle(BlockTexture, Color.Red);
+            GraphicsHelper.OutlineRectangle(BlockTexture, Color.Black, 2);
         }
 
         private void CreateEntities() {
@@ -66,22 +66,23 @@ namespace Randio_2 {
 
         private void CreateBlocks() {
             Blocks = new Block[wblocks, hblocks];
-            Blocks[3, 3] = new Block(BlockTexture);
 
             Random rnd = AlgorithmHelper.GetNewRandom();
 
             //Temp code, replace with something that makes sense
-            /*for (int w = 0; w < wblocks; ++w) {
+            for (int w = 0; w < wblocks; ++w) {
                 for (int h = 0; h < hblocks; ++h) {
-                    int tmp = rnd.Next(0, 6);
-                    if (tmp > 3)
+                    if (w < 2 && h < 2)
+                        continue;
+                    int tmp = rnd.Next(0, 10);
+                    if (tmp > 3 && tmp < 6)
                         Blocks[w, h] = new Block(BlockTexture);
                     if (tmp == 1 && w < wblocks - 1)
                         Blocks[w + 1, h] = new Block(BlockTexture);
                     if (tmp == 5 && h < hblocks - 1)
                         Blocks[w, h + 1] = new Block(BlockTexture);
                 }
-            }*/
+            }
 
         }
 
@@ -95,10 +96,6 @@ namespace Randio_2 {
             DrawBlocks(spriteBatch);
         }
 
-        //even if I draw just a single 32*32 block, the whole screen gets covered with its texture.
-        //things it's not caused by: block generation. texture generation. block drawing. camera.
-        //things it's caused by: yetti.
-
         private void DrawBlocks(SpriteBatch spriteBatch) {
             //Draw blocks
             for (int y = 0; y < Coords.Height/Block.Height; ++y) {
@@ -106,14 +103,17 @@ namespace Randio_2 {
                     // If there is a visible tile in that position
                     Block block = Blocks[x, y];
                     if (block != null) {
+                        int nX = (int)(Coords.X + x * Block.Size.X);
+                        int nY = (int)(Coords.Y + y * Block.Size.Y);
                         // Draw it in screen space.
-                        var position = new Vector2(Coords.X + x * Block.Size.X, Coords.Y + y * Block.Size.Y);
                         //will probably be edited to reflect global position of tile (render to RenderTarget and then add the RenderTarget to global render?)
-                        spriteBatch.Draw(block.Texture, new Rectangle((int)position.X, (int)position.Y, block.Texture.Width, block.Texture.Height), Color.White); //or use this.BlockTexture?
+                        spriteBatch.Draw(block.Texture, new Rectangle(nX, nY, Block.Width, Block.Height), Color.White); //or use this.BlockTexture?
                     }
                 }
             }
         }
+
+
 
     }
 }
