@@ -24,6 +24,14 @@ namespace Randio_2 {
         public Texture2D Texture { get; private set; }
         public int SafeBoundary { get; private set; } //how close to the border can player go before the camera starts moving;
 
+        public Rectangle BoundingRectangle
+        {
+            get
+            {
+                return new Rectangle((int)Position.X, (int)Position.Y, Width, Height);
+            }
+        }
+
         public const int Width = 32;
         public const int Height = 32;
 
@@ -75,14 +83,6 @@ namespace Randio_2 {
             //reset everything else too
         }
 
-        public Rectangle BoundingRectangle
-        {
-            get
-            {
-                return new Rectangle((int)Position.X, (int)Position.Y, Width, Height); //this seems really stupid
-            }
-        }
-
         public void Update(GameTime gameTime, KeyboardState keyboardState) {
             GetInput(keyboardState);
 
@@ -101,10 +101,17 @@ namespace Randio_2 {
 
             ApplyPhysics(gameTime);
 
-
             //reset movement
             movement = 0.0f;
             isJumping = false;
+        }
+
+        public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
+            SpriteEffects effect = SpriteEffects.None;
+            if (Velocity.X > 0)
+                effect = SpriteEffects.FlipHorizontally;
+
+            spriteBatch.Draw(Texture, position, null, Color.White, 0.0f, Vector2.Zero, 1.0f, effect, 0.0f);
         }
 
         private Texture2D CreateTexture(GraphicsDevice graphicsDevice, int width, int height) {
@@ -130,6 +137,7 @@ namespace Randio_2 {
             isJumping = keyboardState.IsKeyDown(jumpButton);
         }
 
+        #region Physics stuff (ApplyPhysics, CheckJump, DoCollisionsXY)
         private void ApplyPhysics(GameTime gameTime) {
             float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -146,15 +154,23 @@ namespace Randio_2 {
 
             velocity.X = MathHelper.Clamp(velocity.X, -MaxMoveSpeed, MaxMoveSpeed);
 
-            position += velocity * elapsed;
-            position.X = (float)Math.Round(position.X);
-            position.Y = (float)Math.Round(position.Y);
+            //Move along the X axis
+            position.X += velocity.X * elapsed;
+            position.X = (float)Math.Round(position.X);        
 
             //Limit the player to stay on the map horizontally
             if (position.X <= 0)
                 position.X = 0;
 
-            DoCollisions();
+            //X axis collisions
+            DoCollisionsXY(true);
+
+            //Move along the Y axis
+            position.Y += velocity.Y * elapsed;
+            position.Y = (float)Math.Round(position.Y);
+
+            //Y axis collisions
+            DoCollisionsXY(false);
 
             if (position.X == lastPosition.X)
                 velocity.X = 0;
@@ -184,7 +200,7 @@ namespace Randio_2 {
             return velocity;
         }
 
-        private void DoCollisions() {
+        private void DoCollisionsXY(bool doCollisionX) {
             Rectangle bounds = BoundingRectangle;
             Tile tile = map.GetTileForX((int)position.X);
             Vector2 playerTilePos = map.GlobalToTileCoordinates(position);
@@ -198,30 +214,40 @@ namespace Randio_2 {
             int topBlockY = Math.Max(Math.Min((int)Math.Floor(playerTilePos.Y / Block.Height), hblocks - 1), 0); //Math.Max so that we don't check for blocks above the top edge (there are none)
             int bottomBlockY = Math.Min(topBlockY + (int)Math.Floor((double)Height / Block.Height), hblocks-1);
 
+            //We don't believe we're grounded until we are proved wrong, prevents doublejumping
+            isOnGround = false;
 
-            //THIS IS STILL BROKEN
             for (int y = topBlockY; y <= bottomBlockY; ++y) {
                 for (int x = leftBlockX; x <= rightBlockX; ++x) {
                     if (tile.Blocks[x, y] != null) {
                         Rectangle otherElement = new Rectangle(x * Block.Width, y * Block.Height, Block.Width, Block.Height);
 
                         Vector2 depth = GeometryHelper.GetIntersectionDepth(bounds, otherElement);
+                        if (depth != Vector2.Zero) {
 
-                        //We hit a box underneath us, we're grounded
-                        if ((bounds.Top < otherElement.Top) && (bounds.Bottom > otherElement.Top)) {
-                            isOnGround = true;
-                            position = new Vector2(Position.X, Position.Y + depth.Y);
-                            bounds = BoundingRectangle;
-                        }
+                            //In the first call, we check for X-axis collisions
+                            if (doCollisionX) {
+                                position = new Vector2(Position.X + depth.X, Position.Y);
+                                bounds = BoundingRectangle;
+                            }
 
-                        //We hit a box above us, we're jumping
-                        /*else if ((bounds.Bottom > otherElement.Bottom) && (bounds.Top < otherElement.Bottom)) {
-                            position = new Vector2(Position.X, Position.Y + depth.Y);
-                            jumpTime = MaxJumpTime; //we reached the apex of our jump
-                        }*/
-                        else {
-                            position = new Vector2(Position.X + depth.X, Position.Y);
-                            bounds = BoundingRectangle;
+                            //In the second call, we do the Y-axis
+                            else {
+                                //We hit a box underneath us, we're grounded
+                                if ((bounds.Top < otherElement.Top) && (bounds.Bottom > otherElement.Top)) {
+                                    isOnGround = true;
+                                    position = new Vector2(Position.X, Position.Y + depth.Y);
+                                    bounds = BoundingRectangle;
+                                }
+
+                                //We hit a box above us, we're jumping
+                                else if ((bounds.Bottom > otherElement.Bottom) && (bounds.Top < otherElement.Bottom)) {
+                                    position = new Vector2(Position.X, Position.Y + depth.Y);
+                                    bounds = BoundingRectangle;
+                                    jumpTime = MaxJumpTime; //we reached the apex of our jump                        
+                                }
+                            }
+
                         }
                     }
                 }
@@ -229,13 +255,6 @@ namespace Randio_2 {
 
             oldBottom = bounds.Bottom;
         }
-
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
-            SpriteEffects effect = SpriteEffects.None;
-            if (Velocity.X > 0)
-                effect = SpriteEffects.FlipHorizontally;
-
-            spriteBatch.Draw(Texture, position, BoundingRectangle, Color.White, 0.0f, Vector2.Zero, 1.0f, effect, 0.0f);
-        }
+#endregion
     }
 }

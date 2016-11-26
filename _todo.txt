@@ -1,7 +1,10 @@
-﻿ISSUES:
-- player texture is not moving along with player (?!)
-- block texture is drawn across the whole screen (?!)
+﻿TODO:
+- Camera movement
 
+ISSUES:
+- NONE! (yet)
 
 IDEAS:
 - Tile blending - for each tile, blend it's edges into surrounding tiles' textures -> keeps tile textures spearated, but blended
+- Doublejumping?
+- Consider reworking collision detection to support non-rectangular object shapes

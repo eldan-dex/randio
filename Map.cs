@@ -23,6 +23,63 @@ namespace Randio_2 {
             CreateTiles(graphicsDevice);
         }
 
+        public void Update(GameTime gameTime, KeyboardState keyboardState) {
+            Player.Update(gameTime, keyboardState);
+            UpdateEntities(gameTime);
+
+            if (CheckOutOfMap((int)Player.Position.Y) == -1) {
+                //player fell down, reset player
+                Player.Reset();
+                CameraToPlayer();
+            }
+        }
+
+        public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
+            foreach (Tile t in GetVisibleTiles())
+                t.Draw(spriteBatch);
+
+            Player.Draw(gameTime, spriteBatch);
+
+            //draw entities?
+        }
+
+        //Public helper methods
+
+        public int CheckOutOfMap(int y) {
+            if (y < 0) //y is above the map
+                return 1;
+
+            else if (y > Height) //y is below the map
+                return -1;
+
+            else return 0; //y is on the map
+        }
+
+        //returns a tile which contains the given X coordinate
+        public Tile GetTileForX(int x) {
+            foreach (Tile t in tiles) {
+                if (t.Coords.Left <= x && t.Coords.Right >= x)
+                    return t;
+            }
+            return null;
+        }
+
+        //translate global position into an offset from the left boundary of the parent tile
+        //untested, but should work
+        public Vector2 GlobalToTileCoordinates(Vector2 global) {
+            int globalOffset = 0;
+            foreach (Tile t in tiles) {
+                if (t.Coords.Left <= (int)global.X && t.Coords.Right >= (int)global.X)
+                    break;
+                else
+                    globalOffset += t.Coords.Width;
+            }
+            return new Vector2(global.X - globalOffset, global.Y);
+        }
+
+
+        //Private helper methods
+
         private void CreatePlayer(GraphicsDevice graphicsDevice) {
             Player = new Player(graphicsDevice, this, Vector2.Zero); //generate position
             CameraToPlayer();
@@ -63,41 +120,13 @@ namespace Randio_2 {
             }
         }
 
-        public int CheckOutOfMap(int y) {
-            if (y < 0) //y is above the map
-                return 1;
-
-            else if (y > Height) //y is below the map
-                return -1;
-
-            else return 0; //y is on the map
-        }
-
-        public void Update(GameTime gameTime, KeyboardState keyboardState) {
-            Player.Update(gameTime, keyboardState);
-            UpdateEntities(gameTime);
-
-            if (CheckOutOfMap((int)Player.Position.Y) == -1) {
-                //player fell down, reset player
-                Player.Reset();
-                CameraToPlayer();
-            }
-        }
-
         private void UpdateEntities(GameTime gameTime) {
             var visibleTiles = GetVisibleTiles();
             foreach (Tile tile in visibleTiles)
                 tile.Update(gameTime);
         }
 
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
-            foreach (Tile t in GetVisibleTiles())
-                t.Draw(spriteBatch);
 
-            Player.Draw(gameTime, spriteBatch);
-
-            //draw entities?
-        }
 
         private Tile[] GetVisibleTiles() {
             List<Tile> visibleTiles = new List<Tile>();
@@ -126,28 +155,6 @@ namespace Randio_2 {
             }
 
             return visibleTiles.ToArray();
-        }
-
-        //returns a tile which contains the given X coordinate
-        public Tile GetTileForX(int x) {
-            foreach (Tile t in tiles) {
-                if (t.Coords.Left <= x && t.Coords.Right >= x)
-                    return t;
-            }
-            return null;
-        }
-
-        //translate global position into an offset from the left boundary of the parent tile
-        //untested, but should work
-        public Vector2 GlobalToTileCoordinates(Vector2 global) {
-            int globalOffset = 0;
-            foreach (Tile t in tiles) {
-                if (t.Coords.Left <= (int)global.X && t.Coords.Right >= (int)global.X)
-                    break;
-                else
-                    globalOffset += t.Coords.Width;
-            }
-            return new Vector2(global.X - globalOffset, global.Y);
         }
     }
 }

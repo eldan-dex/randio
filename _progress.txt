@@ -1,5 +1,11 @@
 ﻿PROGRESS LOG
 
+26.11.2016
+* Rewrite finished
++ Player physics
++ Player collisions
++ Basic block generation
+
 19.11.2016
 * Rewrite from scratch in progress, first new commit
  
