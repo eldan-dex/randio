@@ -1,5 +1,11 @@
 ﻿PROGRESS LOG
 
+27.11.2016
++ Debug interface (step-by-step physics, manual camera movements, OSD)
++ Next tile appears when palyer is on the end of the previous one
++ Camera follows player
++ Camera centers on player upon respawn
+
 26.11.2016
 * Rewrite finished
 + Player physics

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Randio_2 {
@@ -21,6 +18,17 @@ namespace Randio_2 {
         public float Rotation { get; set; }
         public float Zoom { get; set; }
         public Vector2 Origin { get; set; }
+
+        public void CenterXTo(Rectangle rect) {
+            float selfX = Position.X;
+            float rectCenter = rect.X + (rect.Width / 2);
+            selfX = rectCenter - (_viewport.Width / 2);
+
+            if (selfX < 0)
+                selfX = 0;
+
+            Position = new Vector2(selfX, Position.Y);
+        }
 
         public Matrix GetViewMatrix() {
             return

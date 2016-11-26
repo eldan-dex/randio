@@ -48,14 +48,14 @@ namespace Randio_2 {
             TileTexture = new Texture2D(graphicsDevice, Coords.Width, Coords.Height);
 
             GraphicsHelper.FillRectangle(TileTexture, Color.Gray);
-            //GraphicsHelper.OutlineRectangle(TileTexture, Color.Black, 3);
+            GraphicsHelper.OutlineRectangleSide(TileTexture, Color.Black, 4, true, false, true, false);
         }
 
         private void CreateBlockTexture(GraphicsDevice graphicsDevice) {
             BlockTexture = new Texture2D(graphicsDevice, Block.Width, Block.Height);
 
+            //Fill only, outlining is done based on connected neighbours
             GraphicsHelper.FillRectangle(BlockTexture, Color.Red);
-            GraphicsHelper.OutlineRectangle(BlockTexture, Color.Black, 2);
         }
 
         private void CreateEntities() {
@@ -66,24 +66,73 @@ namespace Randio_2 {
 
         private void CreateBlocks() {
             Blocks = new Block[wblocks, hblocks];
+            bool[,] blockGrid = new bool[wblocks, hblocks];
 
             Random rnd = AlgorithmHelper.GetNewRandom();
 
-            //Temp code, replace with something that makes sense
+            //Prepare grid (currently a random dumb layout, replace with a proper algorithm)
             for (int w = 0; w < wblocks; ++w) {
                 for (int h = 0; h < hblocks; ++h) {
-                    if (w < 2 && h < 2)
+                    blockGrid[w, h] = false;
+
+                    if (w < 3 || w > wblocks - 3) {
+                        blockGrid[w, 20] = true;
                         continue;
-                    int tmp = rnd.Next(0, 10);
+                    }
+
+                    int tmp = rnd.Next(0, 12);
                     if (tmp > 3 && tmp < 6)
-                        Blocks[w, h] = new Block(BlockTexture);
+                        blockGrid[w, h] = true;
                     if (tmp == 1 && w < wblocks - 1)
-                        Blocks[w + 1, h] = new Block(BlockTexture);
+                        blockGrid[w + 1, h] = true;
                     if (tmp == 5 && h < hblocks - 1)
-                        Blocks[w, h + 1] = new Block(BlockTexture);
+                        blockGrid[w, h + 1] = true;
                 }
             }
 
+            //Generate textures according to the grid
+            bool isAbove;
+            bool isLeft;
+            bool isRight;
+            bool isBelow;
+
+            for (int w = 0; w < wblocks; ++w) {
+                for (int h = 0; h < hblocks; ++h) {
+                    if (blockGrid[w, h]) {
+                        //isAbove
+                        if (h > 0 && blockGrid[w, h - 1])
+                            isAbove = true;
+                        else
+                            isAbove = false;
+
+                        //isBelow
+                        if (h < hblocks - 1 && blockGrid[w, h + 1])
+                            isBelow = true;
+                        else
+                            isBelow = false;
+
+                        //isLeft
+                        if (w > 0 && blockGrid[w - 1, h])
+                            isLeft = true;
+                        else
+                            isLeft = false;
+
+                        //isRight
+                        if (w < wblocks - 1 && blockGrid[w + 1, h])
+                            isRight = true;
+                        else
+                            isRight = false;
+
+
+                        //Assign texture accordingly  
+                        Texture2D texture = BlockTexture;
+                        GraphicsHelper.OutlineRectangleSide(texture, Color.Black, 2, isLeft, isAbove, isRight, isBelow);
+
+                        Blocks[w, h] = new Block(texture);
+
+                    }
+                }
+            }
         }
 
         public void Update(GameTime gameTime) {

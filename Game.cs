@@ -9,6 +9,7 @@ namespace Randio_2 {
     public class Game : Microsoft.Xna.Framework.Game {
         GraphicsDeviceManager graphics;
         SpriteBatch levelSpriteBatch;
+        SpriteBatch osdSpriteBatch;
 
         private Map map;
         private Camera camera;
@@ -18,8 +19,14 @@ namespace Randio_2 {
         public const int WIDTH = 1280;
         public const int HEIGHT = 736;
 
+
+        private bool debugEnabled = false;
+        private bool oEnabled = false; //for the O button
+
         private bool nextFrame = false;
-        private bool pEnabled = false;
+        private bool pEnabled = false; //for the P button
+
+        SpriteFont debugFont;
 
         public Game() {
             graphics = new GraphicsDeviceManager(this);
@@ -44,7 +51,7 @@ namespace Randio_2 {
         }
 
         private void CreateMap() {
-            map = new Map(GraphicsDevice, 12800, 736); //parameters
+            map = new Map(GraphicsDevice, camera, 12800, 736); //parameters
         }
 
         /// <summary>
@@ -54,7 +61,8 @@ namespace Randio_2 {
         protected override void LoadContent() {
             // Create a new SpriteBatch, which can be used to draw textures.
             levelSpriteBatch = new SpriteBatch(GraphicsDevice);
-
+            osdSpriteBatch = new SpriteBatch(GraphicsDevice);
+            debugFont = Content.Load<SpriteFont>("debug");
         }
 
         /// <summary>
@@ -74,7 +82,7 @@ namespace Randio_2 {
             ProcessInputs();
 
             //For step-by-step physics
-            if (nextFrame) {
+            if ((debugEnabled && nextFrame) || !debugEnabled) {
                 map.Update(gameTime, keyboardState);
                 nextFrame = false;
             }
@@ -98,6 +106,16 @@ namespace Randio_2 {
             map.Draw(gameTime, levelSpriteBatch);
             levelSpriteBatch.End();
 
+            if (debugEnabled) {
+                osdSpriteBatch.Begin();
+
+                //Draw OSD
+                osdSpriteBatch.DrawString(debugFont, "DEBUG ENABLED", new Vector2(10, 10), Color.Black);
+                osdSpriteBatch.DrawString(debugFont, "Player X: " + map.Player.Position.X + "     Player Y: " + map.Player.Position.Y + "\nCurrentTile: " + map.Player.currentTile, new Vector2(10, 30), Color.Black);
+
+                osdSpriteBatch.End();
+            }
+
             base.Draw(gameTime);
         }
 
@@ -107,15 +125,33 @@ namespace Randio_2 {
             if (keyboardState.IsKeyDown(Keys.Escape))
                 Exit();
 
-            //Step-by-step physics for debugging
-            if (keyboardState.IsKeyDown(Keys.P) && pEnabled) {
-                pEnabled = false;
-                nextFrame = true;
+            //"O" key enables/disables debugging features
+            if (keyboardState.IsKeyDown(Keys.O) && oEnabled) {
+                oEnabled = false;
+                debugEnabled = !debugEnabled;
             }
             else
-                pEnabled = true;
+                oEnabled = true;
             
-                
+            //Enter the land of debugging
+            if (debugEnabled) {
+                //"P" key for step-by-step physics
+                if (keyboardState.IsKeyDown(Keys.P) && pEnabled) {
+                    pEnabled = false;
+                    nextFrame = true;
+                }
+                else
+                    pEnabled = true;
+
+                //Arrow keys for manual camera controls
+                if (keyboardState.IsKeyDown(Keys.Right))
+                    camera.Position += new Vector2(5f, 0);
+
+                else if (keyboardState.IsKeyDown(Keys.Left))
+                    camera.Position -= new Vector2(5f, 0);
+            }
+
+
             //Additional global keyboard inputs - global menu key, etc
 
         }

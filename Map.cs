@@ -15,8 +15,10 @@ namespace Randio_2 {
         public int Height { get; private set; }
 
         private Vector2 start; //useful?
+        private Camera camera;
 
-        public Map(GraphicsDevice graphicsDevice, int width, int height) {
+        public Map(GraphicsDevice graphicsDevice, Camera camera, int width, int height) {
+            this.camera = camera;
             Width = width;
             Height = height;
             CreatePlayer(graphicsDevice);
@@ -26,6 +28,8 @@ namespace Randio_2 {
         public void Update(GameTime gameTime, KeyboardState keyboardState) {
             Player.Update(gameTime, keyboardState);
             UpdateEntities(gameTime);
+
+            MoveCamera();
 
             if (CheckOutOfMap((int)Player.Position.Y) == -1) {
                 //player fell down, reset player
@@ -64,6 +68,22 @@ namespace Randio_2 {
             return null;
         }
 
+        //returns the index of the current tile
+        public int GetTileIndexForX(int x) {
+            for (int i = 0; i < tiles.Count; ++i) {
+                if (tiles[i].Coords.Left <= x && tiles[i].Coords.Right >= x)
+                    return i;
+            }
+            return -1;
+        }
+
+        public Tile GetTileByIndex(int index) {
+            if (index < tiles.Count)
+                return tiles[index];
+            else
+                return null;
+        }
+
         //translate global position into an offset from the left boundary of the parent tile
         //untested, but should work
         public Vector2 GlobalToTileCoordinates(Vector2 global) {
@@ -86,7 +106,23 @@ namespace Randio_2 {
         }
 
         private void CameraToPlayer() {
-            //TBI: set camera so that is centered on the player
+            camera.CenterXTo(new Rectangle((int)Player.Position.X, (int)Player.Position.Y, Player.Width, Player.Height));
+        }
+
+        private void MoveCamera() {
+            float leftEdge = camera.Position.X;
+            float rightEdge = leftEdge + Game.WIDTH;
+
+            if (Player.Position.X - leftEdge < Player.SafeMargin) {
+                //move camera left if possible
+                if (camera.Position.X > 5)
+                    camera.Position -= new Vector2(5, 0);
+            }
+            else if (rightEdge - (Player.Position.X + Player.Width) < Player.SafeMargin) {
+                //move camera right is possible
+                if (camera.Position.X < Width)
+                    camera.Position += new Vector2(5, 0);
+            }
         }
 
         private void CreateTiles(GraphicsDevice graphicsDevice) {
@@ -102,8 +138,8 @@ namespace Randio_2 {
             int totalWidth = 0;
 
             while (totalWidth < Width) {
-                //Generate a random width for the next tile
-                int newWidth = rnd.Next(minWidth, maxWidth + 1);
+                //Generate a random width for the next tile, but keep it divisible by Block.Width
+                int newWidth = rnd.Next(minWidth / Block.Width, maxWidth / Block.Width) * Block.Width;
 
                 //If last tile wouldn't be able to fit, extend this one instead
                 int testWidth = totalWidth + newWidth;
@@ -127,13 +163,12 @@ namespace Randio_2 {
         }
 
 
-
         private Tile[] GetVisibleTiles() {
             List<Tile> visibleTiles = new List<Tile>();
 
             var pX = Player.Position.X;
-            var leftBound = pX - Game.WIDTH + Player.SafeBoundary;
-            var rightBound = pX + Player.Width + Game.WIDTH - Player.SafeBoundary;
+            var leftBound = pX - Game.WIDTH + Player.SafeMargin;
+            var rightBound = pX + Player.Width + Game.WIDTH - Player.SafeMargin;
 
             //Bounds cannot be outside the map
             if (leftBound < 0)
@@ -141,18 +176,16 @@ namespace Randio_2 {
             if (rightBound > Width)
                 rightBound = Width;
 
+            //Add unique tiles on the right and left end of screen (implying player is centered)
+            visibleTiles.Add(GetTileForX((int)leftBound));
 
-            int currentX = (int)leftBound;
-            while (currentX <= rightBound) {
-                var tile = GetTileForX(currentX);
-                if (tile != null) {
-                    currentX += tile.Coords.Width;
-                    visibleTiles.Add(tile);
-                }
-                else { //if no tile was found, something is wrong.
-                    currentX += Width / Block.Width / 10; //Minimal tile width
-                }
-            }
+            Tile current = GetTileForX((int)pX);
+            if (!visibleTiles.Contains(current))
+                visibleTiles.Add(current);
+
+            Tile other = GetTileForX((int)rightBound);
+            if (!visibleTiles.Contains(other))
+                visibleTiles.Add(other);
 
             return visibleTiles.ToArray();
         }

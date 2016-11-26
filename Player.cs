@@ -9,6 +9,7 @@ namespace Randio_2 {
 
         public Vector2 Origin { get; private set; }
 
+        //this is the GLOBAL position (relative to the entire map)
         public Vector2 Position
         {
             get { return position; }
@@ -22,13 +23,16 @@ namespace Randio_2 {
         Vector2 velocity;
 
         public Texture2D Texture { get; private set; }
-        public int SafeBoundary { get; private set; } //how close to the border can player go before the camera starts moving;
+        public int SafeMargin { get; private set; } //how close to the border can player go before the camera starts moving;
 
+        //this is the LOCAL bounding rectangle (relative to the current tile)
         public Rectangle BoundingRectangle
         {
             get
             {
-                return new Rectangle((int)Position.X, (int)Position.Y, Width, Height);
+                Tile t = map.GetTileByIndex(currentTile);
+                float newX = Position.X - t.Coords.Left; //this should work
+                return new Rectangle((int)newX, (int)Position.Y, Width, Height);
             }
         }
 
@@ -36,6 +40,7 @@ namespace Randio_2 {
         public const int Height = 32;
 
         private Map map;
+        public int currentTile;
 
         //rewrite this, remove what's unneccessary
         //Also, will be generated, not hardcoded
@@ -75,11 +80,15 @@ namespace Randio_2 {
             Origin = position;
             velocity = Vector2.Zero;
             Texture = CreateTexture(graphicsDevice, Width, Height);
-            SafeBoundary = 80;
+            SafeMargin = 160; //temporary
+            currentTile = 0;
         }
 
         public void Reset() {
-            position = Origin;
+            //Respawn player on the tile where he died
+            //This might not be desirable in the finished game
+
+            position = Origin + new Vector2(map.GetTileByIndex(currentTile).Coords.Left, 0);
             //reset everything else too
         }
 
@@ -100,6 +109,8 @@ namespace Randio_2 {
             }
 
             ApplyPhysics(gameTime);
+
+            CheckTile();
 
             //reset movement
             movement = 0.0f;
@@ -200,10 +211,11 @@ namespace Randio_2 {
             return velocity;
         }
 
-        private void DoCollisionsXY(bool doCollisionX) {
+        private void DoCollisionsXY(bool doCollisionX, Tile otherTile = null) {
             Rectangle bounds = BoundingRectangle;
             Tile tile = map.GetTileForX((int)position.X);
             Vector2 playerTilePos = map.GlobalToTileCoordinates(position);
+
             int wblocks = tile.Coords.Width / Block.Width;
             int hblocks = tile.Coords.Height / Block.Height;
 
@@ -256,5 +268,13 @@ namespace Randio_2 {
             oldBottom = bounds.Bottom;
         }
 #endregion
+
+        private void CheckTile() {
+            Tile current = map.GetTileByIndex(currentTile);
+            if (position.X > current.Coords.Right)
+                ++currentTile;
+            else if (position.X < current.Coords.Left)
+                --currentTile;
+        }
     }
 }

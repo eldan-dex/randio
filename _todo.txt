@@ -2,7 +2,9 @@
 - Camera movement
 
 ISSUES:
-- NONE! (yet)
+- Player falls down through the 0th block of every next tile
+
+- Tile texture size might be too big for the engine to handle and it thus crashes (happens only once in a while)
 
 IDEAS:
 - Tile blending - for each tile, blend it's edges into surrounding tiles' textures -> keeps tile textures spearated, but blended
