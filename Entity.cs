@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -46,17 +47,17 @@ namespace Randio_2 {
         //TODO: edit these to be entity defaults
 
         // Constants for controling horizontal movement
-        private const float MoveAcceleration = 13000.0f;
-        private const float MaxMoveSpeed = 1750.0f;
-        private const float GroundDragFactor = 0.48f;
-        private const float AirDragFactor = 0.58f;
+        protected float MoveAcceleration = 13000.0f;
+        protected float MaxMoveSpeed = 1750.0f;
+        protected float GroundDragFactor = 0.48f;
+        protected float AirDragFactor = 0.58f;
 
         // Constants for controlling vertical movement
-        private const float MaxJumpTime = 0.35f;
-        private const float JumpLaunchVelocity = -3500.0f;
-        private const float GravityAcceleration = 3400.0f;
-        private const float MaxFallSpeed = 550.0f;
-        private const float JumpControlPower = 0.14f;
+        protected float MaxJumpTime = 0.35f;
+        protected float JumpLaunchVelocity = -3500.0f;
+        protected float GravityAcceleration = 3400.0f;
+        protected float MaxFallSpeed = 550.0f;
+        protected float JumpControlPower = 0.14f;
 
         //Current state
         protected float movement;
@@ -138,14 +139,16 @@ namespace Randio_2 {
                 position.X = map.Width;
 
             //X axis collisions
-            DoCollisionsXY(true);
+            TerrainCollisionsXY(true);
+            EntityCollisionsXY(true);
 
             //Move along the Y axis
             position.Y += velocity.Y * elapsed;
             position.Y = (float)Math.Round(position.Y);
 
             //Y axis collisions
-            DoCollisionsXY(false);
+            TerrainCollisionsXY(false);
+            //EntityCollisionsXY(false);
 
             if (position.X == lastPosition.X)
                 velocity.X = 0;
@@ -177,10 +180,13 @@ namespace Randio_2 {
         }
 
         //Check for collisions on one axis (X or Y) at a time and resolve them
-        private void DoCollisionsXY(bool doCollisionX, Tile otherTile = null) {
+        private void TerrainCollisionsXY(bool doCollisionX) {
             Rectangle bounds = BoundingRectangle;
             Tile tile = map.GetTileForX((int)position.X);
             Vector2 playerTilePos = map.GlobalToTileCoordinates(position);
+
+            if (tile == null)
+                return;
 
             int wblocks = tile.Coords.Width / Block.Width;
             int hblocks = tile.Coords.Height / Block.Height;
@@ -233,14 +239,52 @@ namespace Randio_2 {
 
             oldBottom = bounds.Bottom;
         }
+
+        //This is potentially VERY slow
+        private void EntityCollisionsXY(bool doCollisionX) {
+            List<Entity> collidableEntities = new List<Entity>();
+            List<Entity> allEntites = map.GetAllEntites();
+
+            foreach (Entity e in allEntites) {
+                if (e != this && Math.Abs(e.Position.X - Position.X) < Width  && Math.Abs(e.Position.Y - Position.Y) < Height) {
+                    collidableEntities.Add(e);
+                }
+            }
+
+            Rectangle bounds = BoundingRectangle;
+            foreach (Entity e in collidableEntities) {
+
+                Vector2 depth = GeometryHelper.GetIntersectionDepth(bounds, e.BoundingRectangle);
+                if (depth != Vector2.Zero) {
+
+                    if (doCollisionX) {
+                        position = new Vector2(Position.X + depth.X, Position.Y);
+                        bounds = BoundingRectangle;
+                    }
+                    else {
+                        if ((bounds.Top < e.BoundingRectangle.Top) && (bounds.Bottom > e.BoundingRectangle.Top)) {
+                            isOnGround = true;
+                            position = new Vector2(Position.X, Position.Y + depth.Y);
+                            bounds = BoundingRectangle;
+                        }
+
+                        else if ((bounds.Bottom > e.BoundingRectangle.Bottom) && (bounds.Top < e.BoundingRectangle.Bottom)) {
+                            position = new Vector2(Position.X, Position.Y + depth.Y);
+                            bounds = BoundingRectangle;
+                            jumpTime = MaxJumpTime; //we reached the apex of our jump                        
+                        }
+                    }
+                }
+            }
+        }
     #endregion
 
         //Check whether we moved out of our current tile and adjust the currentTile variable
         private void CheckTile() {
             Tile current = map.GetTileByIndex(CurrentTile);
-            if (position.X > current.Coords.Right)
+            if (position.X > current.Coords.Right && CurrentTile < map.TileCount)
                 ++CurrentTile;
-            else if (position.X < current.Coords.Left)
+            else if (position.X < current.Coords.Left && CurrentTile > 0)
                 --CurrentTile;
         }
     }

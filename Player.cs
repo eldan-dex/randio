@@ -35,7 +35,7 @@ namespace Randio_2 {
 
         public void Update(GameTime gameTime, KeyboardState keyboardState) {
             GetInput(keyboardState);
-            base.Update(gameTime);
+            Update(gameTime);
         }
 
         public void Reset() {

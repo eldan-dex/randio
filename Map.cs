@@ -12,6 +12,7 @@ namespace Randio_2 {
         public bool ReachedExit { get; private set; }
         public int Width { get; private set; }
         public int Height { get; private set; }
+        public int TileCount { get { return tiles.Count; } }
 
 
         //Private variables
@@ -32,7 +33,7 @@ namespace Randio_2 {
 
         public void Update(GameTime gameTime, KeyboardState keyboardState) {
             Player.Update(gameTime, keyboardState);
-            UpdateEntities(gameTime);
+            UpdateTiles(gameTime);
 
             MoveCamera();
 
@@ -48,8 +49,8 @@ namespace Randio_2 {
                 t.Draw(spriteBatch);
 
                 //Draw Tile NPCs (not a part of Tile.Draw because we need to have GameTime available)
-                /*foreach (NPC n in t.NPCs)
-                    n.Draw(gameTime, spriteBatch);*/
+                foreach (NPC n in t.NPCs)
+                    n.Draw(gameTime, spriteBatch);
             }
 
             Player.Draw(gameTime, spriteBatch);
@@ -93,6 +94,16 @@ namespace Randio_2 {
                     globalOffset += t.Coords.Width;
             }
             return new Vector2(global.X - globalOffset, global.Y);
+        }
+
+        public List<Entity> GetAllEntites() {
+            List<Entity> result = new List<Entity>();
+
+            result.Add(Player);
+            foreach (Tile t in tiles)
+                result.AddRange(t.NPCs);
+
+            return result;
         }
 
 
@@ -161,7 +172,8 @@ namespace Randio_2 {
             }
         }
 
-        private void UpdateEntities(GameTime gameTime) {
+        //Updates Tiles and NPCs on them
+        private void UpdateTiles(GameTime gameTime) {
             var visibleTiles = GetVisibleTiles();
             foreach (Tile tile in visibleTiles)
                 tile.Update(gameTime);
@@ -172,6 +184,9 @@ namespace Randio_2 {
             List<Tile> visibleTiles = new List<Tile>();
 
             var pX = Player.Position.X;
+            if (pX < 0)
+                pX = 0;
+
             var leftBound = pX - Game.WIDTH + Player.SafeMargin;
             var rightBound = pX + Player.Width + Game.WIDTH - Player.SafeMargin;
 

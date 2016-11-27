@@ -53,8 +53,18 @@ namespace Randio_2 {
         }
 
         public void Update(GameTime gameTime) {
-            foreach (Entity e in NPCs)
-                e.Update(gameTime);
+            List<NPC> toRemove = new List<NPC>();
+            foreach (NPC n in NPCs) {
+                n.Update(gameTime);
+                if (map.CheckOutOfMap((int)n.Position.Y) == -1) {
+                    toRemove.Add(n);
+                }
+            }
+
+            foreach (NPC n in toRemove) {
+                if (NPCs.Contains(n))
+                    NPCs.Remove(n);
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch) {
@@ -82,7 +92,20 @@ namespace Randio_2 {
         private void CreateEntities(GraphicsDevice graphicsDevice) {
             //temporary
             NPCs = new List<NPC>();
-            NPCs.Add(new NPC(graphicsDevice, map, new Vector2(Coords.X + 20, 0), Index, 32, 32));
+
+            Random rnd = AlgorithmHelper.GetNewRandom();
+            //temporary testing code
+            int npcCount = rnd.Next(0, 11);
+            for (int i = 0; i < npcCount; ++i) {
+                int w = 32;//rnd.Next(16, 49);
+                int h = 32;//rnd.Next(16, 49);
+                Vector2 position = new Vector2(Coords.X + rnd.Next(0, Coords.Width - w + 1), rnd.Next(0, map.Height - h + 1));
+                NPC npc = new NPC(graphicsDevice, map, position, Index, w, h);
+
+                NPCs.Add(npc);
+            }
+
+            
         }
 
         private void CreateBlocks() {
