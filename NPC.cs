@@ -111,7 +111,8 @@ namespace Randio_2 {
         }
 
         private void AIIdle() { //Idle
-            isJumping = true;
+            if (!isJumping)
+                isJumping = true;
         }
 
         private void AIRunAway() { //Basically inverted AITrackPlayer()

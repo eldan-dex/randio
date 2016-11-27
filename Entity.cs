@@ -148,7 +148,7 @@ namespace Randio_2 {
 
             //Y axis collisions
             TerrainCollisionsXY(false);
-            //EntityCollisionsXY(false);
+            EntityCollisionsXY(false);
 
             if (position.X == lastPosition.X)
                 velocity.X = 0;
@@ -191,12 +191,26 @@ namespace Randio_2 {
             int wblocks = tile.Coords.Width / Block.Width;
             int hblocks = tile.Coords.Height / Block.Height;
 
-            //Math.Min(sth, block count in that dimension-1) limits the indexes for searching adjacent blocks. It player gets out of bounds, he'll be considered as being on the last tile in that dimension
+            //Math.Min(sth, block count in that dimension-1) limits the indexes for searching adjacent blocks. If entity gets out of bounds, it'll be considered as being on the last tile in that dimension
             int leftBlockX = Math.Min((int)Math.Floor(playerTilePos.X / Block.Width), wblocks - 1); //get the X coordinate for neighbouring blocks on the left
             int rightBlockX = Math.Min(leftBlockX + (int)Math.Floor((double)Width / Block.Width), wblocks - 1);
 
+            //Just to make sure we really don't collide, in case the entity is smaller than one block
+            if (rightBlockX == leftBlockX)
+                ++rightBlockX;
+
+            if (rightBlockX >= wblocks)
+                rightBlockX = wblocks - 1;
+
             int topBlockY = Math.Max(Math.Min((int)Math.Floor(playerTilePos.Y / Block.Height), hblocks - 1), 0); //Math.Max so that we don't check for blocks above the top edge (there are none)
             int bottomBlockY = Math.Min(topBlockY + (int)Math.Floor((double)Height / Block.Height), hblocks - 1);
+
+            //Just to make sure we really don't collide, in case the entity is smaller than one block
+            if (bottomBlockY == topBlockY)
+                ++bottomBlockY;
+
+            if (bottomBlockY >= hblocks)
+                bottomBlockY = hblocks - 1;
 
             //We don't believe we're grounded until we are proved wrong, prevents doublejumping
             isOnGround = false;
@@ -253,7 +267,6 @@ namespace Randio_2 {
 
             Rectangle bounds = BoundingRectangle;
             foreach (Entity e in collidableEntities) {
-
                 Vector2 depth = GeometryHelper.GetIntersectionDepth(bounds, e.BoundingRectangle);
                 if (depth != Vector2.Zero) {
 

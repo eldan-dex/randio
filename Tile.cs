@@ -95,10 +95,10 @@ namespace Randio_2 {
 
             Random rnd = AlgorithmHelper.GetNewRandom();
             //temporary testing code
-            int npcCount = rnd.Next(0, 11);
+            int npcCount = rnd.Next(1, 17);
             for (int i = 0; i < npcCount; ++i) {
-                int w = 32;//rnd.Next(16, 49);
-                int h = 32;//rnd.Next(16, 49);
+                int w = rnd.Next(16, 49);
+                int h = rnd.Next(16, 49);
                 Vector2 position = new Vector2(Coords.X + rnd.Next(0, Coords.Width - w + 1), rnd.Next(0, map.Height - h + 1));
                 NPC npc = new NPC(graphicsDevice, map, position, Index, w, h);
 

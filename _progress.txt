@@ -2,6 +2,7 @@
 
 27.11.2016
 * Entity is now a base class for Player and NPC
+* Fixed collision issues with non-32*32 entities
 + Implemented NPCs with basic AI (follow player, ignore player, run away from player)
 + Entity-to-entity collisions
 + Code cleanups
