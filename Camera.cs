@@ -3,8 +3,22 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Randio_2 {
     public class Camera {
+
+        //Public variables
+        //********************************************************************************//
+        public Vector2 Position { get; set; }
+        public float Rotation { get; set; }
+        public float Zoom { get; set; }
+        public Vector2 Origin { get; set; }
+
+
+        //Private variables
+        //********************************************************************************//
         private readonly Viewport _viewport;
 
+
+        //Public methods
+        //********************************************************************************//
         public Camera(Viewport viewport) {
             _viewport = viewport;
 
@@ -13,11 +27,6 @@ namespace Randio_2 {
             Origin = new Vector2(viewport.Width / 2f, viewport.Height / 2f);
             Position = Vector2.Zero;
         }
-
-        public Vector2 Position { get; set; }
-        public float Rotation { get; set; }
-        public float Zoom { get; set; }
-        public Vector2 Origin { get; set; }
 
         public void CenterXTo(Rectangle rect) {
             float selfX = Position.X;

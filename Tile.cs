@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace Randio_2 {
     class Tile {
+        //Public variables
+        //********************************************************************************//
         public enum TileType {
             City,
             Nature,
@@ -18,19 +19,26 @@ namespace Randio_2 {
         public Texture2D TileTexture { get; private set; }
         public Texture2D BlockTexture { get; private set; }
         public Rectangle Coords { get; private set; }
-
-        public List<Entity> Entities { get; private set; } //or private?
-
+        public List<NPC> NPCs { get; private set; }  //separate list for enemies?
         public Block[,] Blocks { get; private set; }
+        public int Index { get; private set; }
 
+
+        //Private variables
+        //********************************************************************************//
+        private Map map;
         private int wblocks;
         private int hblocks;
 
-        //separate list for enemies?
 
-        public Tile(GraphicsDevice graphicsDevice, TileType type, Rectangle coords) {
+        //Public methods
+        //********************************************************************************//
+        public Tile(GraphicsDevice graphicsDevice, Map map, TileType type, Rectangle coords, int index) {
+            this.map = map;
+
             Type = type;
             Coords = coords;
+            Index = index;
 
             wblocks = coords.Width / Block.Width;
             hblocks = coords.Height / Block.Height;
@@ -40,10 +48,23 @@ namespace Randio_2 {
 
             CreateBlocks();
 
-            CreateEntities(); //separate into CreateNPCs and CreateEnemies?
+            CreateEntities(graphicsDevice); //separate into CreateNPCs and CreateEnemies?
 
         }
 
+        public void Update(GameTime gameTime) {
+            foreach (Entity e in NPCs)
+                e.Update(gameTime);
+        }
+
+        public void Draw(SpriteBatch spriteBatch) {
+            spriteBatch.Draw(TileTexture, Coords, Color.White);
+            DrawBlocks(spriteBatch);
+        }
+
+
+        //Private methods
+        //********************************************************************************//
         private void CreateTileTexture(GraphicsDevice graphicsDevice) {
             TileTexture = new Texture2D(graphicsDevice, Coords.Width, Coords.Height);
 
@@ -58,10 +79,10 @@ namespace Randio_2 {
             GraphicsHelper.FillRectangle(BlockTexture, Color.Red);
         }
 
-        private void CreateEntities() {
+        private void CreateEntities(GraphicsDevice graphicsDevice) {
             //temporary
-            Entities = new List<Entity>();
-            Entities.Add(new Entity(this));
+            NPCs = new List<NPC>();
+            NPCs.Add(new NPC(graphicsDevice, map, new Vector2(Coords.X + 20, 0), Index, 32, 32));
         }
 
         private void CreateBlocks() {
@@ -75,7 +96,7 @@ namespace Randio_2 {
                 for (int h = 0; h < hblocks; ++h) {
                     blockGrid[w, h] = false;
 
-                    if (w < 3 || w > wblocks - 3) {
+                    if (w < 3 || w > wblocks - 4) {
                         blockGrid[w, 20] = true;
                         continue;
                     }
@@ -133,16 +154,6 @@ namespace Randio_2 {
                     }
                 }
             }
-        }
-
-        public void Update(GameTime gameTime) {
-            foreach (Entity e in Entities)
-                e.Update(gameTime);
-        }
-
-        public void Draw(SpriteBatch spriteBatch) {
-            spriteBatch.Draw(TileTexture, Coords, Color.White);
-            DrawBlocks(spriteBatch);
         }
 
         private void DrawBlocks(SpriteBatch spriteBatch) {

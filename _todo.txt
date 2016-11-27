@@ -1,10 +1,15 @@
 ﻿TODO:
-- Camera movement
+- NPCs (testing AI)
+- Player interaction (attack, entity-to-entity collisions)
+
+- Block generation algorithm POC
+- Foreground texture generation algorithm POC
+- Background texture generation algorithm POC
 
 ISSUES:
 - Player falls down through the 0th block of every next tile
 
-- Tile texture size might be too big for the engine to handle and it thus crashes (happens only once in a while)
+- Tile texture size might be too big for the engine to handle and it thus crashes (happens only once in a while) <- temporarily fixed by limiting max newTileSize to 4096
 
 IDEAS:
 - Tile blending - for each tile, blend it's edges into surrounding tiles' textures -> keeps tile textures spearated, but blended

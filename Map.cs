@@ -1,22 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace Randio_2 {
     class Map {
-
-        private List<Tile> tiles;
+        //Public variables
+        //********************************************************************************//   
         public Player Player { get; private set; }
         public bool ReachedExit { get; private set; }
         public int Width { get; private set; }
         public int Height { get; private set; }
 
-        private Vector2 start; //useful?
+
+        //Private variables
+        //********************************************************************************//
+        private List<Tile> tiles;
         private Camera camera;
 
+
+        //Public methods
+        //********************************************************************************//
         public Map(GraphicsDevice graphicsDevice, Camera camera, int width, int height) {
             this.camera = camera;
             Width = width;
@@ -39,16 +44,18 @@ namespace Randio_2 {
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
-            foreach (Tile t in GetVisibleTiles())
+            foreach (Tile t in GetVisibleTiles()) {
                 t.Draw(spriteBatch);
 
-            Player.Draw(gameTime, spriteBatch);
+                //Draw Tile NPCs (not a part of Tile.Draw because we need to have GameTime available)
+                /*foreach (NPC n in t.NPCs)
+                    n.Draw(gameTime, spriteBatch);*/
+            }
 
-            //draw entities?
+            Player.Draw(gameTime, spriteBatch);
         }
 
-        //Public helper methods
-
+        //Check where given Y coordinate lies relative to the map
         public int CheckOutOfMap(int y) {
             if (y < 0) //y is above the map
                 return 1;
@@ -56,7 +63,7 @@ namespace Randio_2 {
             else if (y > Height) //y is below the map
                 return -1;
 
-            else return 0; //y is on the map
+            else return 0; //y is within the map
         }
 
         //returns a tile which contains the given X coordinate
@@ -68,24 +75,15 @@ namespace Randio_2 {
             return null;
         }
 
-        //returns the index of the current tile
-        public int GetTileIndexForX(int x) {
-            for (int i = 0; i < tiles.Count; ++i) {
-                if (tiles[i].Coords.Left <= x && tiles[i].Coords.Right >= x)
-                    return i;
-            }
-            return -1;
-        }
-
+        //returns tile with the corresponding index
         public Tile GetTileByIndex(int index) {
-            if (index < tiles.Count)
+            if (index >= 0 && index < tiles.Count)
                 return tiles[index];
             else
                 return null;
         }
 
         //translate global position into an offset from the left boundary of the parent tile
-        //untested, but should work
         public Vector2 GlobalToTileCoordinates(Vector2 global) {
             int globalOffset = 0;
             foreach (Tile t in tiles) {
@@ -98,8 +96,8 @@ namespace Randio_2 {
         }
 
 
-        //Private helper methods
-
+        //Private methods
+        //********************************************************************************//
         private void CreatePlayer(GraphicsDevice graphicsDevice) {
             Player = new Player(graphicsDevice, this, Vector2.Zero); //generate position
             CameraToPlayer();
@@ -136,6 +134,7 @@ namespace Randio_2 {
             int minWidth = Game.WIDTH;
             int maxWidth = 3 * Game.WIDTH;
             int totalWidth = 0;
+            int tileIndex = 0;
 
             while (totalWidth < Width) {
                 //Generate a random width for the next tile, but keep it divisible by Block.Width
@@ -143,16 +142,22 @@ namespace Randio_2 {
 
                 //If last tile wouldn't be able to fit, extend this one instead
                 int testWidth = totalWidth + newWidth;
-                if (Width - testWidth < minWidth)
-                    newWidth = Width - totalWidth;
+                if (Width - testWidth < minWidth) {
+                    //Don't make the last tile too big, otherwise MonoGame might crash
+                    if (Width - totalWidth <= 4096)
+                        newWidth = Width - totalWidth;
+                    else
+                        newWidth = 4096; //This breaks the purprose of the whole algorithm, because the next tile might be too small. But it fixes the crashing.
+                }
 
                 //Generate TileType
                 var type = (Tile.TileType)rnd.Next(0, 4);
 
                 //Create and add Tile
-                tiles.Add(new Tile(graphicsDevice, type, new Rectangle(totalWidth, 0, newWidth, Height)));
+                tiles.Add(new Tile(graphicsDevice, this, type, new Rectangle(totalWidth, 0, newWidth, Height), tileIndex));
 
                 totalWidth += newWidth;
+                ++tileIndex;
             }
         }
 

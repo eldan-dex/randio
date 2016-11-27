@@ -3,6 +3,9 @@ using Microsoft.Xna.Framework;
 
 namespace Randio_2 {
     class GeometryHelper {
+
+        //Public methods
+        //********************************************************************************//
         public static Vector2 GetIntersectionDepth(Rectangle rectA, Rectangle rectB) {
             // Calculate half sizes.
             float halfWidthA = rectA.Width / 2.0f;

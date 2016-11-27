@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Randio_2 {
     class GraphicsHelper {
+
+        //Public methods
+        //********************************************************************************//
         public static void FillRectangle(Texture2D texture, Color fill) {
             Color[] color = new Color[texture.Width * texture.Height];
-            texture.GetData(color); //AAAAAAAA
+            texture.GetData(color); //Texture size limit is 4096*4096. Textures bigger than that crash when being converted to Color[]
 
             for (int i = 0; i < texture.Width * texture.Height; ++i)
                 color[i] = fill;

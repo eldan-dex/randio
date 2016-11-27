@@ -7,32 +7,42 @@ namespace Randio_2 {
     /// This is the main type for your game.
     /// </summary>
     public class Game : Microsoft.Xna.Framework.Game {
-        GraphicsDeviceManager graphics;
-        SpriteBatch levelSpriteBatch;
-        SpriteBatch osdSpriteBatch;
-
-        private Map map;
-        private Camera camera;
-
-        private KeyboardState keyboardState;
-
+        //Public variables
+        //********************************************************************************// 
         public const int WIDTH = 1280;
         public const int HEIGHT = 736;
 
 
-        private bool debugEnabled = false;
-        private bool oEnabled = false; //for the O button
+        //Private variables
+        //********************************************************************************// 
+        private GraphicsDeviceManager graphics;
+        private SpriteBatch levelSpriteBatch;
+        private SpriteBatch osdSpriteBatch;
+        private SpriteFont debugFont;
 
+        private Map map;
+        private Camera camera;
+        private KeyboardState keyboardState;
+        
+        //"O" - toggle debug
+        private bool debugEnabled = false;
+        private bool oEnabled = false;
+
+        //"P" - play next frame (in debug mode)
         private bool nextFrame = false;
         private bool pEnabled = false; //for the P button
 
-        SpriteFont debugFont;
 
+        //Public methods
+        //********************************************************************************// 
         public Game() {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
 
+
+        //Protected methods
+        //********************************************************************************// 
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
         /// This is where it can query for any required services and load any non-graphic
@@ -48,10 +58,6 @@ namespace Randio_2 {
             CreateMap();
 
             base.Initialize();
-        }
-
-        private void CreateMap() {
-            map = new Map(GraphicsDevice, camera, 12800, 736); //parameters
         }
 
         /// <summary>
@@ -111,12 +117,19 @@ namespace Randio_2 {
 
                 //Draw OSD
                 osdSpriteBatch.DrawString(debugFont, "DEBUG ENABLED", new Vector2(10, 10), Color.Black);
-                osdSpriteBatch.DrawString(debugFont, "Player X: " + map.Player.Position.X + "     Player Y: " + map.Player.Position.Y + "\nCurrentTile: " + map.Player.currentTile, new Vector2(10, 30), Color.Black);
+                osdSpriteBatch.DrawString(debugFont, "Player X: " + map.Player.Position.X + "     Player Y: " + map.Player.Position.Y + "\nCurrentTile: " + map.Player.CurrentTile, new Vector2(10, 30), Color.Black);
 
                 osdSpriteBatch.End();
             }
 
             base.Draw(gameTime);
+        }
+
+
+        //Private methods
+        //********************************************************************************// 
+        private void CreateMap() {
+            map = new Map(GraphicsDevice, camera, 12800, 736); //parameters
         }
 
         private void ProcessInputs() {
