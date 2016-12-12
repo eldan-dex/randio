@@ -29,8 +29,9 @@ namespace Randio_2 {
             CurrentTile = 0;
             Origin = position;
             Texture = CreateTexture(graphicsDevice, Width, Height);
-            SafeMargin = 160; //temporary
-            
+            SafeMargin = 240; //temporary
+
+            InitStats();
         }
 
         public void Update(GameTime gameTime, KeyboardState keyboardState) {
@@ -53,11 +54,20 @@ namespace Randio_2 {
             var texture = new Texture2D(graphicsDevice, width, height);
 
             //Temporary placeholder code, will call texture generation here
-            GraphicsHelper.FillRectangle(texture, Color.Blue);
+            GraphicsHelper.DrawRectangle(texture, Color.Blue);
             GraphicsHelper.OutlineRectangle(texture, Color.Green, 2);
 
             return texture;
         }
+
+        private void InitStats()
+        {
+            //atm player is a little faster and jumps higher and faster than an average entity
+            //TODO: are these good default values for player?
+            MaxMoveSpeed = 1750.0f;
+            MaxJumpTime = 0.35f;
+            JumpLaunchVelocity = -3500.0f;
+    }
 
         private void GetInput(KeyboardState keyboardState) {
             movement = 0;

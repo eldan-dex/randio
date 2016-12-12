@@ -32,5 +32,13 @@ namespace Randio_2 {
             float depthY = distanceY == 0 ? 0 : distanceY > 0 ? minDistanceY - distanceY : -minDistanceY - distanceY; //old: distanceY > 0 ? minDistanceY - distanceY : -minDistanceY - distanceY;
             return new Vector2(depthX, depthY);
         }
+
+        public static Vector2 AngleToVector(double angle) {
+            return new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle));
+        }
+
+        public static double DegToRad(double angle) {
+            return (Math.PI / 180) * angle;
+        }
     }
 }

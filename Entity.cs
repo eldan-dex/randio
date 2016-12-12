@@ -43,18 +43,18 @@ namespace Randio_2 {
 
 
         //Will be generated, not hardcoded
-        //These values will be entity defaults, every entity will then adjust them as needed
-        //TODO: edit these to be entity defaults
+        //These values are entity defaults, every entity should adjust them as needed
+        //TODO: check whether these values are suitable to be entity defaults
 
         // Constants for controling horizontal movement
         protected float MoveAcceleration = 13000.0f;
-        protected float MaxMoveSpeed = 1750.0f;
+        protected float MaxMoveSpeed = 1500.0f;
         protected float GroundDragFactor = 0.48f;
         protected float AirDragFactor = 0.58f;
 
         // Constants for controlling vertical movement
-        protected float MaxJumpTime = 0.35f;
-        protected float JumpLaunchVelocity = -3500.0f;
+        protected float MaxJumpTime = 0.25f;
+        protected float JumpLaunchVelocity = -3000.0f;
         protected float GravityAcceleration = 3400.0f;
         protected float MaxFallSpeed = 550.0f;
         protected float JumpControlPower = 0.14f;
@@ -188,12 +188,14 @@ namespace Randio_2 {
             if (tile == null)
                 return;
 
+            //add a condition when player is on tile edge - check next/prev tiles edge line
+
             int wblocks = tile.Coords.Width / Block.Width;
             int hblocks = tile.Coords.Height / Block.Height;
 
             //Math.Min(sth, block count in that dimension-1) limits the indexes for searching adjacent blocks. If entity gets out of bounds, it'll be considered as being on the last tile in that dimension
             int leftBlockX = Math.Min((int)Math.Floor(playerTilePos.X / Block.Width), wblocks - 1); //get the X coordinate for neighbouring blocks on the left
-            int rightBlockX = Math.Min(leftBlockX + (int)Math.Floor((double)Width / Block.Width), wblocks - 1);
+            int rightBlockX = Math.Min(leftBlockX + (int)Math.Round((double)Width / Block.Width), wblocks - 1);
 
             //Just to make sure we really don't collide, in case the entity is smaller than one block
             if (rightBlockX == leftBlockX)
@@ -203,7 +205,7 @@ namespace Randio_2 {
                 rightBlockX = wblocks - 1;
 
             int topBlockY = Math.Max(Math.Min((int)Math.Floor(playerTilePos.Y / Block.Height), hblocks - 1), 0); //Math.Max so that we don't check for blocks above the top edge (there are none)
-            int bottomBlockY = Math.Min(topBlockY + (int)Math.Floor((double)Height / Block.Height), hblocks - 1);
+            int bottomBlockY = Math.Min(topBlockY + (int)Math.Round((double)Height / Block.Height), hblocks - 1);
 
             //Just to make sure we really don't collide, in case the entity is smaller than one block
             if (bottomBlockY == topBlockY)

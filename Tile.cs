@@ -8,12 +8,11 @@ namespace Randio_2 {
         //Public variables
         //********************************************************************************//
         public enum TileType {
-            City,
-            Nature,
-            Sky,
-            Abstract,
+            Shapes,
+            LSystem,
             Invalid = 999
         }
+        public const int TileTypeCount = 2;
 
         public TileType Type { get; private set; }
         public Texture2D TileTexture { get; private set; }
@@ -76,9 +75,20 @@ namespace Randio_2 {
         //Private methods
         //********************************************************************************//
         private void CreateTileTexture(GraphicsDevice graphicsDevice) {
-            TileTexture = new Texture2D(graphicsDevice, Coords.Width, Coords.Height);
+            if (Type == TileType.Shapes)
+                TileTexture = new ShapesBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height).Texture;
 
-            GraphicsHelper.FillRectangle(TileTexture, Color.Gray);
+            else if (Type == TileType.LSystem)
+                TileTexture = new LSystemBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height).Texture;
+
+            //add more background types
+
+            else //this is never supposed to execute. testing purproses only
+            {
+                //TileTexture = new Texture2D(graphicsDevice, Coords.Width, Coords.Height);
+                //GraphicsHelper.DrawRectangle(TileTexture, Color.Gray);
+                throw new NotImplementedException("CreateTileTexture got invalid TileType");
+            }
             GraphicsHelper.OutlineRectangleSide(TileTexture, Color.Black, 4, true, false, true, false);
         }
 
@@ -86,7 +96,7 @@ namespace Randio_2 {
             BlockTexture = new Texture2D(graphicsDevice, Block.Width, Block.Height);
 
             //Fill only, outlining is done based on connected neighbours
-            GraphicsHelper.FillRectangle(BlockTexture, Color.Red);
+            GraphicsHelper.DrawRectangle(BlockTexture, Color.Red);
         }
 
         private void CreateEntities(GraphicsDevice graphicsDevice) {
@@ -119,10 +129,19 @@ namespace Randio_2 {
                 for (int h = 0; h < hblocks; ++h) {
                     blockGrid[w, h] = false;
 
-                    if (w < 3 || w > wblocks - 4) {
-                        blockGrid[w, 20] = true;
+                    if (w < 4 || w > wblocks - 5) {
+                        blockGrid[w, hblocks-4] = true;
                         continue;
                     }
+
+                    //generate solid ground
+                    if (h > 18)
+                    {
+                        blockGrid[w, h] = true;
+                        continue;
+                    }
+
+                    //todo: holes in the ground (trenches, etc)
 
                     int tmp = rnd.Next(0, 12);
                     if (tmp > 3 && tmp < 6)
@@ -135,42 +154,45 @@ namespace Randio_2 {
             }
 
             //Generate textures according to the grid
-            bool isAbove;
-            bool isLeft;
-            bool isRight;
-            bool isBelow;
+            bool borderAbove;
+            bool borderLeft;
+            bool borderRight;
+            bool borderBelow;
 
+
+            //WHY DOES THIS NOT WORK?!
             for (int w = 0; w < wblocks; ++w) {
                 for (int h = 0; h < hblocks; ++h) {
                     if (blockGrid[w, h]) {
-                        //isAbove
+
+                        //if there is a block above this one
                         if (h > 0 && blockGrid[w, h - 1])
-                            isAbove = true;
+                            borderAbove = false;
                         else
-                            isAbove = false;
+                            borderAbove = true;
 
-                        //isBelow
+                        //if there is a block below this one
                         if (h < hblocks - 1 && blockGrid[w, h + 1])
-                            isBelow = true;
+                            borderBelow = false;
                         else
-                            isBelow = false;
+                            borderBelow = true;
 
-                        //isLeft
+                        //if there is a block left of this one
                         if (w > 0 && blockGrid[w - 1, h])
-                            isLeft = true;
+                            borderLeft = false;
                         else
-                            isLeft = false;
+                            borderLeft = true;
 
-                        //isRight
+                        //if there is a block right of this one
                         if (w < wblocks - 1 && blockGrid[w + 1, h])
-                            isRight = true;
+                            borderRight = false;
                         else
-                            isRight = false;
+                            borderRight = true;
 
 
                         //Assign texture accordingly  
-                        Texture2D texture = BlockTexture;
-                        GraphicsHelper.OutlineRectangleSide(texture, Color.Black, 2, isLeft, isAbove, isRight, isBelow);
+                        Texture2D texture = GraphicsHelper.CopyTexture(BlockTexture); //need to COPY THE TEXTURE HERE
+                        GraphicsHelper.OutlineRectangleSide(texture, Color.LightGray, 4, borderLeft, borderAbove, borderRight, borderBelow);
 
                         Blocks[w, h] = new Block(texture);
 

@@ -46,7 +46,7 @@ namespace Randio_2 {
             else
                 color = Color.Yellow;
 
-            GraphicsHelper.FillRectangle(texture, color);
+            GraphicsHelper.DrawRectangle(texture, color);
             GraphicsHelper.OutlineRectangle(texture, Color.Brown, 2);
 
             return texture;
@@ -58,20 +58,9 @@ namespace Randio_2 {
         }
 
         private void InitNPC() {
-            SightRange = new Vector2(640, 368);
+            SightRange = new Vector2(640, 368); //TODO: adjust range
 
-            // Constants for controling horizontal movement
-            MoveAcceleration = 13000.0f;
-            MaxMoveSpeed = 1500.0f;
-            GroundDragFactor = 0.48f;
-            AirDragFactor = 0.58f;
-
-            // Constants for controlling vertical movement
-            MaxJumpTime = 0.25f;
-            JumpLaunchVelocity = -3000.0f;
-            GravityAcceleration = 3400.0f;
-            MaxFallSpeed = 550.0f;
-            JumpControlPower = 0.14f;
+            //TODO: edit stats on a per-entity basis
         }
 
         //All AI behaviour

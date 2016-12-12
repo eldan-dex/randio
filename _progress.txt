@@ -1,5 +1,13 @@
 ﻿PROGRESS LOG
 
+13.12.2016
+* I forgot to update regularly, so this is a major one
++ Basic background generation (Shapes and LSystems) - right now only violet squares, "sprays" and l-trees of random size
++ Connected blocks now have connected outlines (except for that one dumb point in multiblock corners)
++ Improved terrain collisions (larger entities don't "vibrate" over the surface anymore)
++ Improved block generation - ground is now solid
++ Fixed some other minor problems
+
 27.11.2016
 * Entity is now a base class for Player and NPC
 * Fixed collision issues with non-32*32 entities

@@ -1,18 +1,32 @@
 ﻿TODO:
+- Splotches - from rectangles
+- Terrain collisions - check next tile edges
+- Terrain collisions - continue fixing collisions of entities with nonstandard size
+- Create a whole-splotch (splotch-over-splotch) background (even splotching darker versions of the same colour inside other splotches might work...
+
+- Background textures
+	- Colour splashes (monocolor, or fading towards the edges)
+	- Shapes on a dark/light background (or faded out splashes)
+	- L-Systems (pixelated, darker outlines)
+
 - Improve basic AI
 - Player interaction (attack, etc)
 
 - Block generation algorithm POC
 - Foreground texture generation algorithm POC
-- Background texture generation algorithm POC
 
 ISSUES:
-- NPCs sometimes don't show at all (?!)
-
+- Entities clip/bug through blocks and themselves
+- "Ghost" entities - invisible but impassable areas on the map - wtf are they?
 - Player falls down through the 0th block of every next tile
 - Tile texture size might be too big for the engine to handle and it thus crashes (happens only once in a while) <- temporarily fixed by limiting max newTileSize to 4096
 
 IDEAS:
-- Tile blending - for each tile, blend it's edges into surrounding tiles' textures -> keeps tile textures spearated, but blended
 - Doublejumping?
-- Consider reworking collision detection to support non-rectangular object shapes
+
+
+
+-----
+CO S TÍM?
+- futuristicky (konvenčně)
+- abstraktně (wtf)

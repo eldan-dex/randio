@@ -162,7 +162,7 @@ namespace Randio_2 {
                 }
 
                 //Generate TileType
-                var type = (Tile.TileType)rnd.Next(0, 4);
+                var type = (Tile.TileType)rnd.Next(0, Tile.TileTypeCount);
 
                 //Create and add Tile
                 tiles.Add(new Tile(graphicsDevice, this, type, new Rectangle(totalWidth, 0, newWidth, Height), tileIndex));

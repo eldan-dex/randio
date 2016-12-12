@@ -1,0 +1,56 @@
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
+namespace Randio_2
+{
+    class LSystemBG
+    {
+        public RenderTarget2D Texture { get; private set; }
+        private LSystem defaultSystem;
+        private Turtle turtle;
+        public LSystemBG(GraphicsDevice device, SpriteBatch batch, int width, int height)
+        {
+            CreateTexture(device, batch, width, height);
+        }
+
+        private void CreateTexture(GraphicsDevice device, SpriteBatch batch, int width, int height)
+        {
+            Texture = new RenderTarget2D(device, width, height);
+            List<LSystem.Rule> rules = new List<LSystem.Rule>();
+            rules.Add(new LSystem.Rule("F", "1FF-[2-F+F-F]+[2+F-F+F]"));
+ 
+            defaultSystem = new LSystem("F", 10, 22, rules); //TODO: generate ctor args
+            turtle = new Turtle(device, batch, new Vector2(200, 600), -90, Color.White);
+
+            device.SetRenderTarget(Texture);
+            device.Clear(Color.Black);
+            batch.Begin();
+
+            RenderTarget2D target = new RenderTarget2D(device, width, height);
+            Random r = AlgorithmHelper.GetNewRandom();
+
+            //TODO: either pregenerate a limited set of systems to use (but systems can be more complex)
+            //      or generate systems over and over again, but keep the iteration counts low and rules short, to take less time.
+
+            //TODO: create a proper algorithm
+            int count = r.Next(1, 7);
+            int nextX = width / count;
+            for (int i = 0; i < count; ++i)
+            {
+                int size = r.Next(1, 5);
+                var currentSystem = new LSystem(defaultSystem);
+                currentSystem.Iterate(size);
+                turtle.SetDefaults(new Vector2(nextX, 600), -90);
+                turtle.DrawSystem(currentSystem, target);
+                nextX += 150 * size;
+            }
+
+            batch.Draw(target, new Rectangle(0, 0, width, height), Color.White);
+
+            batch.End();
+            device.SetRenderTarget(null);
+        }
+    }
+}

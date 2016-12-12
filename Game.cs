@@ -10,7 +10,7 @@ namespace Randio_2 {
         //Public variables
         //********************************************************************************// 
         public const int WIDTH = 1280;
-        public const int HEIGHT = 736;
+        public const int HEIGHT = 704;
 
 
         //Private variables
@@ -19,6 +19,8 @@ namespace Randio_2 {
         private SpriteBatch levelSpriteBatch;
         private SpriteBatch osdSpriteBatch;
         private SpriteFont debugFont;
+        private SpriteBatch testSB;
+        private Texture2D testBG;
 
         private Map map;
         private Camera camera;
@@ -31,7 +33,6 @@ namespace Randio_2 {
         //"P" - play next frame (in debug mode)
         private bool nextFrame = false;
         private bool pEnabled = false; //for the P button
-
 
         //Public methods
         //********************************************************************************// 
@@ -68,7 +69,10 @@ namespace Randio_2 {
             // Create a new SpriteBatch, which can be used to draw textures.
             levelSpriteBatch = new SpriteBatch(GraphicsDevice);
             osdSpriteBatch = new SpriteBatch(GraphicsDevice);
-            debugFont = Content.Load<SpriteFont>("debug");
+            debugFont = Content.Load<SpriteFont>("debug"); //there will be some osd in the final game, but the font will not be stored externally
+            testSB = new SpriteBatch(GraphicsDevice); //remove this
+            //testBG = new ShapesBG(GraphicsDevice, testSB, WIDTH, HEIGHT).Texture; //remove this
+            testBG = new LSystemBG(GraphicsDevice, testSB, WIDTH, HEIGHT).Texture; //remove this
         }
 
         /// <summary>
@@ -95,7 +99,7 @@ namespace Randio_2 {
 
             if (map.ReachedExit)
                 Exit(); //temporary. Normally this would reinitialize everything and create a new level
-
+                
             base.Update(gameTime);
         }
 
@@ -108,19 +112,20 @@ namespace Randio_2 {
 
             var viewMatrix = camera.GetViewMatrix();
 
-            levelSpriteBatch.Begin(transformMatrix: viewMatrix);
-            map.Draw(gameTime, levelSpriteBatch);
-            levelSpriteBatch.End();
+             levelSpriteBatch.Begin(transformMatrix: viewMatrix);
+             levelSpriteBatch.Draw(testBG, new Rectangle(0, 0, WIDTH, HEIGHT), Color.White);
+             map.Draw(gameTime, levelSpriteBatch);
+             levelSpriteBatch.End();
 
-            if (debugEnabled) {
-                osdSpriteBatch.Begin();
+             if (debugEnabled) {
+                 osdSpriteBatch.Begin();
 
-                //Draw OSD
-                osdSpriteBatch.DrawString(debugFont, "DEBUG ENABLED", new Vector2(10, 10), Color.Black);
-                osdSpriteBatch.DrawString(debugFont, "Player X: " + map.Player.Position.X + "     Player Y: " + map.Player.Position.Y + "\nCurrentTile: " + map.Player.CurrentTile, new Vector2(10, 30), Color.Black);
+                 //Draw OSD
+                 osdSpriteBatch.DrawString(debugFont, "DEBUG ENABLED", new Vector2(10, 10), Color.Black);
+                 osdSpriteBatch.DrawString(debugFont, "Player X: " + map.Player.Position.X + "     Player Y: " + map.Player.Position.Y + "\nCurrentTile: " + map.Player.CurrentTile, new Vector2(10, 30), Color.Black);
 
-                osdSpriteBatch.End();
-            }
+                 osdSpriteBatch.End();
+             }
 
             base.Draw(gameTime);
         }
@@ -129,7 +134,7 @@ namespace Randio_2 {
         //Private methods
         //********************************************************************************// 
         private void CreateMap() {
-            map = new Map(GraphicsDevice, camera, 12800, 736); //parameters
+            map = new Map(GraphicsDevice, camera, 12800, 704); //parameters
         }
 
         private void ProcessInputs() {
