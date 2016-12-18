@@ -41,6 +41,7 @@
   <PropertyGroup />
   <ItemGroup>
     <Compile Include="AlgorithmHelper.cs" />
+    <Compile Include="Background.cs" />
     <Compile Include="Block.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Entity.cs" />

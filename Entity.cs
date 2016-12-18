@@ -32,8 +32,15 @@ namespace Randio_2 {
 
         public Texture2D Texture { get; protected set; }
         public int CurrentTile { get; protected set; } //public for debugging purposes
-        public int Width { get; private set; }
-        public int Height { get; private set; }
+        public int Width { get; protected set; }
+        public int Height { get; protected set; }
+        public int Direction { get; protected set; }
+
+        //Combat stats //TODO: is it good to set defaults this way?
+        public int HP { get; protected set; } = 10;
+        public int Strength { get; protected set; } = 1;
+        public int Defense { get; protected set; } = 0;
+        public int Range { get; protected set; } = 16; //How far can this entity's interaction (attacks, etc) reach
 
 
         //Private/Protected variables
@@ -73,10 +80,9 @@ namespace Randio_2 {
         public Entity(Map map, Vector2 position, int currentTile, int width, int height) {
             this.map = map;
             this.position = position;
-            this.CurrentTile = currentTile;
+            CurrentTile = currentTile;
             Width = width;
             Height = height;
-
             velocity = Vector2.Zero;
         }
 
@@ -92,6 +98,12 @@ namespace Randio_2 {
 
             ApplyPhysics(gameTime);
             CheckTile();
+
+            //Keep easily accessible direction info
+            if (Velocity.X >= 0)
+                Direction = 1;
+            else
+                Direction = -1;
 
             //reset movement
             movement = 0.0f;
@@ -180,10 +192,14 @@ namespace Randio_2 {
         }
 
         //Check for collisions on one axis (X or Y) at a time and resolve them
-        private void TerrainCollisionsXY(bool doCollisionX) {
+        private void TerrainCollisionsXY(bool doCollisionX, Tile nextTile = null) {
             Rectangle bounds = BoundingRectangle;
             Tile tile = map.GetTileForX((int)position.X);
-            Vector2 playerTilePos = map.GlobalToTileCoordinates(position);
+
+            if (nextTile != null)
+                tile = nextTile;
+            //!!!
+            Vector2 playerTilePos = map.GlobalToTileCoordinates(position); //TODO: this might cause a problem with next-tile collision checking -> translate this too, or rewrite checking to use global positioning?
 
             if (tile == null)
                 return;
@@ -195,7 +211,7 @@ namespace Randio_2 {
 
             //Math.Min(sth, block count in that dimension-1) limits the indexes for searching adjacent blocks. If entity gets out of bounds, it'll be considered as being on the last tile in that dimension
             int leftBlockX = Math.Min((int)Math.Floor(playerTilePos.X / Block.Width), wblocks - 1); //get the X coordinate for neighbouring blocks on the left
-            int rightBlockX = Math.Min(leftBlockX + (int)Math.Round((double)Width / Block.Width), wblocks - 1);
+            int rightBlockX = Math.Min(leftBlockX + (int)Math.Ceiling((double)Width / Block.Width), wblocks - 1);
 
             //Just to make sure we really don't collide, in case the entity is smaller than one block
             if (rightBlockX == leftBlockX)
@@ -205,7 +221,7 @@ namespace Randio_2 {
                 rightBlockX = wblocks - 1;
 
             int topBlockY = Math.Max(Math.Min((int)Math.Floor(playerTilePos.Y / Block.Height), hblocks - 1), 0); //Math.Max so that we don't check for blocks above the top edge (there are none)
-            int bottomBlockY = Math.Min(topBlockY + (int)Math.Round((double)Height / Block.Height), hblocks - 1);
+            int bottomBlockY = Math.Min(topBlockY + (int)Math.Ceiling((double)Height / Block.Height), hblocks - 1);
 
             //Just to make sure we really don't collide, in case the entity is smaller than one block
             if (bottomBlockY == topBlockY)
@@ -251,6 +267,12 @@ namespace Randio_2 {
                         }
                     }
                 }
+            }
+
+            if (rightBlockX == wblocks -1 && nextTile == null)
+            {
+                var next = map.GetTileByIndex(CurrentTile + 1);
+                TerrainCollisionsXY(doCollisionX, next);
             }
 
             oldBottom = bounds.Bottom;

@@ -1,7 +1,8 @@
 ﻿TODO:
+- find an entity within range to interact with
+
 - Splotches - from rectangles
 - Terrain collisions - check next tile edges
-- Terrain collisions - continue fixing collisions of entities with nonstandard size
 - Create a whole-splotch (splotch-over-splotch) background (even splotching darker versions of the same colour inside other splotches might work...
 
 - Background textures
@@ -11,6 +12,7 @@
 
 - Improve basic AI
 - Player interaction (attack, etc)
+	- player direction -> attack/block direction
 
 - Block generation algorithm POC
 - Foreground texture generation algorithm POC
@@ -23,7 +25,8 @@ ISSUES:
 
 IDEAS:
 - Doublejumping?
-
+- HP indicator - entity outline color?
+- blocking attacks?
 
 
 -----

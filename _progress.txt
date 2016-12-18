@@ -1,10 +1,15 @@
 ﻿PROGRESS LOG
 
+18.12
++ Added HPs, Strength, Defence, Range
++ Added "IsBoss" property for NPCs
++ Started implementing entity actions
+
 13.12.2016
 * I forgot to update regularly, so this is a major one
 + Basic background generation (Shapes and LSystems) - right now only violet squares, "sprays" and l-trees of random size
 + Connected blocks now have connected outlines (except for that one dumb point in multiblock corners)
-+ Improved terrain collisions (larger entities don't "vibrate" over the surface anymore)
++ Fixed terrain collision bug ("vibrating") entities
 + Improved block generation - ground is now solid
 + Fixed some other minor problems
 

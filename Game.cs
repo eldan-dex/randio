@@ -121,8 +121,8 @@ namespace Randio_2 {
                  osdSpriteBatch.Begin();
 
                  //Draw OSD
-                 osdSpriteBatch.DrawString(debugFont, "DEBUG ENABLED", new Vector2(10, 10), Color.Black);
-                 osdSpriteBatch.DrawString(debugFont, "Player X: " + map.Player.Position.X + "     Player Y: " + map.Player.Position.Y + "\nCurrentTile: " + map.Player.CurrentTile, new Vector2(10, 30), Color.Black);
+                 osdSpriteBatch.DrawString(debugFont, "DEBUG ENABLED", new Vector2(10, 10), Color.Red);
+                 osdSpriteBatch.DrawString(debugFont, "Player X: " + map.Player.Position.X + "     Player Y: " + map.Player.Position.Y + "\nDirection: " + (map.Player.Velocity.X == 0 ? "still" : (map.Player.Velocity.X > 0 ? "right" : "left")) + "\nCurrentTile: " + map.Player.CurrentTile, new Vector2(10, 30), Color.Red);
 
                  osdSpriteBatch.End();
              }

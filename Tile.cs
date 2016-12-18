@@ -14,6 +14,7 @@ namespace Randio_2 {
         }
         public const int TileTypeCount = 2;
 
+        public Background Background { get; private set; }
         public TileType Type { get; private set; }
         public Texture2D TileTexture { get; private set; }
         public Texture2D BlockTexture { get; private set; }
@@ -41,6 +42,17 @@ namespace Randio_2 {
 
             wblocks = coords.Width / Block.Width;
             hblocks = coords.Height / Block.Height;
+
+            if (Type == TileType.Shapes)
+                Background = new ShapesBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height);
+
+            else if (Type == TileType.LSystem)
+                Background = new LSystemBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height);
+
+            else
+            {
+                throw new NotSupportedException("This is not supposed to happen. Ever.");
+            }
 
             CreateTileTexture(graphicsDevice);
             CreateBlockTexture(graphicsDevice);
@@ -74,33 +86,17 @@ namespace Randio_2 {
 
         //Private methods
         //********************************************************************************//
-        private void CreateTileTexture(GraphicsDevice graphicsDevice) {
-            if (Type == TileType.Shapes)
-                TileTexture = new ShapesBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height).Texture;
-
-            else if (Type == TileType.LSystem)
-                TileTexture = new LSystemBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height).Texture;
-
-            //add more background types
-
-            else //this is never supposed to execute. testing purproses only
-            {
-                //TileTexture = new Texture2D(graphicsDevice, Coords.Width, Coords.Height);
-                //GraphicsHelper.DrawRectangle(TileTexture, Color.Gray);
-                throw new NotImplementedException("CreateTileTexture got invalid TileType");
-            }
+        private void CreateTileTexture(GraphicsDevice graphicsDevice)
+        {
+            TileTexture = Background.Texture;
             GraphicsHelper.OutlineRectangleSide(TileTexture, Color.Black, 4, true, false, true, false);
         }
 
         private void CreateBlockTexture(GraphicsDevice graphicsDevice) {
-            BlockTexture = new Texture2D(graphicsDevice, Block.Width, Block.Height);
-
-            //Fill only, outlining is done based on connected neighbours
-            GraphicsHelper.DrawRectangle(BlockTexture, Color.Red);
+            BlockTexture = Background.BlockTexture;
         }
 
         private void CreateEntities(GraphicsDevice graphicsDevice) {
-            //temporary
             NPCs = new List<NPC>();
 
             Random rnd = AlgorithmHelper.GetNewRandom();

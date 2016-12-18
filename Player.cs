@@ -21,7 +21,11 @@ namespace Randio_2 {
         private const Keys leftButton = Keys.A;
         private const Keys rightButton = Keys.D;
         private const Keys crouchButton = Keys.S;
+        private const Keys actionButtonA = Keys.K;
+        private const Keys actionButtonB = Keys.L;
 
+        private bool AkeyDown;
+        private bool BkeyDown;
 
         //Public methods
         //********************************************************************************//
@@ -67,6 +71,11 @@ namespace Randio_2 {
             MaxMoveSpeed = 1750.0f;
             MaxJumpTime = 0.35f;
             JumpLaunchVelocity = -3500.0f;
+
+            //atm only HP is higher than an average entity
+            HP = 10;
+            Strength = 1;
+            Defense = 0;
     }
 
         private void GetInput(KeyboardState keyboardState) {
@@ -80,6 +89,55 @@ namespace Randio_2 {
                 movement = 1.0f;
 
             isJumping = keyboardState.IsKeyDown(jumpButton);
+
+            if (keyboardState.IsKeyDown(actionButtonA))
+            {
+                if (!AkeyDown)
+                {
+                    PerformAction(ActionA);
+                    AkeyDown = true;
+                }
+            }
+            else
+                AkeyDown = false;
+
+            if (keyboardState.IsKeyDown(actionButtonB))
+            {
+                if (!BkeyDown)
+                {
+                    PerformAction(ActionB);
+                    BkeyDown = true;
+                }
+            }
+            else
+                BkeyDown = false;
+        }
+
+        private void PerformAction(Func<Entity, bool> Interaction)
+        {
+            Entity other = null;
+            if (Direction == 1) //interacting right
+            {
+                //find the first entity in range
+                //other = ...
+            } 
+            else //interacting left
+            {
+                //find the first entity in range
+                //other = ...
+            }
+            if (other != null)
+                Interaction(other);
+        }
+
+        private bool ActionA(Entity other)
+        {
+            return true;
+        }
+
+        private bool ActionB(Entity other)
+        {
+            return true;
         }
     }
 }

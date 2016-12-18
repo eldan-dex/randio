@@ -5,17 +5,17 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Randio_2
 {
-    class ShapesBG
+    class ShapesBG : Background
     {
-        public RenderTarget2D Texture { get; private set; }
         List<Shape> shapes;
 
         public ShapesBG(GraphicsDevice device, SpriteBatch batch, int width, int height)
         {
-            CreateTexture(device, batch, width, height);
+            CreateBackgroundTexture(device, batch, width, height);
+            CreateBlockTexture(device, batch, Block.Width, Block.Height);
         }
 
-        private void CreateTexture(GraphicsDevice device, SpriteBatch batch, int width, int height)
+        public void CreateBackgroundTexture(GraphicsDevice device, SpriteBatch batch, int width, int height)
         {
             Texture = new RenderTarget2D(device, width, height);
             shapes = new List<Shape>();
@@ -47,6 +47,14 @@ namespace Randio_2
 
             batch.End();
             device.SetRenderTarget(null);
+        }
+
+        public void CreateBlockTexture(GraphicsDevice device, SpriteBatch batch, int width, int height)
+        {
+            //implement block texture generation
+            var tex = new Texture2D(device, width, height);
+            GraphicsHelper.DrawRectangle(tex, Color.Red);
+            BlockTexture = tex;
         }
 
         class Shape

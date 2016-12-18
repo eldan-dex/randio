@@ -17,13 +17,15 @@ namespace Randio_2 {
         public bool PlayerInRange { get; private set; }
         public Vector2 SightRange { get; private set; }
 
+        public bool IsBoss { get; private set; }
+
         //Public methods
         //********************************************************************************//
         public NPC(GraphicsDevice graphicsDevice, Map map, Vector2 position, int parentTile, int width, int height) : base(map, position, parentTile, width, height) {
             ParentTile = map.GetTileByIndex(parentTile);
+            InitNPC();
             Behaviour = CreateBehaviour();
             Texture = CreateTexture(graphicsDevice);
-            InitNPC();
         }
 
         new public void Update(GameTime gameTime) {
@@ -47,7 +49,11 @@ namespace Randio_2 {
                 color = Color.Yellow;
 
             GraphicsHelper.DrawRectangle(texture, color);
-            GraphicsHelper.OutlineRectangle(texture, Color.Brown, 2);
+
+            if (IsBoss)
+                GraphicsHelper.OutlineRectangle(texture, Color.Red, 3);
+            else
+                GraphicsHelper.OutlineRectangle(texture, Color.White, 2);
 
             return texture;
         }
@@ -59,6 +65,24 @@ namespace Randio_2 {
 
         private void InitNPC() {
             SightRange = new Vector2(640, 368); //TODO: adjust range
+            Random rnd = AlgorithmHelper.GetNewRandom();
+            IsBoss = rnd.Next(0, 11) == 0; //currently 10% chance of being a boss
+
+            //NPC defaults
+            HP = 3;
+            Strength = 1;
+            Defense = 0;
+
+            if (IsBoss)
+            {
+                Width += 5;
+                Height += 5;
+
+                //Boss defaults
+                HP += 2;
+                Strength += 1;
+                Defense += 1;
+            }
 
             //TODO: edit stats on a per-entity basis
         }
