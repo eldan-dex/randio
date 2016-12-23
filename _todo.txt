@@ -1,8 +1,11 @@
 ﻿TODO:
+- invisible npc bug
+- Terrain collisions - fix "skip" when going left on a new tile
 - find an entity within range to interact with
 
+
 - Splotches - from rectangles
-- Terrain collisions - check next tile edges
+
 - Create a whole-splotch (splotch-over-splotch) background (even splotching darker versions of the same colour inside other splotches might work...
 
 - Background textures
@@ -11,22 +14,27 @@
 	- L-Systems (pixelated, darker outlines)
 
 - Improve basic AI
-- Player interaction (attack, etc)
-	- player direction -> attack/block direction
 
 - Block generation algorithm POC
 - Foreground texture generation algorithm POC
 
+- Basic gameplay:
+	- quest list
+	- quest generation algorithm
+	- quest completion checking
+
+- Refactoring
+
 ISSUES:
 - Entities clip/bug through blocks and themselves
-- "Ghost" entities - invisible but impassable areas on the map - wtf are they?
-- Player falls down through the 0th block of every next tile
+- "Ghost" entities - invisible but impassable areas on the map - wtf are they? and why are they sometimes fixed and sometimes not?
 - Tile texture size might be too big for the engine to handle and it thus crashes (happens only once in a while) <- temporarily fixed by limiting max newTileSize to 4096
+- StackOverflow when player goes too far - why??
 
 IDEAS:
 - Doublejumping?
 - HP indicator - entity outline color?
-- blocking attacks?
+- switch all entities to the global coordination model
 
 
 -----

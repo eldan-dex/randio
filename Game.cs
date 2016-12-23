@@ -9,8 +9,10 @@ namespace Randio_2 {
     public class Game : Microsoft.Xna.Framework.Game {
         //Public variables
         //********************************************************************************// 
-        public const int WIDTH = 1280;
-        public const int HEIGHT = 704;
+        public const int WIDTH = 1296; //1280 small
+        public const int HEIGHT = 720; //704 small
+
+        public static SpriteFont font;
 
 
         //Private variables
@@ -27,7 +29,7 @@ namespace Randio_2 {
         private KeyboardState keyboardState;
         
         //"O" - toggle debug
-        private bool debugEnabled = false;
+        public static bool debugEnabled = false;
         private bool oEnabled = false;
 
         //"P" - play next frame (in debug mode)
@@ -70,6 +72,7 @@ namespace Randio_2 {
             levelSpriteBatch = new SpriteBatch(GraphicsDevice);
             osdSpriteBatch = new SpriteBatch(GraphicsDevice);
             debugFont = Content.Load<SpriteFont>("debug"); //there will be some osd in the final game, but the font will not be stored externally
+            font = Content.Load<SpriteFont>("font"); //this will be loaded dynamically
             testSB = new SpriteBatch(GraphicsDevice); //remove this
             //testBG = new ShapesBG(GraphicsDevice, testSB, WIDTH, HEIGHT).Texture; //remove this
             testBG = new LSystemBG(GraphicsDevice, testSB, WIDTH, HEIGHT).Texture; //remove this
@@ -134,7 +137,7 @@ namespace Randio_2 {
         //Private methods
         //********************************************************************************// 
         private void CreateMap() {
-            map = new Map(GraphicsDevice, camera, 12800, 704); //parameters
+            map = new Map(GraphicsDevice, camera, WIDTH*10, HEIGHT); //parameters
         }
 
         private void ProcessInputs() {
@@ -143,10 +146,16 @@ namespace Randio_2 {
             if (keyboardState.IsKeyDown(Keys.Escape))
                 Exit();
 
+            if (keyboardState.IsKeyDown(Keys.L))
+                map.ResetPlayer();
+
             //"O" key enables/disables debugging features
-            if (keyboardState.IsKeyDown(Keys.O) && oEnabled) {
-                oEnabled = false;
-                debugEnabled = !debugEnabled;
+            if (keyboardState.IsKeyDown(Keys.O)) {
+                if (oEnabled)
+                {
+                    oEnabled = false;
+                    debugEnabled = !debugEnabled;
+                }
             }
             else
                 oEnabled = true;

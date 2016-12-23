@@ -6,8 +6,8 @@ namespace Randio_2 {
         //Public variables
         //********************************************************************************//   
         public Texture2D Texture;
-        public const int Width = 32;
-        public const int Height = 32;
+        public const int Width = 48; //32 small
+        public const int Height = 48; //32 small
         public static readonly Vector2 Size = new Vector2(Width, Height);
 
         //Public methods

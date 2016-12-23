@@ -24,18 +24,17 @@ namespace Randio_2
             device.Clear(Color.Black);
             batch.Begin();
 
-            Random rnd = AlgorithmHelper.GetNewRandom();
-            int count = rnd.Next(0, width / 30 + 1);
-            bool darkerOutline = rnd.Next(0, 2) == 1;
+            int count = AlgorithmHelper.GetRandom(0, width / 30 + 1);
+            bool darkerOutline = AlgorithmHelper.GetRandom(0, 2) == 1;
 
             for (int i = 0; i < count; ++i)
             {
-                var type = (Shape.ShapeType)rnd.Next(0, 2);
-                var w = rnd.Next(16, 129);
-                var h = (rnd.Next(0, 2) > 0) ? w : rnd.Next(16, 97); //2:1 chance that width is similar to height
-                var x = rnd.Next(1, width - w); //shapes cannot go beyond our tile on the x axis (overlapping into other tiles)
-                var y = rnd.Next(1 - h / 3 * 2, height - h / 3); //but can go 2/3 of their height above or below
-                var outlineWidth = rnd.Next((w + h / 2) / 50, (w + h / 2) / 20);
+                var type = (Shape.ShapeType)AlgorithmHelper.GetRandom(0, 2);
+                var w = AlgorithmHelper.GetRandom(16, 129);
+                var h = (AlgorithmHelper.GetRandom(0, 2) > 0) ? w : AlgorithmHelper.GetRandom(16, 97); //2:1 chance that width is similar to height
+                var x = AlgorithmHelper.GetRandom(1, width - w); //shapes cannot go beyond our tile on the x axis (overlapping into other tiles)
+                var y = AlgorithmHelper.GetRandom(1 - h / 3 * 2, height - h / 3); //but can go 2/3 of their height above or below
+                var outlineWidth = AlgorithmHelper.GetRandom((w + h / 2) / 50, (w + h / 2) / 20);
 
                 shapes.Add(new Shape(device, batch, type, w, h, x, y, outlineWidth, darkerOutline));
             }

@@ -1,5 +1,17 @@
 ﻿PROGRESS LOG
 
+22.12
+* Player finally doesn't fall down through the first block of a new tile
+* Improved name generation
+* Fixed a stackoverflow when player went onto the last tile
++ Switched to 48*48 blocksize, scaled up apporpriately (just a test)
+
+19.12
+* Now uses single Random instance for all random generation
+* NPC names aren't overdrawn by other tiles when on tile edge
++ Debug view shows block coords
+
+
 18.12
 + Added HPs, Strength, Defence, Range
 + Added "IsBoss" property for NPCs

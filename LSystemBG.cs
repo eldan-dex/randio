@@ -30,17 +30,16 @@ namespace Randio_2
             batch.Begin();
 
             RenderTarget2D target = new RenderTarget2D(device, width, height);
-            Random r = AlgorithmHelper.GetNewRandom();
 
             //TODO: either pregenerate a limited set of systems to use (but systems can be more complex)
             //      or generate systems over and over again, but keep the iteration counts low and rules short, to take less time.
 
             //TODO: create a proper algorithm
-            int count = r.Next(1, 7);
+            int count = AlgorithmHelper.GetRandom(1, 7);
             int nextX = width / count;
             for (int i = 0; i < count; ++i)
             {
-                int size = r.Next(1, 5);
+                int size = AlgorithmHelper.GetRandom(1, 5);
                 var currentSystem = new LSystem(defaultSystem);
                 currentSystem.Iterate(size);
                 turtle.SetDefaults(new Vector2(nextX, 600), -90);

@@ -19,9 +19,9 @@ namespace Randio_2 {
         public Texture2D TileTexture { get; private set; }
         public Texture2D BlockTexture { get; private set; }
         public Rectangle Coords { get; private set; }
-        public List<NPC> NPCs { get; private set; }  //separate list for enemies?
         public Block[,] Blocks { get; private set; }
         public int Index { get; private set; }
+        public List<NPC> NPCs { get; private set; }
 
 
         //Private variables
@@ -65,14 +65,17 @@ namespace Randio_2 {
 
         public void Update(GameTime gameTime) {
             List<NPC> toRemove = new List<NPC>();
-            foreach (NPC n in NPCs) {
+            foreach (NPC n in NPCs)
+            {
                 n.Update(gameTime);
-                if (map.CheckOutOfMap((int)n.Position.Y) == -1) {
+                if (map.CheckOutOfMap((int)n.Position.Y) == -1)
+                {
                     toRemove.Add(n);
                 }
             }
 
-            foreach (NPC n in toRemove) {
+            foreach (NPC n in toRemove)
+            {
                 if (NPCs.Contains(n))
                     NPCs.Remove(n);
             }
@@ -99,13 +102,12 @@ namespace Randio_2 {
         private void CreateEntities(GraphicsDevice graphicsDevice) {
             NPCs = new List<NPC>();
 
-            Random rnd = AlgorithmHelper.GetNewRandom();
             //temporary testing code
-            int npcCount = rnd.Next(1, 17);
+            int npcCount = AlgorithmHelper.GetRandom(1, 17);
             for (int i = 0; i < npcCount; ++i) {
-                int w = rnd.Next(16, 49);
-                int h = rnd.Next(16, 49);
-                Vector2 position = new Vector2(Coords.X + rnd.Next(0, Coords.Width - w + 1), rnd.Next(0, map.Height - h + 1));
+                int w = AlgorithmHelper.GetRandom(32, 65); //16-49 small
+                int h = AlgorithmHelper.GetRandom(32, 65);
+                Vector2 position = new Vector2(Coords.X + AlgorithmHelper.GetRandom(0, Coords.Width - w + 1), AlgorithmHelper.GetRandom(0, map.Height - h + 1));
                 NPC npc = new NPC(graphicsDevice, map, position, Index, w, h);
 
                 NPCs.Add(npc);
@@ -117,8 +119,6 @@ namespace Randio_2 {
         private void CreateBlocks() {
             Blocks = new Block[wblocks, hblocks];
             bool[,] blockGrid = new bool[wblocks, hblocks];
-
-            Random rnd = AlgorithmHelper.GetNewRandom();
 
             //Prepare grid (currently a random dumb layout, replace with a proper algorithm)
             for (int w = 0; w < wblocks; ++w) {
@@ -139,7 +139,7 @@ namespace Randio_2 {
 
                     //todo: holes in the ground (trenches, etc)
 
-                    int tmp = rnd.Next(0, 12);
+                    int tmp = AlgorithmHelper.GetRandom(0, 12);
                     if (tmp > 3 && tmp < 6)
                         blockGrid[w, h] = true;
                     if (tmp == 1 && w < wblocks - 1)
@@ -156,7 +156,6 @@ namespace Randio_2 {
             bool borderBelow;
 
 
-            //WHY DOES THIS NOT WORK?!
             for (int w = 0; w < wblocks; ++w) {
                 for (int h = 0; h < hblocks; ++h) {
                     if (blockGrid[w, h]) {
@@ -209,6 +208,8 @@ namespace Randio_2 {
                         // Draw it in screen space.
                         //will probably be edited to reflect global position of tile (render to RenderTarget and then add the RenderTarget to global render?)
                         spriteBatch.Draw(block.Texture, new Rectangle(nX, nY, Block.Width, Block.Height), Color.White); //or use this.BlockTexture?
+                        if (Game.debugEnabled)
+                        spriteBatch.DrawString(Game.font, x + "," + y, new Vector2(nX+2, nY+3), Color.Black, 0f, Vector2.Zero, 0.4f, SpriteEffects.None, 0);
                     }
                 }
             }

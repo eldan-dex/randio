@@ -10,8 +10,8 @@ namespace Randio_2 {
         //********************************************************************************//
         public Vector2 Origin { get; private set; }
         public int SafeMargin { get; private set; } //how close to the border can player go before the camera starts moving;
-        public const int Width = 32;
-        public const int Height = 32;
+        public const int Width = 48; //32 small
+        public const int Height = 48; //32 small
 
 
         //Private variables
@@ -69,13 +69,16 @@ namespace Randio_2 {
             //atm player is a little faster and jumps higher and faster than an average entity
             //TODO: are these good default values for player?
             MaxMoveSpeed = 1750.0f;
-            MaxJumpTime = 0.35f;
-            JumpLaunchVelocity = -3500.0f;
+            MaxJumpTime = 0.45f; //0.35f small
+            JumpLaunchVelocity = -4000.0f; //-3500 small
 
             //atm only HP is higher than an average entity
             HP = 10;
             Strength = 1;
             Defense = 0;
+
+            Name = StringHelper.GenerateName().ToUpper();
+            IsPlayer = true;
     }
 
         private void GetInput(KeyboardState keyboardState) {

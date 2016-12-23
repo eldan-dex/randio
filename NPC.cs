@@ -59,14 +59,12 @@ namespace Randio_2 {
         }
 
         private NPCBehaviour CreateBehaviour() {
-            Random rnd = AlgorithmHelper.GetNewRandom();
-            return (NPCBehaviour)rnd.Next(0, 3);
+            return (NPCBehaviour)AlgorithmHelper.GetRandom(0, 3);
         }
 
         private void InitNPC() {
             SightRange = new Vector2(640, 368); //TODO: adjust range
-            Random rnd = AlgorithmHelper.GetNewRandom();
-            IsBoss = rnd.Next(0, 11) == 0; //currently 10% chance of being a boss
+            IsBoss = AlgorithmHelper.GetRandom(0, 11) == 0; //currently 10% chance of being a boss
 
             //NPC defaults
             HP = 3;
@@ -83,6 +81,8 @@ namespace Randio_2 {
                 Strength += 1;
                 Defense += 1;
             }
+
+            Name = StringHelper.GenerateName();
 
             //TODO: edit stats on a per-entity basis
         }

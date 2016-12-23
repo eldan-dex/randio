@@ -35,12 +35,15 @@ namespace Randio_2 {
         public int Width { get; protected set; }
         public int Height { get; protected set; }
         public int Direction { get; protected set; }
+        public string Name { get; protected set; }
 
         //Combat stats //TODO: is it good to set defaults this way?
         public int HP { get; protected set; } = 10;
         public int Strength { get; protected set; } = 1;
         public int Defense { get; protected set; } = 0;
         public int Range { get; protected set; } = 16; //How far can this entity's interaction (attacks, etc) reach
+
+        public bool IsPlayer = false;
 
 
         //Private/Protected variables
@@ -112,9 +115,12 @@ namespace Randio_2 {
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
             SpriteEffects effect = SpriteEffects.None;
-            if (Velocity.X > 0)
+            if (Velocity.X >= 0)
                 effect = SpriteEffects.FlipHorizontally;
 
+            Vector2 namePos = new Vector2(Position.X - (Name.Length / 2) * 4, Position.Y - 22);
+
+            spriteBatch.DrawString(Game.font, Name, namePos, Color.Red);
             spriteBatch.Draw(Texture, position, null, Color.White, 0.0f, Vector2.Zero, 1.0f, effect, 0.0f);
         }
 
@@ -198,11 +204,14 @@ namespace Randio_2 {
 
             if (nextTile != null)
                 tile = nextTile;
-            //!!!
-            Vector2 playerTilePos = map.GlobalToTileCoordinates(position); //TODO: this might cause a problem with next-tile collision checking -> translate this too, or rewrite checking to use global positioning?
 
             if (tile == null)
                 return;
+
+            Vector2 entityTilePos = map.GlobalToTileCoordinates(position, tile.Index); //TODO: this might cause a problem with next-tile collision checking -> translate this too, or rewrite checking to use global positioning?
+
+            if (IsPlayer)
+                IsPlayer = IsPlayer;
 
             //add a condition when player is on tile edge - check next/prev tiles edge line
 
@@ -210,18 +219,21 @@ namespace Randio_2 {
             int hblocks = tile.Coords.Height / Block.Height;
 
             //Math.Min(sth, block count in that dimension-1) limits the indexes for searching adjacent blocks. If entity gets out of bounds, it'll be considered as being on the last tile in that dimension
-            int leftBlockX = Math.Min((int)Math.Floor(playerTilePos.X / Block.Width), wblocks - 1); //get the X coordinate for neighbouring blocks on the left
+            int leftBlockX = Math.Min((int)Math.Floor(entityTilePos.X / Block.Width), wblocks - 1); //get the X coordinate for neighbouring blocks on the left
             int rightBlockX = Math.Min(leftBlockX + (int)Math.Ceiling((double)Width / Block.Width), wblocks - 1);
 
+            if (leftBlockX < 0)
+                leftBlockX = 0;
+
             //Just to make sure we really don't collide, in case the entity is smaller than one block
-            if (rightBlockX == leftBlockX)
-                ++rightBlockX;
+            if (rightBlockX <= leftBlockX)
+                rightBlockX = leftBlockX + 1;
 
             if (rightBlockX >= wblocks)
                 rightBlockX = wblocks - 1;
 
-            int topBlockY = Math.Max(Math.Min((int)Math.Floor(playerTilePos.Y / Block.Height), hblocks - 1), 0); //Math.Max so that we don't check for blocks above the top edge (there are none)
-            int bottomBlockY = Math.Min(topBlockY + (int)Math.Ceiling((double)Height / Block.Height), hblocks - 1);
+            int topBlockY = Math.Max(Math.Min((int)Math.Floor(entityTilePos.Y / Block.Height), hblocks - 1), 0); //Math.Max so that we don't check for blocks above the top edge (there are none)
+            int bottomBlockY = Math.Min(topBlockY + (int)Math.Ceiling((double)Height / Block.Height) + 1, hblocks - 1);
 
             //Just to make sure we really don't collide, in case the entity is smaller than one block
             if (bottomBlockY == topBlockY)
@@ -241,6 +253,9 @@ namespace Randio_2 {
                         Vector2 depth = GeometryHelper.GetIntersectionDepth(bounds, otherElement);
                         if (depth != Vector2.Zero) {
 
+                            if (IsPlayer)
+                                IsPlayer = IsPlayer;
+
                             //In the first call, we check for X-axis collisions
                             if (doCollisionX) {
                                 position = new Vector2(Position.X + depth.X, Position.Y);
@@ -259,8 +274,8 @@ namespace Randio_2 {
                                 //We hit a box above us, we're jumping
                                 else if ((bounds.Bottom > otherElement.Bottom) && (bounds.Top < otherElement.Bottom)) {
                                     position = new Vector2(Position.X, Position.Y + depth.Y);
+                                    jumpTime = MaxJumpTime; //we reached the apex of our jump        
                                     bounds = BoundingRectangle;
-                                    jumpTime = MaxJumpTime; //we reached the apex of our jump                        
                                 }
                             }
 
@@ -272,7 +287,8 @@ namespace Randio_2 {
             if (rightBlockX == wblocks -1 && nextTile == null)
             {
                 var next = map.GetTileByIndex(CurrentTile + 1);
-                TerrainCollisionsXY(doCollisionX, next);
+                if (next != null)
+                    TerrainCollisionsXY(doCollisionX, next);
             }
 
             oldBottom = bounds.Bottom;
@@ -291,6 +307,8 @@ namespace Randio_2 {
 
             Rectangle bounds = BoundingRectangle;
             foreach (Entity e in collidableEntities) {
+                if (IsPlayer)
+                    IsPlayer = IsPlayer;
                 Vector2 depth = GeometryHelper.GetIntersectionDepth(bounds, e.BoundingRectangle);
                 if (depth != Vector2.Zero) {
 

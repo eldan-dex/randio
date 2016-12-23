@@ -13,6 +13,7 @@ namespace Randio_2 {
         public int Width { get; private set; }
         public int Height { get; private set; }
         public int TileCount { get { return tiles.Count; } }
+        public List<NPC> NPCs { get; private set; }
 
 
         //Private variables
@@ -39,19 +40,22 @@ namespace Randio_2 {
 
             if (CheckOutOfMap((int)Player.Position.Y) == -1) {
                 //player fell down, reset player
-                Player.Reset();
-                CameraToPlayer();
+                ResetPlayer();
             }
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
+            List<NPC> visibleNPCs = new List<NPC>();
             foreach (Tile t in GetVisibleTiles()) {
                 t.Draw(spriteBatch);
 
                 //Draw Tile NPCs (not a part of Tile.Draw because we need to have GameTime available)
                 foreach (NPC n in t.NPCs)
-                    n.Draw(gameTime, spriteBatch);
+                    visibleNPCs.Add(n);
             }
+
+            foreach (NPC n in visibleNPCs)
+                n.Draw(gameTime, spriteBatch);
 
             Player.Draw(gameTime, spriteBatch);
         }
@@ -70,7 +74,7 @@ namespace Randio_2 {
         //returns a tile which contains the given X coordinate
         public Tile GetTileForX(int x) {
             foreach (Tile t in tiles) {
-                if (t.Coords.Left <= x && t.Coords.Right >= x)
+                if (t.Coords.Left <= x && t.Coords.Right > x)
                     return t;
             }
             return null;
@@ -84,7 +88,15 @@ namespace Randio_2 {
                 return null;
         }
 
+        public void ResetPlayer()
+        {
+            Player.Reset();
+            CameraToPlayer();
+        }
+
         //translate global position into an offset from the left boundary of the parent tile
+        //the old way, doesn't work on tile edges
+        //todo - redundant?
         public Vector2 GlobalToTileCoordinates(Vector2 global) {
             int globalOffset = 0;
             foreach (Tile t in tiles) {
@@ -94,6 +106,18 @@ namespace Randio_2 {
                     globalOffset += t.Coords.Width;
             }
             return new Vector2(global.X - globalOffset, global.Y);
+        }
+
+        //translate global position into an offset from the left boundary of the parent tile
+        //new way, hopefully better
+        public Vector2 GlobalToTileCoordinates(Vector2 global, int tileIndex)
+        {
+            var tile = GetTileByIndex(tileIndex);
+
+            if (tile == null)
+                throw new NotSupportedException("Invalid tileIndex value!");
+
+            return new Vector2(global.X - tile.Coords.X, global.Y);
         }
 
         public List<Entity> GetAllEntites() {
@@ -138,7 +162,6 @@ namespace Randio_2 {
             if (Width % Block.Width > 0 || Height % Block.Height > 0)
                 throw new ArgumentException("Map dimensions must be divisible by Block dimensions!");
 
-            Random rnd = AlgorithmHelper.GetNewRandom();
             tiles = new List<Tile>();
 
             //Temporary algorithm, will be upgraded
@@ -149,7 +172,7 @@ namespace Randio_2 {
 
             while (totalWidth < Width) {
                 //Generate a random width for the next tile, but keep it divisible by Block.Width
-                int newWidth = rnd.Next(minWidth / Block.Width, maxWidth / Block.Width) * Block.Width;
+                int newWidth = AlgorithmHelper.GetRandom(minWidth / Block.Width, maxWidth / Block.Width) * Block.Width;
 
                 //If last tile wouldn't be able to fit, extend this one instead
                 int testWidth = totalWidth + newWidth;
@@ -162,7 +185,7 @@ namespace Randio_2 {
                 }
 
                 //Generate TileType
-                var type = (Tile.TileType)rnd.Next(0, Tile.TileTypeCount);
+                var type = (Tile.TileType)AlgorithmHelper.GetRandom(0, Tile.TileTypeCount);
 
                 //Create and add Tile
                 tiles.Add(new Tile(graphicsDevice, this, type, new Rectangle(totalWidth, 0, newWidth, Height), tileIndex));
@@ -178,7 +201,6 @@ namespace Randio_2 {
             foreach (Tile tile in visibleTiles)
                 tile.Update(gameTime);
         }
-
 
         private Tile[] GetVisibleTiles() {
             List<Tile> visibleTiles = new List<Tile>();
@@ -197,13 +219,20 @@ namespace Randio_2 {
                 rightBound = Width;
 
             //Add unique tiles on the right and left end of screen (implying player is centered)
-            visibleTiles.Add(GetTileForX((int)leftBound));
+            var tile = GetTileForX((int)leftBound);
+            if (tile != null)
+                visibleTiles.Add(tile);
 
             Tile current = GetTileForX((int)pX);
             if (!visibleTiles.Contains(current))
                 visibleTiles.Add(current);
 
             Tile other = GetTileForX((int)rightBound);
+
+            //hackaround, because GetTileForX returns null on the last coordinate
+            if (rightBound == Width)
+                other = GetTileByIndex(tiles.Count - 1);
+
             if (!visibleTiles.Contains(other))
                 visibleTiles.Add(other);
 

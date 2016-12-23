@@ -14,7 +14,7 @@ Prùbìh hry:
 	Hráè se objeví na "startu" a postupnì prochází svìtem až do "cíle". Celá cesta je generovaná náhodnì - vzhled pozadí, uspoøádání cesty (plošin), typy a vzhled nepøátel, zbranì, itemy, objective (úkol, který je nutné splnit k úspìšnému dokonèení).
 
 Koncept:
-	Náhoda založená na tzv. rulesetech - souborech pravidel definujících jak mùže algoritmus pro generování daného objektu/vlastnosti/textury pracovat (napø. postava hráèe nesmí být vyšší než 30px, širší než 20px a musí obsahovat minimálnì tøi barvy a mít èerný okraj).
+	Náhoda založená na tzv. rulesetech (zatím hardcodovaných v kódu, pozdìj tøeba oddìlených) - souborech pravidel definujících jak mùže algoritmus pro generování daného objektu/vlastnosti/textury pracovat (napø. postava hráèe nesmí být vyšší než 30px, širší než 20px a musí obsahovat minimálnì tøi barvy a mít èerný okraj).
 	Hra pøed startem vygeneruje všechny potøebné textury a mechaniky a poté už se jen nechá hrát
 
 Grafika:
@@ -55,11 +55,10 @@ Entity:
 
 Itemy:
 - Zbranì:
-	Textura generovaná pøes Syntex z nìjakého základu?
+	Textura generovaná l-systémem? :D
 
  -- Vlastnosti:
 	Síla
-	(stav/výdrž?)
 
 - Pomocné itemy
 
@@ -69,8 +68,8 @@ Itemy:
 
 Úkoly:
 - Hlavní cíl:
-	Pravdìpodobnì ve stylu "dojít sem, získat tenhle item, zabít tohohle nepøítele", samozøejmì zase založené na rulesetech
-
+	Náhodnì generovaný (do urèité míry)
+	1 èi více akcí, které musí probìhnout k vítìzství - zabít NPC, donést item nìkam, dojít nìkam, atd. (buï postupnì nebo v jakémkoli poøadí)
 
 
 - Ponechat pro každý prvek hry velmi malou pravdìpodobnost, že pøi poèáteèním generování poruší ruleset a hra tímpádem v jednom z velkého množství pøípadù ztratí kontrolu a "rozbije se" -> fun, fun, fun!

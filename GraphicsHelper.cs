@@ -25,7 +25,6 @@ namespace Randio_2 {
             Color[] color = new Color[texture.Width * texture.Height];
             texture.GetData(color);
 
-            Random r = AlgorithmHelper.GetNewRandom();
             int maxDistance = (texture.Width + texture.Height) / 2;
             int centerX = texture.Width / 2;
             int centerY = texture.Height / 2;
@@ -38,7 +37,7 @@ namespace Randio_2 {
                 int probability = (int)(centerDistance / ((double)maxDistance / 100));
                 if (probability > 75)
                     probability = 100;
-                color[i] = r.Next(0, 100) >= probability ? fill : Color.Transparent;
+                color[i] = AlgorithmHelper.GetRandom(0, 100) >= probability ? fill : Color.Transparent;
                 ++currentX;
                 if (currentX == texture.Width)
                 {
