@@ -6,29 +6,27 @@ using Microsoft.Xna.Framework.Input;
 namespace Randio_2 {
     class Player : Entity {
 
-        //Public variables
-        //********************************************************************************//
+        #region Public varaibles
         public Vector2 Origin { get; private set; }
         public int SafeMargin { get; private set; } //how close to the border can player go before the camera starts moving;
-        public const int Width = 48; //32 small
-        public const int Height = 48; //32 small
+        public const int Width = 32; //32 small, 48big
+        public const int Height = 32; //32 small, 48big
+        #endregion
 
-
-        //Private variables
-        //********************************************************************************//
+        #region Private variables
         // Input configuration
         private const Keys jumpButton = Keys.W; //keys will be assigned randomly
         private const Keys leftButton = Keys.A;
         private const Keys rightButton = Keys.D;
         private const Keys crouchButton = Keys.S;
-        private const Keys actionButtonA = Keys.K;
-        private const Keys actionButtonB = Keys.L;
+        private const Keys actionButtonA = Keys.J;
+        private const Keys actionButtonB = Keys.K;
 
         private bool AkeyDown;
         private bool BkeyDown;
+        #endregion
 
-        //Public methods
-        //********************************************************************************//
+        #region Public methods
         public Player(GraphicsDevice graphicsDevice, Map map, Vector2 position) : base(map, position, 0, Width, Height) {        
             CurrentTile = 0;
             Origin = position;
@@ -50,10 +48,9 @@ namespace Randio_2 {
             position = Origin + new Vector2(map.GetTileByIndex(CurrentTile).Coords.Left, 0);
             //reset everything else too
         }
+        #endregion
 
-
-        //Private methods
-        //********************************************************************************//
+        #region Private methods
         private Texture2D CreateTexture(GraphicsDevice graphicsDevice, int width, int height) {
             var texture = new Texture2D(graphicsDevice, width, height);
 
@@ -118,17 +115,10 @@ namespace Randio_2 {
 
         private void PerformAction(Func<Entity, bool> Interaction)
         {
-            Entity other = null;
-            if (Direction == 1) //interacting right
-            {
-                //find the first entity in range
-                //other = ...
-            } 
-            else //interacting left
-            {
-                //find the first entity in range
-                //other = ...
-            }
+            Entity other = GetFirstEntityInSight(Direction, Range);
+
+            //how should I check for vertical difference?
+
             if (other != null)
                 Interaction(other);
         }
@@ -142,5 +132,6 @@ namespace Randio_2 {
         {
             return true;
         }
+        #endregion
     }
 }

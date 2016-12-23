@@ -1,8 +1,7 @@
 ﻿TODO:
 - invisible npc bug
-- Terrain collisions - fix "skip" when going left on a new tile
-- find an entity within range to interact with
-
+- Terrain collisions - fix "skip" when going right on a new tile
+- improve entity interaction
 
 - Splotches - from rectangles
 
@@ -35,6 +34,13 @@ IDEAS:
 - Doublejumping?
 - HP indicator - entity outline color?
 - switch all entities to the global coordination model
+
+QUESTS:
+1. hrac musi presne vedet co se po nem chce
+2. TYP - zabit oznacena NPCKA
+3. TYP - najit a donest item
+4. TYP - dostat se nekam nahoru?
+5. TYP - zavod?
 
 
 -----

@@ -1,5 +1,10 @@
 ﻿PROGRESS LOG
 
+23.12
+* Switched back to 32*32 blocksize, will switch to 48*48 again at some point.
+* 1st part of refactoring began
++ Entity interaction basics
+
 22.12
 * Player finally doesn't fall down through the first block of a new tile
 * Improved name generation
@@ -8,7 +13,7 @@
 
 19.12
 * Now uses single Random instance for all random generation
-* NPC names aren't overdrawn by other tiles when on tile edge
++ Added entity names
 + Debug view shows block coords
 
 

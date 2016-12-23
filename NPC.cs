@@ -4,8 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Randio_2 {
     class NPC : Entity {
-        //Public variables
-        //********************************************************************************//
+        #region Public variables
         public enum NPCBehaviour {
             GoToPlayer,
             IgnorePlayer,
@@ -18,9 +17,9 @@ namespace Randio_2 {
         public Vector2 SightRange { get; private set; }
 
         public bool IsBoss { get; private set; }
+        #endregion
 
-        //Public methods
-        //********************************************************************************//
+        #region Public methods
         public NPC(GraphicsDevice graphicsDevice, Map map, Vector2 position, int parentTile, int width, int height) : base(map, position, parentTile, width, height) {
             ParentTile = map.GetTileByIndex(parentTile);
             InitNPC();
@@ -33,9 +32,9 @@ namespace Randio_2 {
             AIScan();
             base.Update(gameTime);
         }
+        #endregion
 
-        //Public methods
-        //********************************************************************************//
+        #region Private methods
         private Texture2D CreateTexture(GraphicsDevice graphicsDevice) {
             var texture = new Texture2D(graphicsDevice, Width, Height);
 
@@ -157,5 +156,6 @@ namespace Randio_2 {
             else
                 PlayerInRange = false;
         }
+        #endregion
     }
 }

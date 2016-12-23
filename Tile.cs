@@ -5,8 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Randio_2 {
     class Tile {
-        //Public variables
-        //********************************************************************************//
+        #region Public variables
         public enum TileType {
             Shapes,
             LSystem,
@@ -22,17 +21,15 @@ namespace Randio_2 {
         public Block[,] Blocks { get; private set; }
         public int Index { get; private set; }
         public List<NPC> NPCs { get; private set; }
+        #endregion
 
-
-        //Private variables
-        //********************************************************************************//
+        #region Private variables
         private Map map;
         private int wblocks;
         private int hblocks;
+        #endregion
 
-
-        //Public methods
-        //********************************************************************************//
+        #region Public methods
         public Tile(GraphicsDevice graphicsDevice, Map map, TileType type, Rectangle coords, int index) {
             this.map = map;
 
@@ -85,10 +82,9 @@ namespace Randio_2 {
             spriteBatch.Draw(TileTexture, Coords, Color.White);
             DrawBlocks(spriteBatch);
         }
+#endregion
 
-
-        //Private methods
-        //********************************************************************************//
+        #region Private methods
         private void CreateTileTexture(GraphicsDevice graphicsDevice)
         {
             TileTexture = Background.Texture;
@@ -105,8 +101,8 @@ namespace Randio_2 {
             //temporary testing code
             int npcCount = AlgorithmHelper.GetRandom(1, 17);
             for (int i = 0; i < npcCount; ++i) {
-                int w = AlgorithmHelper.GetRandom(32, 65); //16-49 small
-                int h = AlgorithmHelper.GetRandom(32, 65);
+                int w = AlgorithmHelper.GetRandom(16, 49); //16-49 small
+                int h = AlgorithmHelper.GetRandom(16, 49); //32-65 big
                 Vector2 position = new Vector2(Coords.X + AlgorithmHelper.GetRandom(0, Coords.Width - w + 1), AlgorithmHelper.GetRandom(0, map.Height - h + 1));
                 NPC npc = new NPC(graphicsDevice, map, position, Index, w, h);
 
@@ -214,7 +210,7 @@ namespace Randio_2 {
                 }
             }
         }
-
+        #endregion
 
 
     }

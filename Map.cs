@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -6,24 +7,21 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Randio_2 {
     class Map {
-        //Public variables
-        //********************************************************************************//   
+        #region Public variables  
         public Player Player { get; private set; }
         public bool ReachedExit { get; private set; }
         public int Width { get; private set; }
         public int Height { get; private set; }
         public int TileCount { get { return tiles.Count; } }
         public List<NPC> NPCs { get; private set; }
+        #endregion
 
-
-        //Private variables
-        //********************************************************************************//
+        #region Private variables
         private List<Tile> tiles;
         private Camera camera;
+        #endregion
 
-
-        //Public methods
-        //********************************************************************************//
+        #region Public methods
         public Map(GraphicsDevice graphicsDevice, Camera camera, int width, int height) {
             this.camera = camera;
             Width = width;
@@ -72,20 +70,13 @@ namespace Randio_2 {
         }
 
         //returns a tile which contains the given X coordinate
-        public Tile GetTileForX(int x) {
-            foreach (Tile t in tiles) {
-                if (t.Coords.Left <= x && t.Coords.Right > x)
-                    return t;
-            }
-            return null;
-        }
+        public Tile GetTileForX(int x) => tiles.FirstOrDefault(t => t.Coords.Left <= x && t.Coords.Right > x);
 
         //returns tile with the corresponding index
         public Tile GetTileByIndex(int index) {
             if (index >= 0 && index < tiles.Count)
                 return tiles[index];
-            else
-                return null;
+            return null;
         }
 
         public void ResetPlayer()
@@ -94,22 +85,7 @@ namespace Randio_2 {
             CameraToPlayer();
         }
 
-        //translate global position into an offset from the left boundary of the parent tile
-        //the old way, doesn't work on tile edges
-        //todo - redundant?
-        public Vector2 GlobalToTileCoordinates(Vector2 global) {
-            int globalOffset = 0;
-            foreach (Tile t in tiles) {
-                if (t.Coords.Left <= (int)global.X && t.Coords.Right >= (int)global.X)
-                    break;
-                else
-                    globalOffset += t.Coords.Width;
-            }
-            return new Vector2(global.X - globalOffset, global.Y);
-        }
-
-        //translate global position into an offset from the left boundary of the parent tile
-        //new way, hopefully better
+        //translate global position into an offset from the left boundary of the given tile
         public Vector2 GlobalToTileCoordinates(Vector2 global, int tileIndex)
         {
             var tile = GetTileByIndex(tileIndex);
@@ -129,10 +105,9 @@ namespace Randio_2 {
 
             return result;
         }
+        #endregion
 
-
-        //Private methods
-        //********************************************************************************//
+        #region Private methods
         private void CreatePlayer(GraphicsDevice graphicsDevice) {
             Player = new Player(graphicsDevice, this, Vector2.Zero); //generate position
             CameraToPlayer();
@@ -238,5 +213,6 @@ namespace Randio_2 {
 
             return visibleTiles.ToArray();
         }
+        #endregion
     }
 }

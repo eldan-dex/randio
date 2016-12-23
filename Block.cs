@@ -3,17 +3,17 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Randio_2 {
     class Block {
-        //Public variables
-        //********************************************************************************//   
+        #region Public variables
         public Texture2D Texture;
-        public const int Width = 48; //32 small
-        public const int Height = 48; //32 small
+        public const int Width = 32; //32 small, 48 big
+        public const int Height = 32; //32 small, 48 big
         public static readonly Vector2 Size = new Vector2(Width, Height);
+        #endregion
 
-        //Public methods
-        //********************************************************************************//   
+        #region Public methods 
         public Block(Texture2D texture) {
             Texture = texture;
         }
+        #endregion
     }
 }

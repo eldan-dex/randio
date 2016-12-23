@@ -7,16 +7,13 @@ namespace Randio_2 {
     /// This is the main type for your game.
     /// </summary>
     public class Game : Microsoft.Xna.Framework.Game {
-        //Public variables
-        //********************************************************************************// 
-        public const int WIDTH = 1296; //1280 small
-        public const int HEIGHT = 720; //704 small
-
+        #region Public variables
+        public const int WIDTH = 1280; //1280 small, 1296 big
+        public const int HEIGHT = 704; //704 small, 720 big
         public static SpriteFont font;
+        #endregion
 
-
-        //Private variables
-        //********************************************************************************// 
+        #region Private variables
         private GraphicsDeviceManager graphics;
         private SpriteBatch levelSpriteBatch;
         private SpriteBatch osdSpriteBatch;
@@ -29,23 +26,22 @@ namespace Randio_2 {
         private KeyboardState keyboardState;
         
         //"O" - toggle debug
-        public static bool debugEnabled = false;
+        public static bool debugEnabled = false; //public because... eh.
         private bool oEnabled = false;
 
         //"P" - play next frame (in debug mode)
         private bool nextFrame = false;
         private bool pEnabled = false; //for the P button
+        #endregion
 
-        //Public methods
-        //********************************************************************************// 
+        #region Public methods
         public Game() {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
         }
+        #endregion
 
-
-        //Protected methods
-        //********************************************************************************// 
+        #region Protected methods
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
         /// This is where it can query for any required services and load any non-graphic
@@ -115,27 +111,26 @@ namespace Randio_2 {
 
             var viewMatrix = camera.GetViewMatrix();
 
-             levelSpriteBatch.Begin(transformMatrix: viewMatrix);
-             levelSpriteBatch.Draw(testBG, new Rectangle(0, 0, WIDTH, HEIGHT), Color.White);
-             map.Draw(gameTime, levelSpriteBatch);
-             levelSpriteBatch.End();
+            levelSpriteBatch.Begin(transformMatrix: viewMatrix);
+            levelSpriteBatch.Draw(testBG, new Rectangle(0, 0, WIDTH, HEIGHT), Color.White);
+            map.Draw(gameTime, levelSpriteBatch);
+            levelSpriteBatch.End();
 
-             if (debugEnabled) {
-                 osdSpriteBatch.Begin();
+            if (debugEnabled) {
+                osdSpriteBatch.Begin();
 
-                 //Draw OSD
-                 osdSpriteBatch.DrawString(debugFont, "DEBUG ENABLED", new Vector2(10, 10), Color.Red);
-                 osdSpriteBatch.DrawString(debugFont, "Player X: " + map.Player.Position.X + "     Player Y: " + map.Player.Position.Y + "\nDirection: " + (map.Player.Velocity.X == 0 ? "still" : (map.Player.Velocity.X > 0 ? "right" : "left")) + "\nCurrentTile: " + map.Player.CurrentTile, new Vector2(10, 30), Color.Red);
+                //Draw OSD
+                osdSpriteBatch.DrawString(debugFont, "DEBUG ENABLED", new Vector2(10, 10), Color.Red);
+                osdSpriteBatch.DrawString(debugFont, "Player X: " + map.Player.Position.X + "     Player Y: " + map.Player.Position.Y + "\nDirection: " + (map.Player.Velocity.X == 0 ? "still" : (map.Player.Velocity.X > 0 ? "right" : "left")) + "\nCurrentTile: " + map.Player.CurrentTile, new Vector2(10, 30), Color.Red);
 
-                 osdSpriteBatch.End();
-             }
+                osdSpriteBatch.End();
+            }
 
             base.Draw(gameTime);
         }
+        #endregion
 
-
-        //Private methods
-        //********************************************************************************// 
+        #region Private methods
         private void CreateMap() {
             map = new Map(GraphicsDevice, camera, WIDTH*10, HEIGHT); //parameters
         }
@@ -182,5 +177,6 @@ namespace Randio_2 {
             //Additional global keyboard inputs - global menu key, etc
 
         }
+        #endregion
     }
 }

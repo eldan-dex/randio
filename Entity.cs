@@ -6,8 +6,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Randio_2 {
     class Entity {
 
-        //Public variables
-        //********************************************************************************//
+        #region Public variables
         public Vector2 Position //this is the GLOBAL position (relative to the entire map)
         {
             get { return position; }
@@ -34,7 +33,7 @@ namespace Randio_2 {
         public int CurrentTile { get; protected set; } //public for debugging purposes
         public int Width { get; protected set; }
         public int Height { get; protected set; }
-        public int Direction { get; protected set; }
+        public int Direction { get; protected set; } // 1 = right, 0 = left
         public string Name { get; protected set; }
 
         //Combat stats //TODO: is it good to set defaults this way?
@@ -44,10 +43,9 @@ namespace Randio_2 {
         public int Range { get; protected set; } = 16; //How far can this entity's interaction (attacks, etc) reach
 
         public bool IsPlayer = false;
+        #endregion
 
-
-        //Private/Protected variables
-        //********************************************************************************//
+        #region Private/Protected variables
         //Instance variables
         protected Map map;
 
@@ -76,10 +74,9 @@ namespace Randio_2 {
         private bool isOnGround;  
         private bool wasJumping;
         private float oldBottom;
+        #endregion
 
-
-        //Public methods
-        //********************************************************************************//
+        #region Public methods
         public Entity(Map map, Vector2 position, int currentTile, int width, int height) {
             this.map = map;
             this.position = position;
@@ -123,11 +120,10 @@ namespace Randio_2 {
             spriteBatch.DrawString(Game.font, Name, namePos, Color.Red);
             spriteBatch.Draw(Texture, position, null, Color.White, 0.0f, Vector2.Zero, 1.0f, effect, 0.0f);
         }
+        #endregion
 
-
-        //Private methods
-        //********************************************************************************//
-        #region Physics stuff (ApplyPhysics, CheckJump, DoCollisionsXY)
+        #region Private methods
+        #region Physics (ApplyPhysics, CheckJump, TerrainCollisionsXY, EntityCollisionsXY)
 
         //Move the entity according to physics
         private void ApplyPhysics(GameTime gameTime) {
@@ -296,14 +292,7 @@ namespace Randio_2 {
 
         //This is potentially VERY slow
         private void EntityCollisionsXY(bool doCollisionX) {
-            List<Entity> collidableEntities = new List<Entity>();
-            List<Entity> allEntites = map.GetAllEntites();
-
-            foreach (Entity e in allEntites) {
-                if (e != this && Math.Abs(e.Position.X - Position.X) < Width  && Math.Abs(e.Position.Y - Position.Y) < Height) {
-                    collidableEntities.Add(e);
-                }
-            }
+            List<Entity> collidableEntities = GetEntitiesInSight(Width, Height);
 
             Rectangle bounds = BoundingRectangle;
             foreach (Entity e in collidableEntities) {
@@ -332,7 +321,7 @@ namespace Randio_2 {
                 }
             }
         }
-    #endregion
+        #endregion
 
         //Check whether we moved out of our current tile and adjust the currentTile variable
         private void CheckTile() {
@@ -342,5 +331,61 @@ namespace Randio_2 {
             else if (position.X < current.Coords.Left && CurrentTile > 0)
                 --CurrentTile;
         }
+
+        public List<Entity> GetEntitiesInSight(int xRange, int yRange)
+        {
+            List<Entity> inSight = new List<Entity>();
+            List<Entity> allEntites = map.GetAllEntites();
+
+            foreach (Entity e in allEntites)
+            {
+                if (e != this && Math.Abs(e.Position.X - Position.X) <= xRange && Math.Abs(e.Position.Y - Position.Y) <= yRange)
+                {
+                    inSight.Add(e);
+                }
+            }
+
+            return inSight;
+        }
+
+        public Entity GetFirstEntityInSight(int direction, int range)
+        {
+            Entity found = null;
+            var entities = GetEntitiesInSight(range*3, range*3);
+            List<Entity> foundEntities = new List<Entity>();
+
+            if (direction == 1) //right
+            {
+                int closest = int.MaxValue;
+                foreach (Entity e in entities)
+                {
+                    if (e.Position.X >= Position.X && Math.Abs(e.Position.Y - Position.Y) <= range*2) //range/2? really?
+                    {
+                        int distance = (int)(Math.Abs(e.Position.X - position.X) + Math.Abs(e.Position.Y - position.Y));
+                        if (distance < closest)
+                        {
+                            closest = distance;
+                            found = e;
+                        }
+                    }
+                }
+            }
+            else //left
+            {
+                int closest = int.MaxValue;
+                foreach (Entity e in entities)
+                {
+                    int distance = (int)(Math.Abs(e.Position.X - position.X) + Math.Abs(e.Position.Y - position.Y));
+                    if (distance > closest) //aaa, so much duplicity
+                    {
+                        closest = distance;
+                        found = e;
+                    }
+                }
+            }
+
+            return found;
+        }
+        #endregion
     }
 }
