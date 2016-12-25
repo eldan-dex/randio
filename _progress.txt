@@ -1,5 +1,8 @@
 ﻿PROGRESS LOG
 
+24.12
++ Added attacks, taking damage and dying.
+
 23.12
 * Switched back to 32*32 blocksize, will switch to 48*48 again at some point.
 * 1st part of refactoring began

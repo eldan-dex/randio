@@ -99,10 +99,10 @@ namespace Randio_2 {
             ApplyPhysics(gameTime);
             CheckTile();
 
-            //Keep easily accessible direction info
-            if (Velocity.X >= 0)
+            //Keep easily accessible direction info. If player is still, remember last direction
+            if (Velocity.X > 0)
                 Direction = 1;
-            else
+            else if (Velocity.X < 0)
                 Direction = -1;
 
             //reset movement
@@ -120,6 +120,21 @@ namespace Randio_2 {
             spriteBatch.DrawString(Game.font, Name, namePos, Color.Red);
             spriteBatch.Draw(Texture, position, null, Color.White, 0.0f, Vector2.Zero, 1.0f, effect, 0.0f);
         }
+
+        public void TakeDamage(Entity source, int damage)
+        {
+            var realDamage = damage - Defense;
+            if (realDamage > 0)
+            {
+                HP -= realDamage;
+                isJumping = true; //show that we got hit
+            }
+
+            if (HP <= 0)
+                position = new Vector2(0, 99999); //now OutOfMap check will recognise this NPC as dead and will remove it. VERY CLUMSY AND UGLY WAY OF DOING THIS, todo: maybe fix?
+        }
+
+
         #endregion
 
         #region Private methods
@@ -376,7 +391,7 @@ namespace Randio_2 {
                 foreach (Entity e in entities)
                 {
                     int distance = (int)(Math.Abs(e.Position.X - position.X) + Math.Abs(e.Position.Y - position.Y));
-                    if (distance > closest) //aaa, so much duplicity
+                    if (distance < closest) //aaa, so much duplicity
                     {
                         closest = distance;
                         found = e;

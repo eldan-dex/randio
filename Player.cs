@@ -125,11 +125,15 @@ namespace Randio_2 {
 
         private bool ActionA(Entity other)
         {
+            other.TakeDamage(this, Strength);
             return true;
         }
 
         private bool ActionB(Entity other)
         {
+            //taking/placing/swapping items
+            //if there's item - if inv empty - take. else - swap
+            //if no item - if inv not empty - drop item.
             return true;
         }
         #endregion

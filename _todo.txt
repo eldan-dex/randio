@@ -24,6 +24,8 @@
 
 - Refactoring
 
+- Timed events/animations
+
 ISSUES:
 - Entities clip/bug through blocks and themselves
 - "Ghost" entities - invisible but impassable areas on the map - wtf are they? and why are they sometimes fixed and sometimes not?
