@@ -58,6 +58,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShapesBG.cs" />
     <Compile Include="StringHelper.cs" />
+    <Compile Include="TemplateBG.cs" />
     <Compile Include="Tile.cs" />
   </ItemGroup>
   <ItemGroup>

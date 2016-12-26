@@ -5,6 +5,7 @@
 + Added timed events
 + Added direction arrow to player texture
 + Entity flashes red/gray when hit depending on whether damage was taken
++ Added background template
 
 24.12
 + Added attacks, taking damage and dying.
