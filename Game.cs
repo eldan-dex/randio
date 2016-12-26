@@ -1,12 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
 
 namespace Randio_2 {
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
-    public class Game : Microsoft.Xna.Framework.Game {
+    class Game : Microsoft.Xna.Framework.Game {
         #region Public variables
         public const int WIDTH = 1280; //1280 small, 1296 big
         public const int HEIGHT = 704; //704 small, 720 big

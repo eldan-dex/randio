@@ -13,7 +13,8 @@ namespace Randio_2 {
         public int Width { get; private set; }
         public int Height { get; private set; }
         public int TileCount { get { return tiles.Count; } }
-        public List<NPC> NPCs { get; private set; }
+        //public List<NPC> NPCs { get; private set; }
+        public EventManager<Entity> entityEvents;
         #endregion
 
         #region Private variables
@@ -28,6 +29,8 @@ namespace Randio_2 {
             Height = height;
             CreatePlayer(graphicsDevice);
             CreateTiles(graphicsDevice);
+
+            entityEvents = new EventManager<Entity>();
         }
 
         public void Update(GameTime gameTime, KeyboardState keyboardState) {
@@ -35,6 +38,8 @@ namespace Randio_2 {
             UpdateTiles(gameTime);
 
             MoveCamera();
+
+            entityEvents.Update();
 
             if (CheckOutOfMap((int)Player.Position.Y) == -1) {
                 //player fell down, reset player

@@ -1,7 +1,7 @@
 ﻿TODO:
 - invisible npc bug
 - Terrain collisions - fix "skip" when going right on a new tile
-- improve entity interaction
+- entities can push each other away (and bug each other through walls)
 
 - Splotches - from rectangles
 

@@ -139,5 +139,40 @@ namespace Randio_2 {
             spriteBatch.Draw(texture, new Rectangle((int)a.X, (int)a.Y, size, size), null, color, 0f, new Vector2(0, 0), SpriteEffects.None, 0);
             //spriteBatch.End();
         }
+
+        public static void DrawArrow(int direction, Texture2D texture, Color arrowColor)
+        {
+            Color[] color = new Color[texture.Width * texture.Height];
+            texture.GetData(color);
+
+            int arrowWidth = texture.Width / 2;
+            int arrowStart = texture.Width / 4;
+            int arrowEnd = arrowStart + arrowWidth;
+
+            int hMiddle = texture.Height / 2;
+
+            int index = 0;
+            for (int y = 0; y < texture.Height; ++y)
+            {
+                for (int x = 0; x < texture.Width; ++x)
+                {
+                    if (y == hMiddle && x >= arrowStart && x < arrowEnd)
+                        color[index] = arrowColor;
+
+                    else if ((y == hMiddle - 1 || y == hMiddle + 1) && x >= arrowEnd - 2 && x < arrowEnd)
+                        color[index] = arrowColor;
+
+                    else if ((y == hMiddle - 2 || y == hMiddle + 2) && x >= arrowEnd - 4 && x < arrowEnd - 2)
+                        color[index] = arrowColor;
+
+                    else if ((y == hMiddle - 2 || y == hMiddle + 2) && x >= arrowEnd - 6 && x < arrowEnd - 4)
+                        color[index] = arrowColor;
+
+                    ++index;
+                }
+            }
+
+            texture.SetData(color);
+        }
     }
 }

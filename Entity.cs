@@ -41,6 +41,7 @@ namespace Randio_2 {
         public int Strength { get; protected set; } = 1;
         public int Defense { get; protected set; } = 0;
         public int Range { get; protected set; } = 16; //How far can this entity's interaction (attacks, etc) reach
+        public Color OverwriteColor = Color.White; //used for effects - damage, etc.
 
         public bool IsPlayer = false;
         #endregion
@@ -112,13 +113,13 @@ namespace Randio_2 {
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
             SpriteEffects effect = SpriteEffects.None;
-            if (Velocity.X >= 0)
+            if (Direction < 0)
                 effect = SpriteEffects.FlipHorizontally;
 
             Vector2 namePos = new Vector2(Position.X - (Name.Length / 2) * 4, Position.Y - 22);
 
             spriteBatch.DrawString(Game.font, Name, namePos, Color.Red);
-            spriteBatch.Draw(Texture, position, null, Color.White, 0.0f, Vector2.Zero, 1.0f, effect, 0.0f);
+            spriteBatch.Draw(Texture, position, null, OverwriteColor, 0.0f, Vector2.Zero, 1.0f, effect, 0.0f);
         }
 
         public void TakeDamage(Entity source, int damage)
@@ -127,7 +128,16 @@ namespace Randio_2 {
             if (realDamage > 0)
             {
                 HP -= realDamage;
-                isJumping = true; //show that we got hit
+
+                //when damaged, entity flashes red for 200ms
+                OverwriteColor = Color.Red;
+                map.entityEvents.AddEvent(new TimedEvent<Entity>(200, delegate (Entity e) { e.OverwriteColor = Color.White; }, this));
+            }
+            else
+            {
+                //if attack was deflected, entity flashes gray for 200ms
+                OverwriteColor = Color.DarkGray;
+                map.entityEvents.AddEvent(new TimedEvent<Entity>(200, delegate (Entity e) { e.OverwriteColor = Color.White; }, this));
             }
 
             if (HP <= 0)
@@ -374,7 +384,7 @@ namespace Randio_2 {
                 int closest = int.MaxValue;
                 foreach (Entity e in entities)
                 {
-                    if (e.Position.X >= Position.X && Math.Abs(e.Position.Y - Position.Y) <= range*2) //range/2? really?
+                    if (e.Position.X >= Position.X && Math.Abs(e.Position.Y - Position.Y) <= range*3) //range/2? really?
                     {
                         int distance = (int)(Math.Abs(e.Position.X - position.X) + Math.Abs(e.Position.Y - position.Y));
                         if (distance < closest)
@@ -390,11 +400,14 @@ namespace Randio_2 {
                 int closest = int.MaxValue;
                 foreach (Entity e in entities)
                 {
-                    int distance = (int)(Math.Abs(e.Position.X - position.X) + Math.Abs(e.Position.Y - position.Y));
-                    if (distance < closest) //aaa, so much duplicity
+                    if (e.Position.X <= Position.X && Math.Abs(e.Position.Y - Position.Y) <= range * 3)
                     {
-                        closest = distance;
-                        found = e;
+                        int distance = (int)(Math.Abs(e.Position.X - position.X) + Math.Abs(e.Position.Y - position.Y));
+                        if (distance < closest) //aaa, so much duplicity
+                        {
+                            closest = distance;
+                            found = e;
+                        }
                     }
                 }
             }

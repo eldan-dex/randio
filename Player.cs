@@ -56,6 +56,7 @@ namespace Randio_2 {
 
             //Temporary placeholder code, will call texture generation here
             GraphicsHelper.DrawRectangle(texture, Color.Blue);
+            GraphicsHelper.DrawArrow(1, texture, Color.Black);
             GraphicsHelper.OutlineRectangle(texture, Color.Green, 2);
 
             return texture;
@@ -66,8 +67,8 @@ namespace Randio_2 {
             //atm player is a little faster and jumps higher and faster than an average entity
             //TODO: are these good default values for player?
             MaxMoveSpeed = 1750.0f;
-            MaxJumpTime = 0.45f; //0.35f small
-            JumpLaunchVelocity = -4000.0f; //-3500 small
+            MaxJumpTime = 0.35f; //0.35f small
+            JumpLaunchVelocity = -3500.0f; //-3500 small
 
             //atm only HP is higher than an average entity
             HP = 10;
@@ -116,8 +117,6 @@ namespace Randio_2 {
         private void PerformAction(Func<Entity, bool> Interaction)
         {
             Entity other = GetFirstEntityInSight(Direction, Range);
-
-            //how should I check for vertical difference?
 
             if (other != null)
                 Interaction(other);
