@@ -51,6 +51,7 @@
     <Compile Include="GeometryHelper.cs" />
     <Compile Include="GraphicsHelper.cs" />
     <Compile Include="Item.cs" />
+    <Compile Include="ItemProperties.cs" />
     <Compile Include="LSystem.cs" />
     <Compile Include="LSystemBG.cs" />
     <Compile Include="Map.cs" />

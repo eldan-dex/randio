@@ -10,6 +10,8 @@ namespace Randio_2
         #region Public enums
         public enum ItemType
         {
+            Armor,
+            Weapon,
             Flop
         }
         #endregion
@@ -34,7 +36,7 @@ namespace Randio_2
 
         public ItemType Type { get; protected set; }
         public Texture2D Texture { get; protected set; }
-        public string Name { get; protected set; }
+        public ItemProperties Properties { get; protected set; }
 
         public int CurrentTile { get; protected set; }
         public int Width { get; protected set; }
@@ -52,7 +54,7 @@ namespace Randio_2
         #endregion
 
         #region Public methods
-        public Item(Map map, GraphicsDevice device, ItemType type, Vector2 position, int currentTile, int width, int height, bool placed)
+        public Item(Map map, GraphicsDevice device, ItemType type, Vector2 position, int currentTile, int width, int height, bool placed = true, Entity owner = null, ItemProperties properties = null)
         {
             this.map = map;
             Type = type;
@@ -61,7 +63,9 @@ namespace Randio_2
             Width = width;
             Height = height;
             IsPlaced = placed;
-            GetName();
+            Owner = owner;
+            Properties = properties;
+            InitializeItem();
             CreateTexture(device);
         }
 
@@ -74,8 +78,8 @@ namespace Randio_2
         {
             if (IsPlaced) //Only draw the item if it's not held by any entity
             {
-                Vector2 namePos = new Vector2(Position.X - (Name.Length / 2) * 4, Position.Y - 22);
-                spriteBatch.DrawString(Game.font, Name, namePos, Color.Red, 0, Vector2.Zero, 0.7f, SpriteEffects.None, 0);
+                Vector2 namePos = new Vector2(Position.X - (Properties.Name.Length / 2) * 4, Position.Y - 22);
+                spriteBatch.DrawString(Game.font, Properties.Name, namePos, Color.Red, 0, Vector2.Zero, 0.7f, SpriteEffects.None, 0);
                 spriteBatch.Draw(Texture, position, Color.White);
             }
         }
@@ -108,15 +112,35 @@ namespace Randio_2
         #endregion
 
         #region Private methods
-        private void GetName()
+        private void InitializeItem()
         {
-            if (Type == ItemType.Flop)
-                Name = "Flop";
+            if (!IsPlaced && Owner == null)
+                throw new ArgumentException("Cannot create an unobtainable item");
+
+            if (Properties == null)
+            {
+                Properties = new ItemProperties();
+                switch (Type)
+                {
+                    case ItemType.Armor:
+                        Properties.Name = "Armore";
+                        Properties.ArmorBonus = 1;
+                        break;
+                    case ItemType.Weapon:
+                        Properties.Name = "Weapone";
+                        Properties.StrengthBonus = 1;
+                        break;
+                    case ItemType.Flop:
+                        Properties.Name = "Flope";
+                        Properties.SpeedBonus = 0.5f;
+                        break;
+                }
+            }
         }
 
         private void CreateTexture(GraphicsDevice device)
         {
-            if (Type == ItemType.Flop)
+            //if (Type == ItemType.Flop)
                 Texture = CreateFlopTexture(device);
         }
 

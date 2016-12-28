@@ -71,9 +71,9 @@ namespace Randio_2 {
             JumpLaunchVelocity = -3500.0f; //-3500 small
 
             //atm only HP is higher than an average entity
-            HP = 10;
-            Strength = 1;
-            Defense = 0;
+            DefaultHP = 10;
+            DefaultStrength = 1;
+            DefaultDefense = 0;
 
             Name = StringHelper.GenerateName().ToUpper();
             IsPlayer = true;
@@ -146,6 +146,8 @@ namespace Randio_2 {
                     tmp.PutDown(Direction);
                 }
             }
+
+            ApplyItemProperties();
         }
         #endregion
     }

@@ -66,9 +66,9 @@ namespace Randio_2 {
             IsBoss = AlgorithmHelper.GetRandom(0, 11) == 0; //currently 10% chance of being a boss
 
             //NPC defaults
-            HP = 3;
-            Strength = 1;
-            Defense = 0;
+            DefaultHP = 3;
+            DefaultStrength = 1;
+            DefaultDefense = 0;
 
             if (IsBoss)
             {
@@ -76,9 +76,9 @@ namespace Randio_2 {
                 Height += 5;
 
                 //Boss defaults
-                HP += 2;
-                Strength += 1;
-                Defense += 1;
+                DefaultHP += 2;
+                DefaultStrength += 1;
+                DefaultDefense += 1;
             }
 
             Name = StringHelper.GenerateName();

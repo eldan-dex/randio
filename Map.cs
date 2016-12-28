@@ -200,7 +200,9 @@ namespace Randio_2 {
         {
             //just for testing
             items = new List<Item>();
-            items.Add(new Item(this, device, Item.ItemType.Flop, new Vector2(100, 550), 0, 16, 16, true));
+            items.Add(new Item(this, device, Item.ItemType.Flop, new Vector2(100, 550), 0, 16, 16));
+            items.Add(new Item(this, device, Item.ItemType.Armor, new Vector2(300, 450), 0, 16, 16));
+            items.Add(new Item(this, device, Item.ItemType.Weapon, new Vector2(700, 500), 0, 16, 16, properties: new ItemProperties("OOO WEAPONE", strength: 10)));
         }
 
         //Updates Tiles and NPCs on them

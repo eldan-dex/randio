@@ -36,12 +36,20 @@ namespace Randio_2 {
         public int Direction { get; protected set; } // 1 = right, 0 = left
         public string Name { get; protected set; }
         public Item HeldItem { get; protected set; }
-
-        //Combat stats //TODO: is it good to set defaults this way?
-        public int HP { get; protected set; } = 10;
-        public int Strength { get; protected set; } = 1;
-        public int Defense { get; protected set; } = 0;
         public int Range { get; protected set; } = 16; //How far can this entity's interaction (attacks, etc) reach
+
+        //Combat stats - defaults
+        public int DefaultHP { get; protected set; } = 10;
+        public float DefaultStrength { get; protected set; } = 1;
+        public float DefaultDefense { get; protected set; } = 0;
+        public float DefaultSpeed { get; protected set; } = 1;
+
+        //Combat stats - final (accounting for all modifiers)
+        public int HP { get; protected set; }
+        public float Strength { get; protected set; }
+        public float Defense { get; protected set; }
+        public float Speed { get; protected set; }
+
         public Color OverwriteColor = Color.White; //used for effects - damage, etc.
 
         public bool IsPlayer = false;
@@ -86,6 +94,9 @@ namespace Randio_2 {
             Width = width;
             Height = height;
             velocity = Vector2.Zero;
+
+            //Set combat properties to defaults
+            ResetProperties();
         }
 
         public void Update(GameTime gameTime) {
@@ -123,9 +134,9 @@ namespace Randio_2 {
             spriteBatch.Draw(Texture, position, null, OverwriteColor, 0.0f, Vector2.Zero, 1.0f, effect, 0.0f);
         }
 
-        public void TakeDamage(Entity source, int damage)
+        public void TakeDamage(Entity source, float damage)
         {
-            var realDamage = damage - Defense;
+            var realDamage = (int)(damage - Defense);
             if (realDamage > 0)
             {
                 HP -= realDamage;
@@ -145,7 +156,121 @@ namespace Randio_2 {
                 position = new Vector2(0, 99999); //now OutOfMap check will recognise this NPC as dead and will remove it. VERY CLUMSY AND UGLY WAY OF DOING THIS, todo: maybe fix?
         }
 
+        public List<Entity> GetEntitiesInSight(int xRange, int yRange)
+        {
+            List<Entity> inSight = new List<Entity>();
+            List<Entity> allEntites = map.GetAllEntites();
 
+            foreach (Entity e in allEntites)
+            {
+                if (e != this && Math.Abs(e.Position.X - Position.X) <= xRange && Math.Abs(e.Position.Y - Position.Y) <= yRange)
+                {
+                    inSight.Add(e);
+                }
+            }
+
+            return inSight;
+        }
+
+        public Entity GetFirstEntityInSight(int direction, int range)
+        {
+            Entity found = null;
+            var entities = GetEntitiesInSight(range * 3, range * 3);
+            List<Entity> foundEntities = new List<Entity>();
+
+            if (direction == 1) //right
+            {
+                int closest = int.MaxValue;
+                foreach (Entity e in entities)
+                {
+                    if (e.Position.X >= Position.X && Math.Abs(e.Position.Y - Position.Y) <= range * 3) //range/2? really?
+                    {
+                        int distance = (int)(Math.Abs(e.Position.X - position.X) + Math.Abs(e.Position.Y - position.Y));
+                        if (distance < closest)
+                        {
+                            closest = distance;
+                            found = e;
+                        }
+                    }
+                }
+            }
+            else //left
+            {
+                int closest = int.MaxValue;
+                foreach (Entity e in entities)
+                {
+                    if (e.Position.X <= Position.X && Math.Abs(e.Position.Y - Position.Y) <= range * 3)
+                    {
+                        int distance = (int)(Math.Abs(e.Position.X - position.X) + Math.Abs(e.Position.Y - position.Y));
+                        if (distance < closest) //aaa, so much duplicity
+                        {
+                            closest = distance;
+                            found = e;
+                        }
+                    }
+                }
+            }
+
+            return found;
+        }
+
+        public List<Item> GetItemsInSight(int xRange, int yRange)
+        {
+            List<Item> inSight = new List<Item>();
+            List<Item> allItems = map.GetAllItems();
+
+            foreach (Item i in allItems)
+            {
+                if (Math.Abs(i.Position.X - Position.X) <= xRange && Math.Abs(i.Position.Y - Position.Y) <= yRange)
+                {
+                    inSight.Add(i);
+                }
+            }
+
+            return inSight;
+        }
+
+        public Item GetFirstItemInSight(int direction, int range)
+        {
+            Item found = null;
+            var items = map.GetAllItems();
+            List<Item> foundItems = new List<Item>();
+
+            if (direction == 1) //right
+            {
+                int closest = int.MaxValue;
+                foreach (Item i in items)
+                {
+                    if (i.Position.X >= Position.X && Math.Abs(i.Position.X - Position.X) + Math.Abs(i.Position.Y - Position.Y) <= range * 3) //range/2? really?
+                    {
+                        int distance = (int)(Math.Abs(i.Position.X - position.X) + Math.Abs(i.Position.Y - position.Y));
+                        if (distance < closest)
+                        {
+                            closest = distance;
+                            found = i;
+                        }
+                    }
+                }
+            }
+            else //left
+            {
+                int closest = int.MaxValue;
+                foreach (Item i in items)
+                {
+                    if (i.Position.X <= Position.X && Math.Abs(i.Position.X - Position.X) + Math.Abs(i.Position.Y - Position.Y) <= range * 3)
+                    {
+                        int distance = (int)(Math.Abs(i.Position.X - position.X) + Math.Abs(i.Position.Y - position.Y));
+                        if (distance < closest) //aaa, so much duplicity. Now squared!
+                        {
+                            closest = distance;
+                            found = i;
+                        }
+                    }
+                }
+            }
+
+            return found;
+        }
         #endregion
 
         #region Private methods
@@ -166,7 +291,9 @@ namespace Randio_2 {
             else
                 velocity.X *= AirDragFactor;
 
-            velocity.X = MathHelper.Clamp(velocity.X, -MaxMoveSpeed, MaxMoveSpeed);
+            var actualMaxMoveSpeed = MaxMoveSpeed * Speed; //to enable speed-enhancing items
+
+            velocity.X = MathHelper.Clamp(velocity.X, -actualMaxMoveSpeed, actualMaxMoveSpeed);
 
             //Move along the X axis
             position.X += velocity.X * elapsed;
@@ -357,121 +484,29 @@ namespace Randio_2 {
             else if (position.X < current.Coords.Left && CurrentTile > 0)
                 --CurrentTile;
         }
+        #endregion
 
-        public List<Entity> GetEntitiesInSight(int xRange, int yRange)
+        #region Protected methods
+        //Sets combat proeprties to defaults
+        protected void ResetProperties()
         {
-            List<Entity> inSight = new List<Entity>();
-            List<Entity> allEntites = map.GetAllEntites();
-
-            foreach (Entity e in allEntites)
-            {
-                if (e != this && Math.Abs(e.Position.X - Position.X) <= xRange && Math.Abs(e.Position.Y - Position.Y) <= yRange)
-                {
-                    inSight.Add(e);
-                }
-            }
-
-            return inSight;
+            HP = DefaultHP;
+            Strength = DefaultStrength;
+            Defense = DefaultDefense;
+            Speed = DefaultSpeed;
         }
 
-        public Entity GetFirstEntityInSight(int direction, int range)
+        //Applies item modifiers to combat properties
+        protected void ApplyItemProperties()
         {
-            Entity found = null;
-            var entities = GetEntitiesInSight(range*3, range*3);
-            List<Entity> foundEntities = new List<Entity>();
-
-            if (direction == 1) //right
+            ResetProperties();
+            if (HeldItem != null)
             {
-                int closest = int.MaxValue;
-                foreach (Entity e in entities)
-                {
-                    if (e.Position.X >= Position.X && Math.Abs(e.Position.Y - Position.Y) <= range*3) //range/2? really?
-                    {
-                        int distance = (int)(Math.Abs(e.Position.X - position.X) + Math.Abs(e.Position.Y - position.Y));
-                        if (distance < closest)
-                        {
-                            closest = distance;
-                            found = e;
-                        }
-                    }
-                }
+                HP += HeldItem.Properties.HPBonus;
+                Strength += HeldItem.Properties.StrengthBonus;
+                Defense += HeldItem.Properties.ArmorBonus;
+                Speed += HeldItem.Properties.SpeedBonus;
             }
-            else //left
-            {
-                int closest = int.MaxValue;
-                foreach (Entity e in entities)
-                {
-                    if (e.Position.X <= Position.X && Math.Abs(e.Position.Y - Position.Y) <= range * 3)
-                    {
-                        int distance = (int)(Math.Abs(e.Position.X - position.X) + Math.Abs(e.Position.Y - position.Y));
-                        if (distance < closest) //aaa, so much duplicity
-                        {
-                            closest = distance;
-                            found = e;
-                        }
-                    }
-                }
-            }
-
-            return found;
-        }
-
-        public List<Item> GetItemsInSight(int xRange, int yRange)
-        {
-            List<Item> inSight = new List<Item>();
-            List<Item> allItems = map.GetAllItems();
-
-            foreach (Item i in allItems)
-            {
-                if (Math.Abs(i.Position.X - Position.X) <= xRange && Math.Abs(i.Position.Y - Position.Y) <= yRange)
-                {
-                    inSight.Add(i);
-                }
-            }
-
-            return inSight;
-        }
-
-        public Item GetFirstItemInSight(int direction, int range)
-        {
-            Item found = null;
-            var items = map.GetAllItems();
-            List<Item> foundItems = new List<Item>();
-
-            if (direction == 1) //right
-            {
-                int closest = int.MaxValue;
-                foreach (Item i in items)
-                {
-                    if (i.Position.X >= Position.X && Math.Abs(i.Position.Y - Position.Y) <= range * 3) //range/2? really?
-                    {
-                        int distance = (int)(Math.Abs(i.Position.X - position.X) + Math.Abs(i.Position.Y - position.Y));
-                        if (distance < closest)
-                        {
-                            closest = distance;
-                            found = i;
-                        }
-                    }
-                }
-            }
-            else //left
-            {
-                int closest = int.MaxValue;
-                foreach (Item i in items)
-                {
-                    if (i.Position.X <= Position.X && Math.Abs(i.Position.Y - Position.Y) <= range * 3)
-                    {
-                        int distance = (int)(Math.Abs(i.Position.X - position.X) + Math.Abs(i.Position.Y - position.Y));
-                        if (distance < closest) //aaa, so much duplicity. Now squared!
-                        {
-                            closest = distance;
-                            found = i;
-                        }
-                    }
-                }
-            }
-
-            return found;
         }
         #endregion
     }
