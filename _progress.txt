@@ -1,5 +1,13 @@
 ﻿PROGRESS LOG
 
+28.12
++ Added items (pick up, put down, swap)
+
+27.12
+* Minor cleanups
++ Added City background (thx to ReyeMe)
++ Started adding items
+
 26.12
 * Improved nearest entity detection for attacks
 + Added timed events

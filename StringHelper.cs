@@ -53,16 +53,15 @@ namespace Randio_2
 
                     //prevent weird sounding combinations
                     if (next == "r" || next == "l")
-                        disabled = "gxzqus";
-
-                    else if ((last == "r" || last == "l") && (next == "r" || next == "l"))
-                        disabled = "rl";
-
-                    else if (next == "l")
-                        disabled = "r";
-
+                        disabled = "gxzqusj";
                     else
                         disabled = "";
+
+                    if ((last == "r" || last == "l") && (next == "r" || next == "l"))
+                        disabled += "rl";
+
+                    if (next == "l")
+                        disabled += "r";
                 }
                 else
                 {
@@ -75,15 +74,15 @@ namespace Randio_2
 
                     if (next == "r")
                         disabled = "rl";
-
                     else if (next == "l")
                         disabled = "r";
-
                     else if (next == "w")
                         disabled = "l";
-
                     else
                         disabled = "";
+
+                    if (i == len - 2) //last letter
+                        disabled += "w";
                 }
                 result += next;
 

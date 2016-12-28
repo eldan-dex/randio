@@ -20,6 +20,7 @@ namespace Randio_2 {
         #region Private variables
         private List<Tile> tiles;
         private Camera camera;
+        private List<Item> items;
         #endregion
 
         #region Public methods
@@ -29,17 +30,17 @@ namespace Randio_2 {
             Height = height;
             CreatePlayer(graphicsDevice);
             CreateTiles(graphicsDevice);
-
-            entityEvents = new EventManager<Entity>();
+            CreateEventManagers();
+            CreateItems(graphicsDevice);
         }
 
         public void Update(GameTime gameTime, KeyboardState keyboardState) {
             Player.Update(gameTime, keyboardState);
             UpdateTiles(gameTime);
+            UpdateEvents();
+            UpdateItems(gameTime);
 
             MoveCamera();
-
-            entityEvents.Update();
 
             if (CheckOutOfMap((int)Player.Position.Y) == -1) {
                 //player fell down, reset player
@@ -61,6 +62,9 @@ namespace Randio_2 {
                 n.Draw(gameTime, spriteBatch);
 
             Player.Draw(gameTime, spriteBatch);
+
+            foreach (Item i in items)
+                i.Draw(gameTime, spriteBatch);
         }
 
         //Check where given Y coordinate lies relative to the map
@@ -107,6 +111,18 @@ namespace Randio_2 {
             result.Add(Player);
             foreach (Tile t in tiles)
                 result.AddRange(t.NPCs);
+
+            return result;
+        }
+
+        //returns only items placed on ground (ignores those held by entities)
+        public List<Item> GetAllItems()
+        {
+            var result = new List<Item>();
+
+            foreach (Item i in items)
+                if (i.IsPlaced)
+                    result.Add(i);
 
             return result;
         }
@@ -175,11 +191,34 @@ namespace Randio_2 {
             }
         }
 
+        private void CreateEventManagers()
+        {
+            entityEvents = new EventManager<Entity>();
+        }
+
+        private void CreateItems(GraphicsDevice device)
+        {
+            //just for testing
+            items = new List<Item>();
+            items.Add(new Item(this, device, Item.ItemType.Flop, new Vector2(100, 550), 0, 16, 16, true));
+        }
+
         //Updates Tiles and NPCs on them
         private void UpdateTiles(GameTime gameTime) {
             var visibleTiles = GetVisibleTiles();
             foreach (Tile tile in visibleTiles)
                 tile.Update(gameTime);
+        }
+
+        private void UpdateEvents()
+        {
+            entityEvents.Update();
+        }
+
+        private void UpdateItems(GameTime gameTime)
+        {
+            foreach (Item i in items)
+                i.Update(gameTime);
         }
 
         private Tile[] GetVisibleTiles() {

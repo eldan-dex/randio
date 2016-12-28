@@ -44,11 +44,13 @@
     <Compile Include="Background.cs" />
     <Compile Include="Block.cs" />
     <Compile Include="Camera.cs" />
+    <Compile Include="CityBG.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="GeometryHelper.cs" />
     <Compile Include="GraphicsHelper.cs" />
+    <Compile Include="Item.cs" />
     <Compile Include="LSystem.cs" />
     <Compile Include="LSystemBG.cs" />
     <Compile Include="Map.cs" />

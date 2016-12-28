@@ -9,9 +9,10 @@ namespace Randio_2 {
         public enum TileType {
             Shapes,
             LSystem,
+            City,
             Invalid = 999
         }
-        public const int TileTypeCount = 2;
+        public const int TileTypeCount = 3;
 
         public Background Background { get; private set; }
         public TileType Type { get; private set; }
@@ -42,10 +43,10 @@ namespace Randio_2 {
 
             if (Type == TileType.Shapes)
                 Background = new ShapesBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height);
-
             else if (Type == TileType.LSystem)
                 Background = new LSystemBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height);
-
+            else if (Type == TileType.City)
+                Background = new CityBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height);
             else
             {
                 throw new NotSupportedException("This is not supposed to happen. Ever.");

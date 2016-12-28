@@ -1,12 +1,14 @@
 ﻿TODO:
-- invisible npc bug
+- cannot turn when blocked by npc
+
 - Terrain collisions - fix "skip" when going right on a new tile
 - entities can push each other away (and bug each other through walls)
 
+- entity outline color as HP indicator
+- entity fill as type indicator (boss has black slant lines, etc.)
+
 - Splotches - from rectangles
-
 - Create a whole-splotch (splotch-over-splotch) background (even splotching darker versions of the same colour inside other splotches might work...
-
 - Background textures
 	- Colour splashes (monocolor, or fading towards the edges)
 	- Shapes on a dark/light background (or faded out splashes)
@@ -27,14 +29,13 @@
 - Timed events/animations
 
 ISSUES:
+- Tearing when moving camera along with player
 - Entities clip/bug through blocks and themselves
 - "Ghost" entities - invisible but impassable areas on the map - wtf are they? and why are they sometimes fixed and sometimes not?
 - Tile texture size might be too big for the engine to handle and it thus crashes (happens only once in a while) <- temporarily fixed by limiting max newTileSize to 4096
 - StackOverflow when player goes too far - why??
 
 IDEAS:
-- Doublejumping?
-- HP indicator - entity outline color?
 - switch all entities to the global coordination model
 
 QUESTS:

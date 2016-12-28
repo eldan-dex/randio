@@ -35,6 +35,7 @@ namespace Randio_2 {
         public int Height { get; protected set; }
         public int Direction { get; protected set; } // 1 = right, 0 = left
         public string Name { get; protected set; }
+        public Item HeldItem { get; protected set; }
 
         //Combat stats //TODO: is it good to set defaults this way?
         public int HP { get; protected set; } = 10;
@@ -407,6 +408,64 @@ namespace Randio_2 {
                         {
                             closest = distance;
                             found = e;
+                        }
+                    }
+                }
+            }
+
+            return found;
+        }
+
+        public List<Item> GetItemsInSight(int xRange, int yRange)
+        {
+            List<Item> inSight = new List<Item>();
+            List<Item> allItems = map.GetAllItems();
+
+            foreach (Item i in allItems)
+            {
+                if (Math.Abs(i.Position.X - Position.X) <= xRange && Math.Abs(i.Position.Y - Position.Y) <= yRange)
+                {
+                    inSight.Add(i);
+                }
+            }
+
+            return inSight;
+        }
+
+        public Item GetFirstItemInSight(int direction, int range)
+        {
+            Item found = null;
+            var items = map.GetAllItems();
+            List<Item> foundItems = new List<Item>();
+
+            if (direction == 1) //right
+            {
+                int closest = int.MaxValue;
+                foreach (Item i in items)
+                {
+                    if (i.Position.X >= Position.X && Math.Abs(i.Position.Y - Position.Y) <= range * 3) //range/2? really?
+                    {
+                        int distance = (int)(Math.Abs(i.Position.X - position.X) + Math.Abs(i.Position.Y - position.Y));
+                        if (distance < closest)
+                        {
+                            closest = distance;
+                            found = i;
+                        }
+                    }
+                }
+            }
+            else //left
+            {
+                int closest = int.MaxValue;
+                foreach (Item i in items)
+                {
+                    if (i.Position.X <= Position.X && Math.Abs(i.Position.Y - Position.Y) <= range * 3)
+                    {
+                        int distance = (int)(Math.Abs(i.Position.X - position.X) + Math.Abs(i.Position.Y - position.Y));
+                        if (distance < closest) //aaa, so much duplicity. Now squared!
+                        {
+                            closest = distance;
+                            found = i;
                         }
                     }
                 }

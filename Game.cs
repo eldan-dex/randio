@@ -72,7 +72,8 @@ namespace Randio_2 {
             font = Content.Load<SpriteFont>("font"); //this will be loaded dynamically
             testSB = new SpriteBatch(GraphicsDevice); //remove this
             //testBG = new ShapesBG(GraphicsDevice, testSB, WIDTH, HEIGHT).Texture; //remove this
-            testBG = new LSystemBG(GraphicsDevice, testSB, WIDTH, HEIGHT).Texture; //remove this
+            //testBG = new LSystemBG(GraphicsDevice, testSB, WIDTH, HEIGHT).Texture; //remove this
+            //testBG = new CityBG(GraphicsDevice, testSB, WIDTH, HEIGHT).Texture; //remove this
         }
 
         /// <summary>
@@ -113,8 +114,8 @@ namespace Randio_2 {
             var viewMatrix = camera.GetViewMatrix();
 
             levelSpriteBatch.Begin(transformMatrix: viewMatrix);
-            levelSpriteBatch.Draw(testBG, new Rectangle(0, 0, WIDTH, HEIGHT), Color.White);
-            map.Draw(gameTime, levelSpriteBatch);
+            //levelSpriteBatch.Draw(testBG, new Rectangle(0, 0, WIDTH, HEIGHT), Color.White); //uncomment this for background testing
+            map.Draw(gameTime, levelSpriteBatch); //comment this for background testing
             levelSpriteBatch.End();
 
             if (debugEnabled) {

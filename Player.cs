@@ -95,7 +95,7 @@ namespace Randio_2 {
             {
                 if (!AkeyDown)
                 {
-                    PerformAction(ActionA);
+                    Attack();
                     AkeyDown = true;
                 }
             }
@@ -106,7 +106,7 @@ namespace Randio_2 {
             {
                 if (!BkeyDown)
                 {
-                    PerformAction(ActionB);
+                    PickDropItem();
                     BkeyDown = true;
                 }
             }
@@ -114,26 +114,38 @@ namespace Randio_2 {
                 BkeyDown = false;
         }
 
-        private void PerformAction(Func<Entity, bool> Interaction)
+        private void Attack()
         {
-            Entity other = GetFirstEntityInSight(Direction, Range);
-
-            if (other != null)
-                Interaction(other);
+            Entity nearest = GetFirstEntityInSight(Direction, Range);
+            if (nearest != null)
+                nearest.TakeDamage(this, Strength);
         }
 
-        private bool ActionA(Entity other)
+        private void PickDropItem()
         {
-            other.TakeDamage(this, Strength);
-            return true;
-        }
+            Item nearest = GetFirstItemInSight(Direction, Range);
 
-        private bool ActionB(Entity other)
-        {
-            //taking/placing/swapping items
-            //if there's item - if inv empty - take. else - swap
-            //if no item - if inv not empty - drop item.
-            return true;
+            //Take item if none is currently being held
+            if (HeldItem == null)
+            {
+                if (nearest != null)
+                    HeldItem = nearest.PickUp(this);
+            }
+            //Drop held item or swap items if available
+            else
+            {
+                if (nearest == null)
+                {
+                    HeldItem.PutDown(Direction);
+                    HeldItem = null;
+                }
+                else
+                {
+                    Item tmp = HeldItem;
+                    HeldItem = nearest.PickUp(this);
+                    tmp.PutDown(Direction);
+                }
+            }
         }
         #endregion
     }
