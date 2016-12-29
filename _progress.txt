@@ -1,5 +1,9 @@
 ﻿PROGRESS LOG
 
+29.12
++ HP indicated by outline color (green = full, red = empty)
++ CityBG updated to generate block texture (thx to ReyeMe)
+
 28.12
 + Added items (pick up, put down, swap)
 

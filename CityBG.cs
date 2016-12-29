@@ -65,8 +65,23 @@ namespace Randio_2 {
 
         public void CreateBlockTexture( GraphicsDevice device, SpriteBatch batch, int width, int height )
         {
+            //Base color
+            Color diffuse = Color.PaleTurquoise;
+
             var texture = new Texture2D(device, width, height);
+
+            Color[] color = new Color[texture.Width * texture.Height];
+            texture.GetData(color); //Texture size limit is 4096*4096. Textures bigger than that crash when being converted to Color[]
             
+            //noise
+            for (int i = 0; i < texture.Width * texture.Height; ++i)
+            {
+                float scale = AlgorithmHelper.GetRandom(75, 100) / 100f;
+                color[i] = Color.FromNonPremultiplied((byte)(diffuse.R*scale), (byte)(diffuse.G * scale), (byte)(diffuse.B * scale), diffuse.A);
+            }
+            
+            texture.SetData(color);
+
             BlockTexture = texture;
         }
         #endregion

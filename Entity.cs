@@ -40,6 +40,7 @@ namespace Randio_2 {
 
         //Combat stats - defaults
         public int DefaultHP { get; protected set; } = 10;
+        public int MaxHP { get; protected set; }
         public float DefaultStrength { get; protected set; } = 1;
         public float DefaultDefense { get; protected set; } = 0;
         public float DefaultSpeed { get; protected set; } = 1;
@@ -51,6 +52,7 @@ namespace Randio_2 {
         public float Speed { get; protected set; }
 
         public Color OverwriteColor = Color.White; //used for effects - damage, etc.
+        public Color OutlineColor = Color.Green; //HP indicator
 
         public bool IsPlayer = false;
         #endregion
@@ -84,6 +86,9 @@ namespace Randio_2 {
         private bool isOnGround;  
         private bool wasJumping;
         private float oldBottom;
+
+        //Outline (HP indicator) width
+        protected int outlineWidth = 2;
         #endregion
 
         #region Public methods
@@ -97,6 +102,10 @@ namespace Randio_2 {
 
             //Set combat properties to defaults
             ResetProperties();
+
+            //Start with full HP
+            HP = DefaultHP;
+            MaxHP = DefaultHP;
         }
 
         public void Update(GameTime gameTime) {
@@ -144,6 +153,7 @@ namespace Randio_2 {
                 //when damaged, entity flashes red for 200ms
                 OverwriteColor = Color.Red;
                 map.entityEvents.AddEvent(new TimedEvent<Entity>(200, delegate (Entity e) { e.OverwriteColor = Color.White; }, this));
+                UpdateOutlineColor();
             }
             else
             {
@@ -154,6 +164,19 @@ namespace Randio_2 {
 
             if (HP <= 0)
                 position = new Vector2(0, 99999); //now OutOfMap check will recognise this NPC as dead and will remove it. VERY CLUMSY AND UGLY WAY OF DOING THIS, todo: maybe fix?
+        }
+
+        public void UpdateOutlineColor()
+        {
+            int difference = MaxHP - HP;
+            float upperPerc = (float)difference / MaxHP;
+            float lowerPerc = (float)1 - upperPerc;
+
+            int newR = (int)(255 * upperPerc);
+            int newG = (int)(255 * lowerPerc);
+
+            OutlineColor = new Color(newR, newG, 0);
+            GraphicsHelper.OutlineRectangle(Texture, OutlineColor, outlineWidth);
         }
 
         public List<Entity> GetEntitiesInSight(int xRange, int yRange)
@@ -270,6 +293,11 @@ namespace Randio_2 {
             }
 
             return found;
+        }
+
+        public void FillHP()
+        {
+            HP = MaxHP;
         }
         #endregion
 
@@ -490,7 +518,6 @@ namespace Randio_2 {
         //Sets combat proeprties to defaults
         protected void ResetProperties()
         {
-            HP = DefaultHP;
             Strength = DefaultStrength;
             Defense = DefaultDefense;
             Speed = DefaultSpeed;
@@ -503,9 +530,24 @@ namespace Randio_2 {
             if (HeldItem != null)
             {
                 HP += HeldItem.Properties.HPBonus;
+                MaxHP += HeldItem.Properties.HPBonus;
                 Strength += HeldItem.Properties.StrengthBonus;
                 Defense += HeldItem.Properties.ArmorBonus;
                 Speed += HeldItem.Properties.SpeedBonus;
+
+                UpdateOutlineColor();
+            }
+        }
+
+        protected void DisapplyItemProperties()
+        {
+            ResetProperties();
+            if (HeldItem != null)
+            {
+                HP -= HeldItem.Properties.HPBonus;
+                MaxHP -= HeldItem.Properties.HPBonus;
+
+                UpdateOutlineColor();
             }
         }
         #endregion

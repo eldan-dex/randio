@@ -25,6 +25,8 @@ namespace Randio_2 {
             InitNPC();
             Behaviour = CreateBehaviour();
             Texture = CreateTexture(graphicsDevice);
+            //First setting the outline color must be done in child classes
+            UpdateOutlineColor();
         }
 
         new public void Update(GameTime gameTime) {
@@ -50,9 +52,9 @@ namespace Randio_2 {
             GraphicsHelper.DrawRectangle(texture, color);
 
             if (IsBoss)
-                GraphicsHelper.OutlineRectangle(texture, Color.Red, 3);
+                outlineWidth = 4;
             else
-                GraphicsHelper.OutlineRectangle(texture, Color.White, 2);
+                outlineWidth = 3;
 
             return texture;
         }

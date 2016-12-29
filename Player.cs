@@ -9,8 +9,8 @@ namespace Randio_2 {
         #region Public varaibles
         public Vector2 Origin { get; private set; }
         public int SafeMargin { get; private set; } //how close to the border can player go before the camera starts moving;
-        public const int Width = 32; //32 small, 48big
-        public const int Height = 32; //32 small, 48big
+        public const int PlayerWidth = 32; //32 small, 48big
+        public const int PlayerHeight = 32; //32 small, 48big
         #endregion
 
         #region Private variables
@@ -27,13 +27,15 @@ namespace Randio_2 {
         #endregion
 
         #region Public methods
-        public Player(GraphicsDevice graphicsDevice, Map map, Vector2 position) : base(map, position, 0, Width, Height) {        
+        public Player(GraphicsDevice graphicsDevice, Map map, Vector2 position) : base(map, position, 0, PlayerWidth, PlayerHeight) {        
             CurrentTile = 0;
             Origin = position;
             Texture = CreateTexture(graphicsDevice, Width, Height);
             SafeMargin = 240; //temporary
 
             InitStats();
+            //First setting the outline color must be done in child classes
+            UpdateOutlineColor();
         }
 
         public void Update(GameTime gameTime, KeyboardState keyboardState) {
@@ -57,7 +59,7 @@ namespace Randio_2 {
             //Temporary placeholder code, will call texture generation here
             GraphicsHelper.DrawRectangle(texture, Color.Blue);
             GraphicsHelper.DrawArrow(1, texture, Color.Black);
-            GraphicsHelper.OutlineRectangle(texture, Color.Green, 2);
+            outlineWidth = 3;
 
             return texture;
         }
@@ -129,7 +131,10 @@ namespace Randio_2 {
             if (HeldItem == null)
             {
                 if (nearest != null)
+                {
                     HeldItem = nearest.PickUp(this);
+                    ApplyItemProperties();
+                }
             }
             //Drop held item or swap items if available
             else
@@ -137,17 +142,18 @@ namespace Randio_2 {
                 if (nearest == null)
                 {
                     HeldItem.PutDown(Direction);
+                    DisapplyItemProperties();
                     HeldItem = null;
                 }
                 else
                 {
-                    Item tmp = HeldItem;
+                    Item heldTmp = HeldItem;
+                    DisapplyItemProperties(); //disapply the previous item
                     HeldItem = nearest.PickUp(this);
-                    tmp.PutDown(Direction);
+                    heldTmp.PutDown(Direction);
+                    ApplyItemProperties(); //apply the new item
                 }
             }
-
-            ApplyItemProperties();
         }
         #endregion
     }
