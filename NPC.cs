@@ -20,11 +20,17 @@ namespace Randio_2 {
         #endregion
 
         #region Public methods
-        public NPC(GraphicsDevice graphicsDevice, Map map, Vector2 position, int parentTile, int width, int height) : base(map, position, parentTile, width, height) {
+        public NPC(GraphicsDevice graphicsDevice, Map map, Vector2 position, int parentTile, int width, int height, int additionalHP = 0, float additionalStrength = 0, float additionalDefense = 0, float additionalSpeed = 0) : base(map, position, parentTile, width, height) {
             ParentTile = map.GetTileByIndex(parentTile);
             InitNPC();
             Behaviour = CreateBehaviour();
             Texture = CreateTexture(graphicsDevice);
+
+            DefaultHP += additionalHP;
+            DefaultStrength += additionalStrength;
+            DefaultDefense += additionalDefense;
+            DefaultSpeed += additionalSpeed;
+
             //First setting the outline color must be done in child classes
             UpdateOutlineColor();
         }

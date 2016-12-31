@@ -330,8 +330,8 @@ namespace Randio_2 {
             //Limit the player to stay on the map horizontally
             if (position.X < 0)
                 position.X = 0;
-            else if (position.X > map.Width)
-                position.X = map.Width;
+            else if (position.X+Width > map.Width)
+                position.X = map.Width-Width;
 
             //X axis collisions
             TerrainCollisionsXY(true);

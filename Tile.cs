@@ -105,7 +105,15 @@ namespace Randio_2 {
                 int w = AlgorithmHelper.GetRandom(16, 49); //16-49 small
                 int h = AlgorithmHelper.GetRandom(16, 49); //32-65 big
                 Vector2 position = new Vector2(Coords.X + AlgorithmHelper.GetRandom(0, Coords.Width - w + 1), AlgorithmHelper.GetRandom(0, map.Height - h + 1));
-                NPC npc = new NPC(graphicsDevice, map, position, Index, w, h);
+
+                //BALANCE THIS
+                int additionalBase = AlgorithmHelper.GetRandom(Index, 2 * Index);
+                int addHP = AlgorithmHelper.GetRandom(additionalBase / 2, 2 * additionalBase);
+                float addStr = AlgorithmHelper.GetRandom((float)additionalBase / 4, additionalBase);
+                float addDef = AlgorithmHelper.GetRandom((float)additionalBase / 4, additionalBase);
+                float addSpd = AlgorithmHelper.GetRandom(0, (float)additionalBase / 100); //balance additional speed
+
+                NPC npc = new NPC(graphicsDevice, map, position, Index, w, h, addHP, addStr, addDef, addSpd);
 
                 NPCs.Add(npc);
             }

@@ -12,6 +12,11 @@ namespace Randio_2 {
             return Rand.Next(min, max);
         }
 
+        public static float GetRandom(float min, float max)
+        {
+            return (float)(min + (Rand.NextDouble() * (max - min)));
+        }
+
 
         public static int BiasedRandom(int min, int max, double probabilityPower = 2)
         {

@@ -1,5 +1,9 @@
 ﻿PROGRESS LOG
 
+31.12
+* Game doesn't crash when player reaches end of map
++ NPC stats now depend on tile index
+
 29.12
 + HP indicated by outline color (green = full, red = empty)
 + CityBG updated to generate block texture (thx to ReyeMe)
