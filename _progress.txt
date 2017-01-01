@@ -1,5 +1,8 @@
 ﻿PROGRESS LOG
 
+1.1.2017
++ Started implementing quests
+
 31.12
 * Game doesn't crash when player reaches end of map
 + NPC stats now depend on tile index
