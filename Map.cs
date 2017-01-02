@@ -209,12 +209,12 @@ namespace Randio_2 {
             for (int i = 0; i < count; ++i)
             {
                 Quest quest;
-                Quest.QuestType type = (Quest.QuestType)0;//AlgorithmHelper.GetRandom(0, Quest.QuestTypeCount); //todo: debug
+                Quest.QuestType type = (Quest.QuestType)AlgorithmHelper.GetRandom(0, Quest.QuestTypeCount);
 
                 string name = "";
                 string description = "";
                 List<Entity> targets = null;
-                List<Item> items = null;
+                List<Item> itemFetchList = null;
                 List<Vector2> points = null;
 
                 if (type == Quest.QuestType.KillTargets)
@@ -237,15 +237,51 @@ namespace Randio_2 {
 
                 else if (type == Quest.QuestType.FetchIitems)
                 {
+                    name = "Bring ";
+                    itemFetchList = new List<Item>();
+                    points = new List<Vector2>();
+                    int itemCount = AlgorithmHelper.GetRandom(0, 4); //todo: balance
 
+                    //improve point generating algorithm?
+                    int pointX = AlgorithmHelper.GetRandom(0, Width);
+                    int pointY = AlgorithmHelper.GetRandom(0, Height - 2*Block.Height);
+
+                    points.Add(new Vector2(pointX, pointY));
+
+                    for (int j = 0; j < itemCount; ++j)
+                    {
+                        var item = items[AlgorithmHelper.GetRandom(0, items.Count)];
+                        itemFetchList.Add(item);
+
+                        //Append target name to quest name
+                        name += item.Properties.Name;
+                        if (j < itemCount - 1)
+                            name += ", ";
+                    }
+
+                    name += " to " + points[0].X.ToString() + ";" + points[0].Y.ToString(); //todo: find a better way to mark destination - mark place above block with borders?
                 }
 
                 else if (type == Quest.QuestType.ReachPoint)
                 {
+                    name = "Reach ";
+                    int pointCount = AlgorithmHelper.GetRandom(0, 4); //todo: balance
+                    for (int j = 0; j < pointCount; ++j)
+                    {
+                        //improve point generating algorithm?
+                        int pointX = AlgorithmHelper.GetRandom(0, Width);
+                        int pointY = AlgorithmHelper.GetRandom(0, Height - 2 * Block.Height);
 
+                        var point = new Vector2(pointX, pointY);
+                        points.Add(point);
+
+                        name += point.X.ToString() + ";" + point.Y.ToString();
+                        if (j < pointCount - 1)
+                            name += ", ";
+                    }
                 }
 
-                quests.AddQuest(new Quest(this, type, name, description, targets, items, points));
+                quests.AddQuest(new Quest(this, type, name, description, targets, itemFetchList, points));
             }
         }
 

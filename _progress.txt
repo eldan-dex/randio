@@ -2,7 +2,7 @@
 
 2.1.2017
 * Minor changes and fixes
-+ Quests (only killing targets at the moment)
++ Quests (needs tweaking though)
 + Tweaked name generation - not more than two words per name from now on, generated names are now unique
 + Switched to 40*40 blocks, probably final
 

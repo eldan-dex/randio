@@ -80,7 +80,7 @@ namespace Randio_2
                 {
                     //check whether the item is where it's supposed to be
                     int distance = GeometryHelper.VectorDistance(i.Position, DestinationPoints[0]);
-                    if (distance <= i.Width && i.IsPlaced) //don't account for held items
+                    if (distance <= i.Width*3 && i.IsPlaced) //don't account for held items //todo: balance distance
                         ++finishedItems;
                 }
 
@@ -95,7 +95,7 @@ namespace Randio_2
                     int distance = GeometryHelper.VectorDistance(map.Player.Position, point);
 
                     //We only need to reach it once for it to count towards reachedPoints
-                    if (distance <= map.Player.Width)
+                    if (distance <= map.Player.Width*2) //todo: balance distance
                         reachedPoints.Add(point);
                 }
 

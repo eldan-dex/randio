@@ -1,8 +1,7 @@
 ﻿TODO:
 - cannot turn when blocked by npc
 
-- quests
-
+- improve quests
 - improve AI
 
 - Terrain collisions - fix "skip" when going right on a new tile
@@ -34,11 +33,10 @@
 ISSUES:
 - Tearing when moving camera along with player
 - Entities clip/bug through blocks and themselves
-- "Ghost" entities - invisible but impassable areas on the map - wtf are they? and why are they sometimes fixed and sometimes not?
 - Tile texture size might be too big for the engine to handle and it thus crashes (happens only once in a while) <- temporarily fixed by limiting max newTileSize to 4096
-- StackOverflow when player goes too far - why??
 
 IDEAS:
+- keep the bug where player can get a quest to kill themselves as a feature
 - switch all entities to the global coordination model
 
 QUESTS:

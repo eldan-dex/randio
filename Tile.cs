@@ -144,12 +144,12 @@ namespace Randio_2 {
 
                     //todo: holes in the ground (trenches, etc)
 
-                    int tmp = AlgorithmHelper.GetRandom(0, 12);
-                    if (tmp > 3 && tmp < 6)
+                    int tmp = AlgorithmHelper.GetRandom(0, 15);
+                    if (tmp > 3 && tmp < 7)
                         blockGrid[w, h] = true;
-                    if (tmp == 1 && w < wblocks - 1)
+                    if (tmp == 1 && w < wblocks - 2)
                         blockGrid[w + 1, h] = true;
-                    if (tmp == 5 && h < hblocks - 1)
+                    if (tmp == 5 && h < hblocks - 2)
                         blockGrid[w, h + 1] = true;
                 }
             }
