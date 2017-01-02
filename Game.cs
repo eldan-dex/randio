@@ -111,28 +111,40 @@ namespace Randio_2 {
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            var viewMatrix = camera.GetViewMatrix();
-
-            levelSpriteBatch.Begin(transformMatrix: viewMatrix);
-            //levelSpriteBatch.Draw(testBG, new Rectangle(0, 0, WIDTH, HEIGHT), Color.White); //uncomment this for background testing
-            map.Draw(gameTime, levelSpriteBatch); //comment this for background testing
-            levelSpriteBatch.End();
-
-            if (debugEnabled) {
-                osdSpriteBatch.Begin();
-
-                //Draw OSD
-                osdSpriteBatch.DrawString(debugFont, "DEBUG ENABLED", new Vector2(10, 10), Color.Red);
-                osdSpriteBatch.DrawString(debugFont, "Player X: " + map.Player.Position.X + "     Player Y: " + map.Player.Position.Y + "\nDirection: " + (map.Player.Direction == 1 ? "right" : "left") + "\nCurrentTile: " + map.Player.CurrentTile + "\nHP: " + map.Player.HP.ToString() + "/" + map.Player.MaxHP.ToString() + ", Speed: " + map.Player.Speed.ToString() + "\nStrength: " + map.Player.Strength.ToString() + ", Defense: " + map.Player.Defense.ToString(), new Vector2(10, 30), Color.Red);
-
-                osdSpriteBatch.End();
-            }
+            DrawLevel(gameTime);
+            DrawOSDs();
 
             base.Draw(gameTime);
         }
         #endregion
 
         #region Private methods
+        private void DrawLevel(GameTime gameTime)
+        {
+            var viewMatrix = camera.GetViewMatrix();
+            levelSpriteBatch.Begin(transformMatrix: viewMatrix);
+            //levelSpriteBatch.Draw(testBG, new Rectangle(0, 0, WIDTH, HEIGHT), Color.White); //uncomment this for background testing
+            map.Draw(gameTime, levelSpriteBatch); //comment this out for background testing
+            levelSpriteBatch.End();
+        }
+
+        private void DrawOSDs()
+        {
+            osdSpriteBatch.Begin();
+            if (debugEnabled)
+            {
+                osdSpriteBatch.DrawString(debugFont, "DEBUG ENABLED", new Vector2(10, 10), Color.Red);
+                osdSpriteBatch.DrawString(debugFont, "Player X: " + map.Player.Position.X + "     Player Y: " + map.Player.Position.Y + "\nDirection: " + (map.Player.Direction == 1 ? "right" : "left") + "\nCurrentTile: " + map.Player.CurrentTile + "\nHP: " + map.Player.HP.ToString() + "/" + map.Player.MaxHP.ToString() + ", Speed: " + map.Player.Speed.ToString() + "\nStrength: " + map.Player.Strength.ToString() + ", Defense: " + map.Player.Defense.ToString(), new Vector2(10, 30), Color.Red);
+            }
+
+            if (map.quests != null)
+            {
+                Vector2 questPosition = (debugEnabled ? new Vector2(10, 120) : new Vector2(10, 10));
+                osdSpriteBatch.DrawString(debugFont, map.quests.GetQuestStatus(), questPosition, Color.DarkGreen);
+            }
+            osdSpriteBatch.End();
+        }
+
         private void CreateMap() {
             map = new Map(GraphicsDevice, camera, WIDTH*10, HEIGHT); //parameters
         }

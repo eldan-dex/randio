@@ -15,6 +15,7 @@ namespace Randio_2 {
         public int TileCount { get { return tiles.Count; } }
         //public List<NPC> NPCs { get; private set; }
         public EventManager<Entity> entityEvents;
+        public QuestManager quests;
         #endregion
 
         #region Private variables
@@ -31,6 +32,7 @@ namespace Randio_2 {
             CreatePlayer(graphicsDevice);
             CreateTiles(graphicsDevice);
             CreateEventManagers();
+            CreateQuests();
             CreateItems(graphicsDevice);
         }
 
@@ -194,6 +196,12 @@ namespace Randio_2 {
         private void CreateEventManagers()
         {
             entityEvents = new EventManager<Entity>();
+        }
+
+        private void CreateQuests()
+        {
+            quests = new QuestManager();
+            quests.CreateRandomQuestSet();
         }
 
         private void CreateItems(GraphicsDevice device)

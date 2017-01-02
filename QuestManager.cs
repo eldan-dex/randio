@@ -36,6 +36,28 @@ namespace Randio_2
                 AddRandomQuest();
         }
 
+        public string GetQuestStatus()
+        {
+            string result = "";
+            int longest = 0;
+
+            //Iterate for the first time, get max length
+            foreach (Quest q in quests)
+            {
+                if (q.Name.Length > longest)
+                    longest = q.Name.Length;
+            }
+
+            //Iterate for the second time, get names and perpare layout
+            foreach (Quest q in quests)
+            {
+                result += q.Name.PadRight(longest + 2) + (q.Completed ? "X" : "O") + "\n";
+            }
+
+            //Remove last \n
+            return result.Substring(0, result.Length-1);
+        }
+
     }
 }
 
