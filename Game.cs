@@ -9,8 +9,8 @@ namespace Randio_2 {
     /// </summary>
     class Game : Microsoft.Xna.Framework.Game {
         #region Public variables
-        public const int WIDTH = 1280; //1280 small, 1296 big
-        public const int HEIGHT = 704; //704 small, 720 big
+        public const int WIDTH = 1280; //1280 small, 1280 medium, 1296 big
+        public const int HEIGHT = 720; //704 small, 1280 medium, 720 big
         public static SpriteFont font;
         #endregion
 

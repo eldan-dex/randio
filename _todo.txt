@@ -8,6 +8,8 @@
 - Terrain collisions - fix "skip" when going right on a new tile
 - entities can push each other away (and bug each other through walls)
 
+- tweak target picking algorithm
+
 - entity fill as type indicator (boss has black slant lines, etc.)
 
 - Splotches - from rectangles

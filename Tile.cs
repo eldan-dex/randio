@@ -102,8 +102,8 @@ namespace Randio_2 {
             //temporary testing code
             int npcCount = AlgorithmHelper.GetRandom(1, 17);
             for (int i = 0; i < npcCount; ++i) {
-                int w = AlgorithmHelper.GetRandom(16, 49); //16-49 small
-                int h = AlgorithmHelper.GetRandom(16, 49); //32-65 big
+                int w = AlgorithmHelper.GetRandom(24, 57); //16-49 small, 24-57 medium
+                int h = AlgorithmHelper.GetRandom(24, 57); //32-65 big
                 Vector2 position = new Vector2(Coords.X + AlgorithmHelper.GetRandom(0, Coords.Width - w + 1), AlgorithmHelper.GetRandom(0, map.Height - h + 1));
 
                 //BALANCE THIS
@@ -131,12 +131,12 @@ namespace Randio_2 {
                     blockGrid[w, h] = false;
 
                     if (w < 4 || w > wblocks - 5) {
-                        blockGrid[w, hblocks-4] = true;
+                        blockGrid[w, hblocks-3] = true;
                         continue;
                     }
 
                     //generate solid ground
-                    if (h > 18)
+                    if (h > 15)
                     {
                         blockGrid[w, h] = true;
                         continue;

@@ -23,7 +23,7 @@ namespace Randio_2
             rules.Add(new LSystem.Rule("F", "1FF-[2-F+F-F]+[2+F-F+F]"));
  
             defaultSystem = new LSystem("F", 10, 22, rules); //TODO: generate ctor args
-            turtle = new Turtle(device, batch, new Vector2(200, 600), -90, Color.White);
+            turtle = new Turtle(device, batch, new Vector2(200, 640), -90, Color.White);
 
             device.SetRenderTarget(Texture);
             device.Clear(Color.Black);
@@ -42,7 +42,7 @@ namespace Randio_2
                 int size = AlgorithmHelper.GetRandom(1, 5);
                 var currentSystem = new LSystem(defaultSystem);
                 currentSystem.Iterate(size);
-                turtle.SetDefaults(new Vector2(nextX, 600), -90);
+                turtle.SetDefaults(new Vector2(nextX, 640), -90);
                 turtle.DrawSystem(currentSystem, target);
                 nextX += 150 * size;
             }
