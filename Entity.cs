@@ -152,14 +152,14 @@ namespace Randio_2 {
 
                 //when damaged, entity flashes red for 200ms
                 OverwriteColor = Color.Red;
-                map.entityEvents.AddEvent(new TimedEvent<Entity>(200, delegate (Entity e) { e.OverwriteColor = Color.White; }, this));
+                map.entityEvents.AddEvent(new Event<Entity>(200, delegate (Entity e) { e.OverwriteColor = Color.White; }, this));
                 UpdateOutlineColor();
             }
             else
             {
                 //if attack was deflected, entity flashes gray for 200ms
                 OverwriteColor = Color.DarkGray;
-                map.entityEvents.AddEvent(new TimedEvent<Entity>(200, delegate (Entity e) { e.OverwriteColor = Color.White; }, this));
+                map.entityEvents.AddEvent(new Event<Entity>(200, delegate (Entity e) { e.OverwriteColor = Color.White; }, this));
             }
 
             if (HP <= 0)

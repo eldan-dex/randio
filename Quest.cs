@@ -13,6 +13,7 @@ namespace Randio_2
             FetchIitems,
             ReachPoint
         }
+        public const int QuestTypeCount = 3;
 
         public bool Completed { get; private set; }
         public QuestType Type { get; private set; }

@@ -3,27 +3,29 @@ using System.Collections.Generic;
 
 namespace Randio_2
 {
-    class EventManager<T> {
-        List<TimedEvent<T>> events;
-        TimedEvent<T> next;
+    class EventManager<T>
+    {
+        List<Event<T>> events;
+        Event<T> next;
 
         public EventManager()
         {
-            events = new List<TimedEvent<T>>();
+            events = new List<Event<T>>();
             next = null;
         }
 
-        public void AddEvent(TimedEvent<T> action) {
+        public void AddEvent(Event<T> action)
+        {
             events.Add(action);
             PrepareNextEvent();
         }
 
         public void PrepareNextEvent() //find next scheuduled event
         {
-            TimedEvent<T> nearestEvent = null;
+            Event<T> nearestEvent = null;
             DateTime eventTime = DateTime.Now.AddYears(1); //this can cause issues if an event is set to happen more than 1 year in the future. but why would anybody want to do that?
 
-            foreach (TimedEvent<T> e in events)
+            foreach (Event<T> e in events)
             {
                 if (e.fireTime < eventTime)
                 {
@@ -45,24 +47,5 @@ namespace Randio_2
             }
         }
 
-    }
-
-    class TimedEvent<T>
-    {
-        public DateTime fireTime;
-        Action<T> action;
-        T parameter;
-
-        public TimedEvent(int fireTimeMiliseconds, Action<T> action, T parameter)
-        {
-            fireTime = DateTime.Now.AddMilliseconds(fireTimeMiliseconds);
-            this.action = action;
-            this.parameter = parameter;
-        }
-
-        public void FireEvent()
-        {
-            action(parameter);
-        }
     }
 }
