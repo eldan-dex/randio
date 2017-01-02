@@ -7,9 +7,9 @@ namespace Randio_2 {
 
         //Public methods
         //********************************************************************************//
-        public static int GetRandom(int min, int max)
+        public static int GetRandom(int minInc, int maxExc)
         {
-            return Rand.Next(min, max);
+            return Rand.Next(minInc, maxExc);
         }
 
         public static float GetRandom(float min, float max)

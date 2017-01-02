@@ -1,8 +1,9 @@
 ﻿PROGRESS LOG
 
 2.1.2017
-* Reworked OSD drawing
-+ Basic quest display
+* Minor changes and fixes
++ Quests (only killing targets at the moment)
++ Tweaked name generation - not more than two words per name from now on, generated names are now unique
 
 1.1.2017
 + Started implementing quests

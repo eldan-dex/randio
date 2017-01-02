@@ -1,6 +1,10 @@
 ﻿TODO:
 - cannot turn when blocked by npc
 
+- quests
+
+- improve AI
+
 - Terrain collisions - fix "skip" when going right on a new tile
 - entities can push each other away (and bug each other through walls)
 
@@ -12,10 +16,6 @@
 	- Colour splashes (monocolor, or fading towards the edges)
 	- Shapes on a dark/light background (or faded out splashes)
 	- L-Systems (pixelated, darker outlines)
-
-- Improve basic AI
-
-- Quests
 
 - Block generation algorithm POC
 - Foreground texture generation algorithm POC

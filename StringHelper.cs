@@ -1,33 +1,39 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Randio_2
 {
     class StringHelper
     {
+        static List<string> knownNames = new List<string>(); //todo: is there a better place to place this list?
+        //todo: when map-resetting, this needs to be reinitialized
+
         #region Public methods
         public static string GenerateName()
         {
             string result = "";
 
-            int words = AlgorithmHelper.BiasedRandom(1, 3, 1.8);
+            int words = AlgorithmHelper.GetRandom(1, 3); //1 or 2 words
             int maxTotalLen = 12;
-            int maxWordLen = 6;
-            int minLen;
+            int remaining = maxTotalLen;
             for (int i = 0; i < words; ++i)
             {
-                if (i == 0 || i == words - 1)
-                    minLen = 2;
-                else
-                    minLen = AlgorithmHelper.GetRandom(0, 2) == 0 ? 1 : 3; //either 1 or 3 as min len for middle words
+                int len = AlgorithmHelper.GetRandom(3, Math.Min(remaining, 9)); //todo: think about tweaking
+                string word = FirstLetterToUpper(GenerateWord(len));
 
-                int len = AlgorithmHelper.GetRandom(minLen, maxWordLen + 1);
-                result += FirstLetterToUpper(GenerateWord(len)) + " ";
-
-                //so that the last word is never a single letter
-                if (words == 3 && result.Length > maxTotalLen - minLen)
-                    words = 2;
+                result += word + " ";
+                remaining -= len;
             }
-            return result.Substring(0, Math.Min(result.Length, maxTotalLen));
+
+            var name = result.TrimEnd();
+            if (!knownNames.Contains(name))
+            {
+                knownNames.Add(name);
+                return name;
+            }
+
+            //Recursion, because we need to generate again if last name was already used
+            return GenerateName();
         }
 
         public static string GenerateWord(int len)

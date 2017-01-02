@@ -29,11 +29,12 @@ namespace Randio_2 {
             this.camera = camera;
             Width = width;
             Height = height;
+
             CreatePlayer(graphicsDevice);
             CreateTiles(graphicsDevice);
             CreateEventManagers();
-            CreateQuests();
             CreateItems(graphicsDevice);
+            CreateQuests();
         }
 
         public void Update(GameTime gameTime, KeyboardState keyboardState) {
@@ -41,6 +42,7 @@ namespace Randio_2 {
             UpdateTiles(gameTime);
             UpdateEvents();
             UpdateItems(gameTime);
+            UpdateQuests();
 
             MoveCamera();
 
@@ -200,8 +202,51 @@ namespace Randio_2 {
 
         private void CreateQuests()
         {
-            quests = new QuestManager();
-            quests.CreateRandomQuestSet();
+            quests = new QuestManager(this);
+            //quests.CreateRandomQuestSet();
+
+            int count = AlgorithmHelper.GetRandom(1, 5);
+            for (int i = 0; i < count; ++i)
+            {
+                Quest quest;
+                Quest.QuestType type = (Quest.QuestType)0;//AlgorithmHelper.GetRandom(0, Quest.QuestTypeCount); //todo: debug
+
+                string name = "";
+                string description = "";
+                List<Entity> targets = null;
+                List<Item> items = null;
+                List<Vector2> points = null;
+
+                if (type == Quest.QuestType.KillTargets)
+                {
+                    name = "Kill ";
+                    targets = new List<Entity>();
+                    var entities = GetAllEntites();
+                    int enemyCount = AlgorithmHelper.GetRandom(1, 4); //todo: balance
+                    for (int j = 0; j < enemyCount; ++j)
+                    {
+                        var target = entities[AlgorithmHelper.GetRandom(0, entities.Count)];
+                        targets.Add(target);
+
+                        //Append target name to quest name
+                        name += target.Name;
+                        if (j < enemyCount - 1)
+                            name += ", ";
+                    }
+                }
+
+                else if (type == Quest.QuestType.FetchIitems)
+                {
+
+                }
+
+                else if (type == Quest.QuestType.ReachPoint)
+                {
+
+                }
+
+                quests.AddQuest(new Quest(this, type, name, description, targets, items, points));
+            }
         }
 
         private void CreateItems(GraphicsDevice device)
@@ -229,6 +274,11 @@ namespace Randio_2 {
         {
             foreach (Item i in items)
                 i.Update(gameTime);
+        }
+
+        private void UpdateQuests()
+        {
+            quests.Update();
         }
 
         private Tile[] GetVisibleTiles() {

@@ -8,13 +8,22 @@ namespace Randio_2
     class QuestManager
     {
         List<Quest> quests;
+        Map map;
 
-        public QuestManager()
-        {
+        public QuestManager(Map map)
+        { 
             quests = new List<Quest>();
+            this.map = map;
+        }
+
+        public void AddQuest(Quest q)
+        {
+            if (!quests.Contains(q))
+                quests.Add(q);
         }
 
         //todo: allow some parameters?
+        //is this even a good idea?
         public void AddRandomQuest()
         {
             Quest quest;
@@ -23,10 +32,9 @@ namespace Randio_2
             //set quest parameters based on type
             //or leave this to a GenerateRandomQuest method in Quest.cs?
 
-            quest = new Quest(type, "Testovaci", "Vitut. Vitut. Vitut. Vitut.");
+            quest = new Quest(map, type, "Testovaci", "Vitut. Vitut. Vitut. Vitut.");
 
-
-            quests.Add(quest);
+            AddQuest(quest);
         }
 
         public void CreateRandomQuestSet()
@@ -36,7 +44,7 @@ namespace Randio_2
                 AddRandomQuest();
         }
 
-        public string GetQuestStatus()
+        public string QuestsStatus()
         {
             string result = "";
             int longest = 0;
@@ -51,11 +59,17 @@ namespace Randio_2
             //Iterate for the second time, get names and perpare layout
             foreach (Quest q in quests)
             {
-                result += q.Name.PadRight(longest + 2) + (q.Completed ? "X" : "O") + "\n";
+                result += q.Name.PadRight(longest + 2) + q.Progress + "\n";
             }
 
             //Remove last \n
             return result.Substring(0, result.Length-1);
+        }
+
+        public void Update()
+        {
+            foreach (Quest q in quests)
+                q.CheckCompletion();
         }
 
     }

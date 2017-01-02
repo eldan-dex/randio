@@ -140,7 +140,7 @@ namespace Randio_2 {
             if (map.quests != null)
             {
                 Vector2 questPosition = (debugEnabled ? new Vector2(10, 120) : new Vector2(10, 10));
-                osdSpriteBatch.DrawString(debugFont, map.quests.GetQuestStatus(), questPosition, Color.DarkGreen);
+                osdSpriteBatch.DrawString(font, map.quests.QuestsStatus(), questPosition, Color.DarkGreen);
             }
             osdSpriteBatch.End();
         }

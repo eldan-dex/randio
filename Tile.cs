@@ -66,7 +66,7 @@ namespace Randio_2 {
             foreach (NPC n in NPCs)
             {
                 n.Update(gameTime);
-                if (map.CheckOutOfMap((int)n.Position.Y) == -1)
+                if (map.CheckOutOfMap((int)n.Position.Y) == -1 |! n.Alive)
                 {
                     toRemove.Add(n);
                 }

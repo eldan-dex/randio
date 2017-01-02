@@ -29,6 +29,7 @@ namespace Randio_2 {
             }
         }
 
+        public bool Alive { get; private set; }
         public Texture2D Texture { get; protected set; }
         public int CurrentTile { get; protected set; } //public for debugging purposes
         public int Width { get; protected set; }
@@ -99,6 +100,7 @@ namespace Randio_2 {
             Width = width;
             Height = height;
             velocity = Vector2.Zero;
+            Alive = true;
 
             //Set combat properties to defaults
             ResetProperties();
@@ -163,7 +165,9 @@ namespace Randio_2 {
             }
 
             if (HP <= 0)
-                position = new Vector2(0, 99999); //now OutOfMap check will recognise this NPC as dead and will remove it. VERY CLUMSY AND UGLY WAY OF DOING THIS, todo: maybe fix?
+            {
+                Alive = false; //now OutOfMap check will recognise this NPC as dead and will remove it.
+            }
         }
 
         public void UpdateOutlineColor()
