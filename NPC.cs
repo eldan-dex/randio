@@ -19,6 +19,9 @@ namespace Randio_2 {
         public bool IsBoss { get; private set; }
         #endregion
 
+        #region Private variables
+        #endregion
+
         #region Public methods
         public NPC(GraphicsDevice graphicsDevice, Map map, Vector2 position, int parentTile, int width, int height, int additionalHP = 0, float additionalStrength = 0, float additionalDefense = 0, float additionalSpeed = 0) : base(map, position, parentTile, width, height) {
             ParentTile = map.GetTileByIndex(parentTile);
@@ -38,6 +41,7 @@ namespace Randio_2 {
         new public void Update(GameTime gameTime) {
             AIMovement();
             AIScan();
+            AIInteract();
             base.Update(gameTime);
         }
         #endregion
@@ -164,6 +168,22 @@ namespace Randio_2 {
             else
                 PlayerInRange = false;
         }
+
+        private void AIInteract()
+        {
+            if (CanAttack)
+            {
+                var dist = GeometryHelper.VectorDistance(Position, map.Player.Position);
+                if ((Direction == -1 && map.Player.Position.X < Position.X && dist <= Range + map.Player.Width) || (Direction == 1 && map.Player.Position.X >= Position.X && dist <= Range + Width))
+                {
+                    map.Player.TakeDamage(this, Strength);
+                    CanAttack = false;
+                    map.entityEvents.AddEvent(new Event<Entity>(500, delegate (Entity e) { e.CanAttack = true; }, this));
+                }
+            }
+        }
+
+        //todo: allow npcs to pick/drop items?
         #endregion
     }
 }

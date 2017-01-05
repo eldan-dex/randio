@@ -92,7 +92,9 @@ namespace Randio_2
                 //for each point, check whether we've reached it
                 foreach (Vector2 point in DestinationPoints)
                 {
-                    int distance = GeometryHelper.VectorDistance(map.Player.Position, point);
+                    if (map == null)
+                        return;
+                    int distance = GeometryHelper.VectorDistance(map.Player.Position, point); //todo: map null exception on init?
 
                     //We only need to reach it once for it to count towards reachedPoints
                     if (distance <= map.Player.Width*2) //todo: balance distance

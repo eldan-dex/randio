@@ -29,7 +29,7 @@ namespace Randio_2 {
             }
         }
 
-        public bool Alive { get; private set; }
+        public bool Alive { get; protected set; }
         public Texture2D Texture { get; protected set; }
         public int CurrentTile { get; protected set; } //public for debugging purposes
         public int Width { get; protected set; }
@@ -56,6 +56,7 @@ namespace Randio_2 {
         public Color OutlineColor = Color.Green; //HP indicator
 
         public bool IsPlayer = false;
+        public bool CanAttack = true; //used only by NPCs for attack events. todo: rename, todo: this seems very awful
         #endregion
 
         #region Private/Protected variables

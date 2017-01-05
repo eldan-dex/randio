@@ -1,6 +1,10 @@
 ﻿PROGRESS LOG
 
-2.1.2017
+5.1
+* Improved player respawn
++ NPCs can now attack
+
+2.1
 * Minor changes and fixes
 + Quests (needs tweaking though)
 + Tweaked name generation - not more than two words per name from now on, generated names are now unique

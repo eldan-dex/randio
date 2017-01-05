@@ -39,6 +39,11 @@ namespace Randio_2 {
         }
 
         public void Update(GameTime gameTime, KeyboardState keyboardState) {
+            if (!Alive)
+            {
+                map.ResetPlayer(); //todo: will have to do somethign when player dies instead of just resetting
+            }
+
             GetInput(keyboardState);
             Update(gameTime);
         }
@@ -46,9 +51,11 @@ namespace Randio_2 {
         public void Reset() {
             //Respawn player on the tile where he died
             //This might not be desirable in the finished game
-
             position = Origin + new Vector2(map.GetTileByIndex(CurrentTile).Coords.Left, 0);
-            //reset everything else too
+
+            Alive = true;
+            HP = MaxHP;
+            UpdateOutlineColor();
         }
         #endregion
 

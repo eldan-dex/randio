@@ -265,6 +265,7 @@ namespace Randio_2 {
                 else if (type == Quest.QuestType.ReachPoint)
                 {
                     name = "Reach ";
+                    points = new List<Vector2>();
                     int pointCount = AlgorithmHelper.GetRandom(0, 4); //todo: balance
                     for (int j = 0; j < pointCount; ++j)
                     {
