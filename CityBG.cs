@@ -72,12 +72,14 @@ namespace Randio_2 {
 
             Color[] color = new Color[texture.Width * texture.Height];
             texture.GetData(color); //Texture size limit is 4096*4096. Textures bigger than that crash when being converted to Color[]
-            
+
             //noise
             for (int i = 0; i < texture.Width * texture.Height; ++i)
             {
+                /*
                 float scale = AlgorithmHelper.GetRandom(75, 100) / 100f;
-                color[i] = Color.FromNonPremultiplied((byte)(diffuse.R*scale), (byte)(diffuse.G * scale), (byte)(diffuse.B * scale), diffuse.A);
+                color[i] = Color.FromNonPremultiplied((byte)(diffuse.R*scale), (byte)(diffuse.G * scale), (byte)(diffuse.B * scale), diffuse.A);*/
+                color[i] = Color.Black;
             }
             
             texture.SetData(color);
@@ -90,7 +92,7 @@ namespace Randio_2 {
         Color zIndexToColor( int zIndex ) {
             switch (zIndex) {
                 case 0:
-                    return new Color(2,9,38);
+                    return new Color(0,15,85);
                 case 1:
                     return new Color(3,88,119);
                 case 2:

@@ -203,7 +203,6 @@ namespace Randio_2 {
         private void CreateQuests()
         {
             quests = new QuestManager(this);
-            //quests.CreateRandomQuestSet();
 
             int count = AlgorithmHelper.GetRandom(1, 5);
             for (int i = 0; i < count; ++i)
@@ -240,7 +239,7 @@ namespace Randio_2 {
                     name = "Bring ";
                     itemFetchList = new List<Item>();
                     points = new List<Vector2>();
-                    int itemCount = AlgorithmHelper.GetRandom(0, 4); //todo: balance
+                    int itemCount = AlgorithmHelper.GetRandom(1, 4); //todo: balance
 
                     //improve point generating algorithm?
                     int pointX = AlgorithmHelper.GetRandom(0, Width);
@@ -266,7 +265,7 @@ namespace Randio_2 {
                 {
                     name = "Reach ";
                     points = new List<Vector2>();
-                    int pointCount = AlgorithmHelper.GetRandom(0, 4); //todo: balance
+                    int pointCount = AlgorithmHelper.GetRandom(1, 4); //todo: balance
                     for (int j = 0; j < pointCount; ++j)
                     {
                         //improve point generating algorithm?

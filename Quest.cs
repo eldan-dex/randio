@@ -32,6 +32,7 @@ namespace Randio_2
         //todo: do we need to have the Completed parameter?
         public Quest(Map map, QuestType type, string name, string description, List<Entity> targets = null, List<Item> items = null, List<Vector2> points = null, bool completed = false)
         {
+            this.map = map;
             Type = type;
             Name = name;
             Description = description;
@@ -51,7 +52,7 @@ namespace Randio_2
 
         void CheckProperInitialization()
         {
-            if ((Type == QuestType.KillTargets && Targets == null) || (Type == QuestType.FetchIitems && (RequiredItems == null || DestinationPoints == null)) || (Type == QuestType.ReachPoint && DestinationPoints == null))
+            if ((Type == QuestType.KillTargets && Targets.Count == 0) || (Type == QuestType.FetchIitems && (RequiredItems.Count == 0 || DestinationPoints.Count == 0)) || (Type == QuestType.ReachPoint && DestinationPoints == null))
                 throw new ArgumentNullException("Cannot initialize quest: required argument is null");
         }
 
@@ -98,7 +99,8 @@ namespace Randio_2
 
                     //We only need to reach it once for it to count towards reachedPoints
                     if (distance <= map.Player.Width*2) //todo: balance distance
-                        reachedPoints.Add(point);
+                        if (!reachedPoints.Contains(point))
+                            reachedPoints.Add(point);
                 }
 
                 percent = (int)((float)reachedPoints.Count / DestinationPoints.Count * 100);

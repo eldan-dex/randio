@@ -18,7 +18,7 @@ namespace Randio_2 {
         private const Keys jumpButton = Keys.W; //keys will be assigned randomly
         private const Keys leftButton = Keys.A;
         private const Keys rightButton = Keys.D;
-        private const Keys crouchButton = Keys.S;
+        private const Keys slowButton = Keys.LeftShift;
         private const Keys actionButtonA = Keys.J;
         private const Keys actionButtonB = Keys.K;
 
@@ -89,14 +89,16 @@ namespace Randio_2 {
     }
 
         private void GetInput(KeyboardState keyboardState) {
-            movement = 0;
-            if (Math.Abs(movement) < 0.5f)
-                movement = 0.0f;
+            movement = 0.0f;
+            var speed = 1.0f;
+
+            if (keyboardState.IsKeyDown(slowButton))
+                speed = 0.3f;
 
             if (keyboardState.IsKeyDown(leftButton))
-                movement = -1.0f;
+                movement = -speed;
             else if (keyboardState.IsKeyDown(rightButton))
-                movement = 1.0f;
+                movement = speed;
 
             isJumping = keyboardState.IsKeyDown(jumpButton);
 

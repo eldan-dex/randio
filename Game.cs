@@ -155,7 +155,7 @@ namespace Randio_2 {
             if (keyboardState.IsKeyDown(Keys.Escape))
                 Exit();
 
-            if (keyboardState.IsKeyDown(Keys.L)) //debug: remove this in final game
+            if (keyboardState.IsKeyDown(Keys.L)) //todo: remove this in final game?
                 map.ResetPlayer();
 
             //"O" key enables/disables debugging features

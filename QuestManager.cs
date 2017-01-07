@@ -22,28 +22,6 @@ namespace Randio_2
                 quests.Add(q);
         }
 
-        //todo: allow some parameters?
-        //is this even a good idea?
-        public void AddRandomQuest()
-        {
-            Quest quest;
-            Quest.QuestType type = (Quest.QuestType)AlgorithmHelper.GetRandom(0, Quest.QuestTypeCount);
-
-            //set quest parameters based on type
-            //or leave this to a GenerateRandomQuest method in Quest.cs?
-
-            quest = new Quest(map, type, "Testovaci", "Vitut. Vitut. Vitut. Vitut.");
-
-            AddQuest(quest);
-        }
-
-        public void CreateRandomQuestSet()
-        {
-            int count = AlgorithmHelper.GetRandom(1, 5);
-            for (int i = 0; i < count; ++i)
-                AddRandomQuest();
-        }
-
         public string QuestsStatus()
         {
             string result = "";

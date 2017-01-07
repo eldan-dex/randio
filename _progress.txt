@@ -1,5 +1,10 @@
 ﻿PROGRESS LOG
 
+7.1
+* Fixed some quest bugs
++ City BG now has black blocks
++ Added slow walk
+
 5.1
 * Improved player respawn
 + NPCs can now attack
