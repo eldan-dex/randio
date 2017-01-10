@@ -22,6 +22,7 @@ namespace Randio_2 {
         public Block[,] Blocks { get; private set; }
         public int Index { get; private set; }
         public List<NPC> NPCs { get; private set; }
+        public int GroundLevel = 15;
         #endregion
 
         #region Private variables
@@ -136,7 +137,7 @@ namespace Randio_2 {
                     }
 
                     //generate solid ground
-                    if (h > 15)
+                    if (h > GroundLevel)
                     {
                         blockGrid[w, h] = true;
                         continue;

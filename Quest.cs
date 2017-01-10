@@ -10,8 +10,8 @@ namespace Randio_2
         public enum QuestType
         {
             KillTargets, //only set Targets variable
-            FetchIitems, //set RequiredItems and DestinationPoints[0] - items need to be placed somewhere
-            ReachPoint //only set DestinationPoints
+            FetchIitems, //set RequiredItems and DestinationBlocks[0] - items need to be placed somewhere
+            ReachBlock //only set DestinationBlocks
         }
         public const int QuestTypeCount = 3;
 
@@ -24,13 +24,13 @@ namespace Randio_2
         //not necessary to initialize and use all the fields
         public List<Entity> Targets { get; private set; }
         public List<Item> RequiredItems { get; private set; }
-        public List<Vector2> DestinationPoints { get; private set; }
+        public List<Rectangle> DestinationBlocks { get; private set; }
 
         private Map map; //for references to Player and objects
-        private List<Vector2> reachedPoints;
+        private List<Rectangle> reachedBlocks;
 
         //todo: do we need to have the Completed parameter?
-        public Quest(Map map, QuestType type, string name, string description, List<Entity> targets = null, List<Item> items = null, List<Vector2> points = null, bool completed = false)
+        public Quest(Map map, QuestType type, string name, string description, List<Entity> targets = null, List<Item> items = null, List<Rectangle> blocks = null, bool completed = false)
         {
             this.map = map;
             Type = type;
@@ -39,20 +39,20 @@ namespace Randio_2
 
             Targets = targets;
             RequiredItems = items;
-            DestinationPoints = points;
+            DestinationBlocks = blocks;
 
             CheckProperInitialization(); //debug only
 
             //only initialize this if we need it
-            if (DestinationPoints != null)
-                reachedPoints = new List<Vector2>();
+            if (DestinationBlocks != null)
+                reachedBlocks = new List<Rectangle>();
 
             Completed = completed;
         }
 
         void CheckProperInitialization()
         {
-            if ((Type == QuestType.KillTargets && Targets.Count == 0) || (Type == QuestType.FetchIitems && (RequiredItems.Count == 0 || DestinationPoints.Count == 0)) || (Type == QuestType.ReachPoint && DestinationPoints == null))
+            if ((Type == QuestType.KillTargets && Targets.Count == 0) || (Type == QuestType.FetchIitems && (RequiredItems.Count == 0 || DestinationBlocks.Count == 0)) || (Type == QuestType.ReachBlock && DestinationBlocks == null))
                 throw new ArgumentNullException("Cannot initialize quest: required argument is null");
         }
 
@@ -80,30 +80,29 @@ namespace Randio_2
                 foreach (Item i in RequiredItems)
                 {
                     //check whether the item is where it's supposed to be
-                    int distance = GeometryHelper.VectorDistance(i.Position, DestinationPoints[0]);
-                    if (distance <= i.Width*3 && i.IsPlaced) //don't account for held items //todo: balance distance
+                    var dest = DestinationBlocks[0];
+                    var pos = i.Position;
+
+                    if (i.IsPlaced && //don't account for held items 
+                        pos.X >= dest.Left && pos.Y >= dest.Top && pos.X+i.Width <= dest.Right && pos.Y+i.Height <= dest.Bottom)
                         ++finishedItems;
                 }
 
                 percent = (int)((float)finishedItems / RequiredItems.Count * 100);
             }
 
-            else if (Type == QuestType.ReachPoint)
+            else if (Type == QuestType.ReachBlock)
             {
                 //for each point, check whether we've reached it
-                foreach (Vector2 point in DestinationPoints)
+                foreach (Rectangle block in DestinationBlocks)
                 {
-                    if (map == null)
-                        return;
-                    int distance = GeometryHelper.VectorDistance(map.Player.Position, point); //todo: map null exception on init?
-
-                    //We only need to reach it once for it to count towards reachedPoints
-                    if (distance <= map.Player.Width*2) //todo: balance distance
-                        if (!reachedPoints.Contains(point))
-                            reachedPoints.Add(point);
+                    var pos = map.Player.Position;
+                    if (pos.X >= block.Left && pos.Y >= block.Top && pos.X + map.Player.Width <= block.Right && pos.Y + map.Player.Height <= block.Bottom)
+                        if (!reachedBlocks.Contains(block)) //We only need to reach it once for it to count towards reachedPoints
+                            reachedBlocks.Add(block);
                 }
 
-                percent = (int)((float)reachedPoints.Count / DestinationPoints.Count * 100);
+                percent = (int)((float)reachedBlocks.Count / DestinationBlocks.Count * 100);
             }
 
             //Set the display value

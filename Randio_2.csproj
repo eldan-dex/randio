@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="AlgorithmHelper.cs" />
     <Compile Include="Background.cs" />
+    <Compile Include="Zone.cs" />
     <Compile Include="Block.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="CityBG.cs" />

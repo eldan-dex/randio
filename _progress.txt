@@ -1,5 +1,8 @@
 ﻿PROGRESS LOG
 
+10.1
++ Quest destination markers (reach targt, drop items at X), are now marked in color on the map.
+
 9.1
 * Foxed player not being able to turn when cornered
 + Added color palettes

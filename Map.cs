@@ -16,6 +16,7 @@ namespace Randio_2 {
         //public List<NPC> NPCs { get; private set; }
         public EventManager<Entity> entityEvents;
         public QuestManager quests;
+        public List<Zone> questZones;
         #endregion
 
         #region Private variables
@@ -34,7 +35,7 @@ namespace Randio_2 {
             CreateTiles(graphicsDevice);
             CreateEventManagers();
             CreateItems(graphicsDevice);
-            CreateQuests();
+            CreateQuests(graphicsDevice);
         }
 
         public void Update(GameTime gameTime, KeyboardState keyboardState) {
@@ -60,6 +61,11 @@ namespace Randio_2 {
                 //Draw Tile NPCs (not a part of Tile.Draw because we need to have GameTime available)
                 foreach (NPC n in t.NPCs)
                     visibleNPCs.Add(n);
+            }
+
+            foreach (Zone z in questZones)
+            {
+                z.Draw(spriteBatch);
             }
 
             foreach (NPC n in visibleNPCs)
@@ -200,9 +206,10 @@ namespace Randio_2 {
             entityEvents = new EventManager<Entity>();
         }
 
-        private void CreateQuests()
+        private void CreateQuests(GraphicsDevice device)
         {
             quests = new QuestManager(this);
+            questZones = new List<Zone>();
 
             int count = AlgorithmHelper.GetRandom(1, 5);
             for (int i = 0; i < count; ++i)
@@ -214,7 +221,7 @@ namespace Randio_2 {
                 string description = "";
                 List<Entity> targets = null;
                 List<Item> itemFetchList = null;
-                List<Vector2> points = null;
+                List<Rectangle> blocks = null;
 
                 if (type == Quest.QuestType.KillTargets)
                 {
@@ -238,14 +245,12 @@ namespace Randio_2 {
                 {
                     name = "Bring ";
                     itemFetchList = new List<Item>();
-                    points = new List<Vector2>();
+                    blocks = new List<Rectangle>();
                     int itemCount = AlgorithmHelper.GetRandom(1, 4); //todo: balance
 
-                    //improve point generating algorithm?
-                    int pointX = AlgorithmHelper.GetRandom(0, Width);
-                    int pointY = AlgorithmHelper.GetRandom(0, Height - 2*Block.Height);
-
-                    points.Add(new Vector2(pointX, pointY));
+                    var newZone = GetNewZone();
+                    blocks.Add(newZone);
+                    questZones.Add(new Zone(device, newZone, Color.Green));
 
                     for (int j = 0; j < itemCount; ++j)
                     {
@@ -258,31 +263,78 @@ namespace Randio_2 {
                             name += ", ";
                     }
 
-                    name += " to " + points[0].X.ToString() + ";" + points[0].Y.ToString(); //todo: find a better way to mark destination - mark place above block with borders?
+                    name += " to " + "the green area."; //todo: find a better way to mark destination - mark place above block with borders?
                 }
 
-                else if (type == Quest.QuestType.ReachPoint)
+                else if (type == Quest.QuestType.ReachBlock)
                 {
-                    name = "Reach ";
-                    points = new List<Vector2>();
+                    name = "Reach areas with these colors: ";
+                    blocks = new List<Rectangle>();
                     int pointCount = AlgorithmHelper.GetRandom(1, 4); //todo: balance
                     for (int j = 0; j < pointCount; ++j)
                     {
-                        //improve point generating algorithm?
-                        int pointX = AlgorithmHelper.GetRandom(0, Width);
-                        int pointY = AlgorithmHelper.GetRandom(0, Height - 2 * Block.Height);
+                        var newZone = GetNewZone();
+                        blocks.Add(newZone);
+                        questZones.Add(new Zone(device, newZone, Color.Orange));
 
-                        var point = new Vector2(pointX, pointY);
-                        points.Add(point);
 
-                        name += point.X.ToString() + ";" + point.Y.ToString();
+                        name += "Orange";
                         if (j < pointCount - 1)
                             name += ", ";
                     }
                 }
 
-                quests.AddQuest(new Quest(this, type, name, description, targets, itemFetchList, points));
+                quests.AddQuest(new Quest(this, type, name, description, targets, itemFetchList, blocks));
             }
+        }
+
+        private Rectangle GetNewZone()
+        {
+            Tile tile = tiles[AlgorithmHelper.GetRandom(0, tiles.Count)];
+            int xblocks = tile.Coords.Width / Block.Width;
+            int yblocks = tile.Coords.Height / Block.Height;
+
+            List<int> valX = new List<int>();
+            List<int> valY = new List<int>();
+
+            for (int x = 1; x < xblocks; ++x)
+            {
+                for (int y = 1; y < tile.GroundLevel; ++y)
+                {
+                    int rand = AlgorithmHelper.GetRandom(0, (xblocks * yblocks) / 10);
+                    if (rand % 42 == 0 && tile.Blocks[x, y] != null)
+                    {
+                        rand = AlgorithmHelper.GetRandom(0, 5);
+                        if (rand == 1 && tile.Blocks[x, y - 1] == null && (tile.Blocks[x - 1, y - 1] == null || tile.Blocks [x + 1, y - 1] == null))
+                        {
+                            valX.Add(x);
+                            valY.Add(y - 1);
+                        }
+                        else if (rand == 2 && tile.Blocks[x, y + 1] == null && (tile.Blocks[x - 1, y + 1] == null || tile.Blocks[x + 1, y + 1] == null))
+                        {
+                            valX.Add(x);
+                            valY.Add(y + 1);
+                        }
+                        else if (rand == 3 && tile.Blocks[x - 1, y] == null && tile.Blocks[x - 2, y] == null)
+                        {
+                            valX.Add(x - 1);
+                            valY.Add(y);
+                        }
+                        else if (rand == 4 && tile.Blocks[x + 1, y] == null && tile.Blocks[x + 2, y] == null)
+                        {
+                            valX.Add(x + 1);
+                            valY.Add(y);
+                        }
+                    }
+                }
+            }
+
+            //todo: dangerous, possible infinite loop.
+            if (valX.Count == 0)
+                return GetNewZone();
+
+            int rnd = AlgorithmHelper.GetRandom(0, valX.Count);
+            return new Rectangle(valX[rnd]*Block.Width, valY[rnd]*Block.Height, Block.Width, Block.Height);
         }
 
         private void CreateItems(GraphicsDevice device)
