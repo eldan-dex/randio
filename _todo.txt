@@ -1,8 +1,5 @@
 ﻿TODO:
-- cannot turn when blocked by npc
-
 - improve quests
-- improve AI
 
 - Terrain collisions - fix "skip" when going right on a new tile
 - entities can push each other away (and bug each other through walls)
@@ -11,20 +8,15 @@
 
 - entity fill as type indicator (boss has black slant lines, etc.)
 
+- improve AI
+
 - Splotches - from rectangles
 - Create a whole-splotch (splotch-over-splotch) background (even splotching darker versions of the same colour inside other splotches might work...
 - Background textures
 	- Colour splashes (monocolor, or fading towards the edges)
 	- Shapes on a dark/light background (or faded out splashes)
 	- L-Systems (pixelated, darker outlines)
-
-- Block generation algorithm POC
-- Foreground texture generation algorithm POC
-
-- Basic gameplay:
-	- quest list
-	- quest generation algorithm
-	- quest completion checking
+	- use old city-style blocks with another background (shapes?)
 
 - Refactoring
 

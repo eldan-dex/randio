@@ -125,9 +125,9 @@ namespace Randio_2 {
             CheckTile();
 
             //Keep easily accessible direction info. If player is still, remember last direction
-            if (Velocity.X > 0)
+            if (movement > 0)
                 Direction = 1;
-            else if (Velocity.X < 0)
+            else if (movement < 0)
                 Direction = -1;
 
             //reset movement

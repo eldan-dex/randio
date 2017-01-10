@@ -1,5 +1,11 @@
 ﻿PROGRESS LOG
 
+9.1
+* Foxed player not being able to turn when cornered
++ Added color palettes
++ Updates ShapesBG
++ AI now idles by moving around randomly
+
 7.1
 * Fixed some quest bugs
 + City BG now has black blocks

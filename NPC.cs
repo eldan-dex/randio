@@ -20,6 +20,7 @@ namespace Randio_2 {
         #endregion
 
         #region Private variables
+        int lastDirection = 0;
         #endregion
 
         #region Public methods
@@ -135,8 +136,17 @@ namespace Randio_2 {
         }
 
         private void AIIdle() { //Idle
-            if (!isJumping)
-                isJumping = true;
+            int ran = AlgorithmHelper.GetRandom(0, 27);
+            if (ran == 0)
+                lastDirection = 1;
+
+            else if (ran == 1)
+                lastDirection = -1;
+
+            else if (ran > 23)
+                lastDirection = 0;
+
+            movement = lastDirection * 0.7f;
         }
 
         private void AIRunAway() { //Basically inverted AITrackPlayer()

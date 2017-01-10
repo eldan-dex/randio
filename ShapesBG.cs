@@ -8,9 +8,14 @@ namespace Randio_2
     class ShapesBG : Background
     {
         List<Shape> shapes;
+        List<Color> palette;
+        int blockColorId;
 
         public ShapesBG(GraphicsDevice device, SpriteBatch batch, int width, int height)
         {
+            palette = GraphicsHelper.GetColorPalette();
+            blockColorId = AlgorithmHelper.GetRandom(0, palette.Count);
+
             CreateBackgroundTexture(device, batch, width, height);
             CreateBlockTexture(device, batch, Block.Width, Block.Height);
         }
@@ -21,10 +26,14 @@ namespace Randio_2
             shapes = new List<Shape>();
 
             device.SetRenderTarget(Texture);
-            device.Clear(Color.Black);
+
+            Color bg = palette[AlgorithmHelper.GetRandom(0, palette.Count)];
+            palette.Remove(bg);
+            device.Clear(bg);
+
             batch.Begin();
 
-            int count = AlgorithmHelper.GetRandom(0, width / 30 + 1);
+            int count = AlgorithmHelper.GetRandom(0, width / 20 + 1);
             bool darkerOutline = AlgorithmHelper.GetRandom(0, 2) == 1;
 
             for (int i = 0; i < count; ++i)
@@ -36,7 +45,7 @@ namespace Randio_2
                 var y = AlgorithmHelper.GetRandom(1 - h / 3 * 2, height - h / 3); //but can go 2/3 of their height above or below
                 var outlineWidth = AlgorithmHelper.GetRandom((w + h / 2) / 50, (w + h / 2) / 20);
 
-                shapes.Add(new Shape(device, batch, type, w, h, x, y, outlineWidth, darkerOutline));
+                shapes.Add(new Shape(device, batch, type, palette, w, h, x, y, outlineWidth, darkerOutline));
             }
 
             foreach (Shape s in shapes)
@@ -72,7 +81,9 @@ namespace Randio_2
             public Texture2D Texture { get; private set; }
             public ShapeType Type { get; private set; }
 
-            public Shape(GraphicsDevice device, SpriteBatch batch, ShapeType type, int width, int height, int x, int y, int outlineWidth, bool darkerOutline)
+            private List<Color> palette;
+
+            public Shape(GraphicsDevice device, SpriteBatch batch, ShapeType type, List<Color> palette, int width, int height, int x, int y, int outlineWidth, bool darkerOutline)
             {
                 Width = width;
                 Height = height;
@@ -80,6 +91,7 @@ namespace Randio_2
                 Coords = new Rectangle(x, y, width, height);
                 Texture = new Texture2D(device, width, height);
                 Type = type;
+                this.palette = palette;
 
                 CreateTexture(device, batch, width, height, outlineWidth, darkerOutline);
             }
@@ -93,7 +105,7 @@ namespace Randio_2
 
                 if (Type == ShapeType.Rectangle)
                 {
-                    GraphicsHelper.DrawRectangle(Texture, Color.Violet);
+                    GraphicsHelper.DrawRectangle(Texture, palette[AlgorithmHelper.BiasedRandom(0, palette.Count-1, 1.4)]);
                     if (darkerOutline)
                         GraphicsHelper.CreateDarkerOutline(Texture, outlineWidth);
                     else
@@ -101,7 +113,7 @@ namespace Randio_2
                 }
 
                 else if (Type == ShapeType.Splotch)
-                    GraphicsHelper.DrawSplotch(Texture, Color.Violet);
+                    GraphicsHelper.DrawSplotch(Texture, palette[AlgorithmHelper.BiasedRandom(0, palette.Count-1, 1.4)]);
             }
         }
     }
