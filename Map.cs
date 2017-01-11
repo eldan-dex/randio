@@ -215,13 +215,13 @@ namespace Randio_2 {
             for (int i = 0; i < count; ++i)
             {
                 Quest quest;
-                Quest.QuestType type = (Quest.QuestType)AlgorithmHelper.GetRandom(0, Quest.QuestTypeCount);
+                Quest.QuestType type = (Quest.QuestType)AlgorithmHelper.GetRandom(2, Quest.QuestTypeCount);
 
                 string name = "";
                 string description = "";
                 List<Entity> targets = null;
                 List<Item> itemFetchList = null;
-                List<Rectangle> blocks = null;
+                List<Zone> zones = null;
 
                 if (type == Quest.QuestType.KillTargets)
                 {
@@ -245,16 +245,27 @@ namespace Randio_2 {
                 {
                     name = "Bring ";
                     itemFetchList = new List<Item>();
-                    blocks = new List<Rectangle>();
+                    zones = new List<Zone>();
                     int itemCount = AlgorithmHelper.GetRandom(1, 4); //todo: balance
 
-                    var newZone = GetNewZone();
-                    blocks.Add(newZone);
-                    questZones.Add(new Zone(device, newZone, Color.Green));
+                    var newZone = GetNewZone(device, Color.Green);
+                    zones.Add(newZone);
+                    questZones.Add(newZone);
 
                     for (int j = 0; j < itemCount; ++j)
                     {
                         var item = items[AlgorithmHelper.GetRandom(0, items.Count)];
+
+                        while (itemFetchList.Contains(item))
+                        {
+                            if (itemFetchList.Count == itemCount)
+                            {
+                                j = itemCount;
+                                break;
+                            }
+                            item = items[AlgorithmHelper.GetRandom(0, items.Count)];
+                        }
+                        
                         itemFetchList.Add(item);
 
                         //Append target name to quest name
@@ -263,20 +274,19 @@ namespace Randio_2 {
                             name += ", ";
                     }
 
-                    name += " to " + "the green area."; //todo: find a better way to mark destination - mark place above block with borders?
+                    name += " to " + "the green area."; //todo: improve destination marking - all "green areas" look the same atm
                 }
 
                 else if (type == Quest.QuestType.ReachBlock)
                 {
                     name = "Reach areas with these colors: ";
-                    blocks = new List<Rectangle>();
+                    zones = new List<Zone>();
                     int pointCount = AlgorithmHelper.GetRandom(1, 4); //todo: balance
                     for (int j = 0; j < pointCount; ++j)
                     {
-                        var newZone = GetNewZone();
-                        blocks.Add(newZone);
-                        questZones.Add(new Zone(device, newZone, Color.Orange));
-
+                        var newZone = GetNewZone(device, Color.Orange);
+                        zones.Add(newZone);
+                        questZones.Add(newZone);
 
                         name += "Orange";
                         if (j < pointCount - 1)
@@ -284,11 +294,11 @@ namespace Randio_2 {
                     }
                 }
 
-                quests.AddQuest(new Quest(this, type, name, description, targets, itemFetchList, blocks));
+                quests.AddQuest(new Quest(this, type, name, description, targets, itemFetchList, zones));
             }
         }
 
-        private Rectangle GetNewZone()
+        private Zone GetNewZone(GraphicsDevice device, Color zoneColor)
         {
             Tile tile = tiles[AlgorithmHelper.GetRandom(0, tiles.Count)];
             int xblocks = tile.Coords.Width / Block.Width;
@@ -329,12 +339,12 @@ namespace Randio_2 {
                 }
             }
 
-            //todo: dangerous, possible infinite loop.
+            //todo: dangerous, possible infinite loop. although very improbable
             if (valX.Count == 0)
-                return GetNewZone();
+                return GetNewZone(device, zoneColor);
 
             int rnd = AlgorithmHelper.GetRandom(0, valX.Count);
-            return new Rectangle(valX[rnd]*Block.Width, valY[rnd]*Block.Height, Block.Width, Block.Height);
+            return new Zone(device, new Rectangle(tile.Coords.X + valX[rnd] * Block.Width, tile.Coords.Y + valY[rnd] * Block.Height, Block.Width, Block.Height), zoneColor);
         }
 
         private void CreateItems(GraphicsDevice device)

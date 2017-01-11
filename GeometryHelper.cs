@@ -45,5 +45,12 @@ namespace Randio_2 {
         {
             return (int)(Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y));
         }
+
+        public static Rectangle TileToGlobalCoordinates(Rectangle tileCoords, Tile tile)
+        {
+            if (tileCoords == null || tile == null)
+                return new Rectangle(); //todo: or throw exception (better?)
+            return new Rectangle(tileCoords.X + tile.Coords.X, tileCoords.Y + tile.Coords.Y, tileCoords.Width, tileCoords.Height);
+        }
     }
 }

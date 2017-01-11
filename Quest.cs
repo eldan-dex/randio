@@ -24,13 +24,13 @@ namespace Randio_2
         //not necessary to initialize and use all the fields
         public List<Entity> Targets { get; private set; }
         public List<Item> RequiredItems { get; private set; }
-        public List<Rectangle> DestinationBlocks { get; private set; }
+        public List<Zone> DestinationBlocks { get; private set; }
 
         private Map map; //for references to Player and objects
         private List<Rectangle> reachedBlocks;
 
         //todo: do we need to have the Completed parameter?
-        public Quest(Map map, QuestType type, string name, string description, List<Entity> targets = null, List<Item> items = null, List<Rectangle> blocks = null, bool completed = false)
+        public Quest(Map map, QuestType type, string name, string description, List<Entity> targets = null, List<Item> items = null, List<Zone> blocks = null, bool completed = false)
         {
             this.map = map;
             Type = type;
@@ -80,7 +80,7 @@ namespace Randio_2
                 foreach (Item i in RequiredItems)
                 {
                     //check whether the item is where it's supposed to be
-                    var dest = DestinationBlocks[0];
+                    var dest = DestinationBlocks[0].Coords;
                     var pos = i.Position;
 
                     if (i.IsPlaced && //don't account for held items 
@@ -94,12 +94,19 @@ namespace Randio_2
             else if (Type == QuestType.ReachBlock)
             {
                 //for each point, check whether we've reached it
-                foreach (Rectangle block in DestinationBlocks)
+                foreach (Zone zone in DestinationBlocks)
                 {
-                    var pos = map.Player.Position;
-                    if (pos.X >= block.Left && pos.Y >= block.Top && pos.X + map.Player.Width <= block.Right && pos.Y + map.Player.Height <= block.Bottom)
+                    if (!zone.Active) //don't concern ourselves with inactive zones
+                        continue;
+
+                    var block = zone.Coords;
+                    var newPlayerRect = GeometryHelper.TileToGlobalCoordinates(map.Player.BoundingRectangle, map.GetTileByIndex(map.Player.CurrentTile));
+                    if (GeometryHelper.GetIntersectionDepth(block, newPlayerRect) != Vector2.Zero)
                         if (!reachedBlocks.Contains(block)) //We only need to reach it once for it to count towards reachedPoints
+                        {
                             reachedBlocks.Add(block);
+                            zone.Deactivate();
+                        }
                 }
 
                 percent = (int)((float)reachedBlocks.Count / DestinationBlocks.Count * 100);
