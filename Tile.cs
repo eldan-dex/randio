@@ -195,7 +195,7 @@ namespace Randio_2 {
 
                         //Assign texture accordingly
                         //If block is topmost, use a different texture
-                        Texture2D texture = borderAbove ? GraphicsHelper.CopyTexture(BlockTopmostTexture) : GraphicsHelper.CopyTexture(BlockTexture); //need to COPY THE TEXTURE HERE
+                        Texture2D texture = borderAbove ? GraphicsHelper.CopyTexture(BlockTexture) : GraphicsHelper.CopyTexture(BlockTopmostTexture); //need to COPY THE TEXTURE HERE
                         if (Background.OutlineBlocks)
                             GraphicsHelper.OutlineRectangleSide(texture, Color.LightGray, 4, borderLeft, borderAbove, borderRight, borderBelow);
 

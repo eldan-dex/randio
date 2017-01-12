@@ -11,6 +11,7 @@ namespace Randio_2 {
         {
             CreateBackgroundTexture(device, batch, width, height);
             CreateBlockTexture(device, batch, Block.Width, Block.Height);
+            BlockTopmostTexture = BlockTexture;
         }
 
         public void CreateBackgroundTexture( GraphicsDevice device, SpriteBatch batch, int width, int height )
