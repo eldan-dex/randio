@@ -18,6 +18,7 @@ namespace Randio_2 {
         public TileType Type { get; private set; }
         public Texture2D TileTexture { get; private set; }
         public Texture2D BlockTexture { get; private set; }
+        public Texture2D BlockTopmostTexture { get; private set; }
         public Rectangle Coords { get; private set; }
         public Block[,] Blocks { get; private set; }
         public int Index { get; private set; }
@@ -95,6 +96,7 @@ namespace Randio_2 {
 
         private void CreateBlockTexture(GraphicsDevice graphicsDevice) {
             BlockTexture = Background.BlockTexture;
+            BlockTopmostTexture = Background.BlockTopmostTexture;
         }
 
         private void CreateEntities(GraphicsDevice graphicsDevice) {
@@ -191,11 +193,13 @@ namespace Randio_2 {
                             borderRight = true;
 
 
-                        //Assign texture accordingly  
-                        Texture2D texture = GraphicsHelper.CopyTexture(BlockTexture); //need to COPY THE TEXTURE HERE
-                        GraphicsHelper.OutlineRectangleSide(texture, Color.LightGray, 4, borderLeft, borderAbove, borderRight, borderBelow);
+                        //Assign texture accordingly
+                        //If block is topmost, use a different texture
+                        Texture2D texture = borderAbove ? GraphicsHelper.CopyTexture(BlockTopmostTexture) : GraphicsHelper.CopyTexture(BlockTexture); //need to COPY THE TEXTURE HERE
+                        if (Background.OutlineBlocks)
+                            GraphicsHelper.OutlineRectangleSide(texture, Color.LightGray, 4, borderLeft, borderAbove, borderRight, borderBelow);
 
-                        Blocks[w, h] = new Block(texture);
+                        Blocks[w, h] = new Block(texture, borderAbove);
 
                     }
                 }
@@ -212,8 +216,10 @@ namespace Randio_2 {
                         int nX = (int)(Coords.X + x * Block.Size.X);
                         int nY = (int)(Coords.Y + y * Block.Size.Y);
                         // Draw it in screen space.
-                        //will probably be edited to reflect global position of tile (render to RenderTarget and then add the RenderTarget to global render?)
-                        spriteBatch.Draw(block.Texture, new Rectangle(nX, nY, Block.Width, Block.Height), Color.White); //or use this.BlockTexture?
+                        //todo: will probably be edited to reflect global position of tile (render to RenderTarget and then add the RenderTarget to global render?)
+                        var texture = block.Texture == null ? block.TopmostTexture : block.Texture; //draw topmost blocks with a different texture (if needed)
+
+                        spriteBatch.Draw(texture, new Rectangle(nX, nY, Block.Width, Block.Height), Color.White); //or use this.BlockTexture?
                         if (Game.debugEnabled)
                         spriteBatch.DrawString(Game.font, x + "," + y, new Vector2(nX+2, nY+3), Color.Black, 0f, Vector2.Zero, 0.4f, SpriteEffects.None, 0);
                     }

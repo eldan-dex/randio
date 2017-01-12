@@ -1,5 +1,9 @@
 ﻿PROGRESS LOG
 
+12.1
++ Topmost blocks now can have a different texture than the rest
++ Drawing block outlines can be enabled/disabled ona  per-background basis
+
 10.1
 * Tweaked quest completion checking
 + Quest destination markers (reach targt, drop items at X), are now marked in color on the map (Zones)
