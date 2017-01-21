@@ -4,21 +4,18 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Randio_2 {
     public class Camera {
 
-        //Public variables
-        //********************************************************************************//
+        #region Public variables
         public Vector2 Position { get; set; }
         public float Rotation { get; set; }
         public float Zoom { get; set; }
         public Vector2 Origin { get; set; }
+        #endregion 
 
-
-        //Private variables
-        //********************************************************************************//
+        #region Private variables
         private readonly Viewport _viewport;
+        #endregion 
 
-
-        //Public methods
-        //********************************************************************************//
+        #region Public methods
         public Camera(Viewport viewport) {
             _viewport = viewport;
 
@@ -47,5 +44,6 @@ namespace Randio_2 {
                 Matrix.CreateScale(Zoom, Zoom, 1) *
                 Matrix.CreateTranslation(new Vector3(Origin, 0.0f));
         }
+        #endregion
     }
 }

@@ -5,9 +5,12 @@ namespace Randio_2
 {
     class EventManager<T>
     {
+        #region Private variables
         List<Event<T>> events;
         Event<T> next;
+        #endregion
 
+        #region Public variables
         public EventManager()
         {
             events = new List<Event<T>>();
@@ -46,6 +49,6 @@ namespace Randio_2
                 PrepareNextEvent();
             }
         }
-
+        #endregion
     }
 }

@@ -2,11 +2,11 @@
 
 namespace Randio_2 {
     static class AlgorithmHelper {
+        #region Public variables
         public static Random Rand = new Random((int)DateTime.Now.Ticks);
+        #endregion
 
-
-        //Public methods
-        //********************************************************************************//
+        #region Public methods
         public static int GetRandom(int minInc, int maxExc)
         {
             return Rand.Next(minInc, maxExc);
@@ -25,5 +25,6 @@ namespace Randio_2 {
             var result = Math.Floor(min + (max + 1 - min) * (Math.Pow(randomDouble, probabilityPower)));
             return (int)result;
         }
+        #endregion
     }
 }

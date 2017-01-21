@@ -1,18 +1,23 @@
-﻿        using System;
-        using System.Collections.Generic;
-        using Microsoft.Xna.Framework;
-        using Microsoft.Xna.Framework.Graphics;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Randio_2
 {
     class LSystem
     {
+        #region Public variables
         public string State { get; private set; }
         public int Step { get; private set; }
         public double Angle { get; private set; }
+        #endregion
 
+        #region Private variables
         private List<Rule> rules;
+        #endregion
 
+        #region Public methods
         //Ctors
         public LSystem()
         {
@@ -113,32 +118,12 @@ namespace Randio_2
                 Replace = replace;
             }
         }
+        #endregion
     }
 
     class Turtle
     {
-        class Moment
-        {
-            public Vector2 currentPosition;
-            public double angle;
-
-            public Moment()
-            {
-            }
-
-            public Moment(Moment other)
-            {
-                currentPosition = other.currentPosition;
-                angle = other.angle;
-            }
-
-            public Moment(Vector2 position, double angle)
-            {
-                currentPosition = position;
-                this.angle = angle;
-            }
-        }
-
+        #region Private variables
         SpriteBatch spriteBatch;
         GraphicsDevice device;
         Texture2D lineTexture;
@@ -146,7 +131,9 @@ namespace Randio_2
         Moment defaultMoment;
         Stack<Moment> time;
         Color currentColor;
+        #endregion
 
+        #region Public methods
         public Turtle(GraphicsDevice device, SpriteBatch spriteBatch, Vector2 startingPosition, double startingAngle, Color currentColor)
         {
             this.device = device;
@@ -217,7 +204,9 @@ namespace Randio_2
 
             return target;
         }
+        #endregion
 
+        #region Private methods
         private void MoveTurtle(int length, RenderTarget2D target)
         {
             Vector2 newPos = now.currentPosition + (length * GeometryHelper.AngleToVector(GeometryHelper.DegToRad(now.angle)));
@@ -229,5 +218,34 @@ namespace Randio_2
 
             now.currentPosition = newPos; //move next line to start inside parent?
         }
+        #endregion
+
+        #region Nested classes
+        class Moment
+        {
+            #region Public variables
+            public Vector2 currentPosition;
+            public double angle;
+            #endregion
+
+            #region Public methods
+            public Moment()
+            {
+            }
+
+            public Moment(Moment other)
+            {
+                currentPosition = other.currentPosition;
+                angle = other.angle;
+            }
+
+            public Moment(Vector2 position, double angle)
+            {
+                currentPosition = position;
+                this.angle = angle;
+            }
+            #endregion
+        }
+        #endregion
     }
 }

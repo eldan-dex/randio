@@ -9,8 +9,8 @@ namespace Randio_2 {
         #region Public varaibles
         public Vector2 Origin { get; private set; }
         public int SafeMargin { get; private set; } //how close to the border can player go before the camera starts moving;
-        public const int PlayerWidth = 38; //32 small, 48big
-        public const int PlayerHeight = 38; //32 small, 48big
+        public const int PlayerWidth = 37; //32 small, 48big
+        public const int PlayerHeight = 37; //32 small, 48big
         #endregion
 
         #region Private variables
@@ -84,7 +84,7 @@ namespace Randio_2 {
             DefaultStrength = 1;
             DefaultDefense = 0;
 
-            Name = StringHelper.GenerateName().ToUpper();
+            Name = StringHelper.GenerateName(1).ToUpper();
             IsPlayer = true;
     }
 

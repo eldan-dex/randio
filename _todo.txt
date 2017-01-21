@@ -23,9 +23,9 @@
 - Timed events/animations
 
 ISSUES:
-- Tearing when moving camera along with player
 - Entities clip/bug through blocks and themselves
 - Tile texture size might be too big for the engine to handle and it thus crashes (happens only once in a while) <- temporarily fixed by limiting max newTileSize to 4096
+-> opticky prodlouzit tile polozenim 1-3 podobnych (stejny type) vedle sebe
 
 IDEAS:
 - keep the bug where player can get a quest to kill themselves as a feature

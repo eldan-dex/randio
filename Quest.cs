@@ -7,6 +7,7 @@ namespace Randio_2
 {
     class Quest
     {
+        #region Public variables
         public enum QuestType
         {
             KillTargets, //only set Targets variable
@@ -25,10 +26,14 @@ namespace Randio_2
         public List<Entity> Targets { get; private set; }
         public List<Item> RequiredItems { get; private set; }
         public List<Zone> DestinationBlocks { get; private set; }
+        #endregion
 
+        #region Private variables
         private Map map; //for references to Player and objects
         private List<Rectangle> reachedBlocks;
+        #endregion
 
+        #region Public methods
         //todo: do we need to have the Completed parameter?
         public Quest(Map map, QuestType type, string name, string description, List<Entity> targets = null, List<Item> items = null, List<Zone> blocks = null, bool completed = false)
         {
@@ -41,19 +46,11 @@ namespace Randio_2
             RequiredItems = items;
             DestinationBlocks = blocks;
 
-            CheckProperInitialization(); //debug only
-
             //only initialize this if we need it
             if (DestinationBlocks != null)
                 reachedBlocks = new List<Rectangle>();
 
             Completed = completed;
-        }
-
-        void CheckProperInitialization()
-        {
-            if ((Type == QuestType.KillTargets && Targets.Count == 0) || (Type == QuestType.FetchIitems && (RequiredItems.Count == 0 || DestinationBlocks.Count == 0)) || (Type == QuestType.ReachBlock && DestinationBlocks == null))
-                throw new ArgumentNullException("Cannot initialize quest: required argument is null");
         }
 
         public void CheckCompletion()
@@ -119,6 +116,7 @@ namespace Randio_2
             else
                 Progress = percent.ToString() + "%";
         }
+        #endregion
     }
 }
 

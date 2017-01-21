@@ -158,6 +158,12 @@ namespace Randio_2 {
             if (keyboardState.IsKeyDown(Keys.L)) //todo: remove this in final game?
                 map.ResetPlayer();
 
+            if (keyboardState.IsKeyDown(Keys.G))
+            {
+                StringHelper.Reset();
+                CreateMap();
+            }
+
             //"O" key enables/disables debugging features
             if (keyboardState.IsKeyDown(Keys.O)) {
                 if (oEnabled)

@@ -2,10 +2,9 @@
 using Microsoft.Xna.Framework;
 
 namespace Randio_2 {
-    class GeometryHelper {
-
-        //Public methods
-        //********************************************************************************//
+    class GeometryHelper
+    {
+        #region Public methods
         public static Vector2 GetIntersectionDepth(Rectangle rectA, Rectangle rectB) {
             // Calculate half sizes.
             float halfWidthA = rectA.Width / 2.0f;
@@ -52,5 +51,6 @@ namespace Randio_2 {
                 return new Rectangle(); //todo: or throw exception (better?)
             return new Rectangle(tileCoords.X + tile.Coords.X, tileCoords.Y + tile.Coords.Y, tileCoords.Width, tileCoords.Height);
         }
+        #endregion
     }
 }

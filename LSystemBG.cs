@@ -7,9 +7,12 @@ namespace Randio_2
 {
     class LSystemBG : Background
     {
+        #region Private variables
         private LSystem defaultSystem;
         private Turtle turtle;
+        #endregion
 
+        #region Public methods
         public LSystemBG(GraphicsDevice device, SpriteBatch batch, int width, int height)
         {
             CreateBackgroundTexture(device, batch, width, height);
@@ -61,5 +64,6 @@ namespace Randio_2
             GraphicsHelper.DrawRectangle(tex, Color.Yellow);
             BlockTexture = tex;
         }
+        #endregion
     }
 }

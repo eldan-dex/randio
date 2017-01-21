@@ -18,7 +18,7 @@ namespace Randio_2
             Texture = new Texture2D(device, coords.Width, coords.Height);
             Coords = coords;
             GraphicsHelper.DrawRectangle(Texture, Color.Transparent);
-            GraphicsHelper.OutlineRectangle(Texture, zoneOutline, 3);
+            GraphicsHelper.OutlineRectangle(Texture, zoneOutline, 6);
         }
 
         public void Draw(SpriteBatch spriteBatch)

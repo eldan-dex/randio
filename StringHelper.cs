@@ -9,11 +9,16 @@ namespace Randio_2
         //todo: when map-resetting, this needs to be reinitialized
 
         #region Public methods
-        public static string GenerateName()
+        public static void Reset()
+        {
+            knownNames = new List<string>();
+        }
+
+        public static string GenerateName(int words = -1)
         {
             string result = "";
-
-            int words = AlgorithmHelper.GetRandom(1, 3); //1 or 2 words
+            if (words == -1)
+                words = AlgorithmHelper.GetRandom(1, 3); //1 or 2 words
             int maxTotalLen = 12;
             int remaining = maxTotalLen;
             for (int i = 0; i < words; ++i)

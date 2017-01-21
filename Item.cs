@@ -123,15 +123,15 @@ namespace Randio_2
                 switch (Type)
                 {
                     case ItemType.Armor:
-                        Properties.Name = "Armore";
+                        Properties.Name = "TEST ARMOR";
                         Properties.ArmorBonus = 1;
                         break;
                     case ItemType.Weapon:
-                        Properties.Name = "Weapone";
+                        Properties.Name = "TEST WEAPON";
                         Properties.StrengthBonus = 1;
                         break;
                     case ItemType.Flop:
-                        Properties.Name = "Flope";
+                        Properties.Name = "TEST SPEED";
                         Properties.SpeedBonus = 0.5f;
                         break;
                 }

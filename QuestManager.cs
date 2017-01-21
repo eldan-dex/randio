@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using System.Collections.Generic;
 
 namespace Randio_2
 {
     class QuestManager
     {
+        #region Private variables
         List<Quest> quests;
         Map map;
+        #endregion
 
+        #region Public variables
         public QuestManager(Map map)
         { 
             quests = new List<Quest>();
@@ -35,10 +35,15 @@ namespace Randio_2
             }
 
             //Iterate for the second time, get names and perpare layout
+            bool allCompleted = false;
             foreach (Quest q in quests)
             {
                 result += q.Name.PadRight(longest + 2) + q.Progress + "\n";
+                allCompleted = q.Completed;
             }
+
+            if (allCompleted)
+                result += "All quests are completed, press G to win.\n";
 
             //Remove last \n
             return result.Substring(0, result.Length-1);
@@ -49,14 +54,6 @@ namespace Randio_2
             foreach (Quest q in quests)
                 q.CheckCompletion();
         }
-
+        #endregion
     }
 }
-
-/*
-1. hrac musi presne vedet co se po nem chce
-2. TYP - zabit oznacena NPCKA
-3. TYP - najit a donest item
-4. TYP - dostat se nekam nahoru?
-5. TYP - zavod?
-*/

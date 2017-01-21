@@ -1,5 +1,10 @@
 ﻿PROGRESS LOG
 
+21.1
+* Fixed image tearing when camera is moving along with player
+* Player size changed to 37*37
++ Map can now be reset by pressing G
+
 12.1
 + Topmost blocks now can have a different texture than the rest
 + Drawing block outlines can be enabled/disabled ona  per-background basis

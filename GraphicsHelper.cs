@@ -7,9 +7,7 @@ using System.Linq;
 namespace Randio_2 {
     class GraphicsHelper
     {
-
-        //Public methods
-        //********************************************************************************//
+        #region Public methods
         public static void DrawRectangle(Texture2D texture, Color fill)
         {
             Color[] color = new Color[texture.Width * texture.Height];
@@ -203,5 +201,6 @@ namespace Randio_2 {
             }
             return result;
         }
+        #endregion
     }
 }

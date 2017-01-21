@@ -227,7 +227,5 @@ namespace Randio_2 {
             }
         }
         #endregion
-
-
     }
 }
