@@ -146,7 +146,8 @@ namespace Randio_2 {
         }
 
         private void CreateMap() {
-            map = new Map(GraphicsDevice, camera, WIDTH*10, HEIGHT); //parameters
+            //map = new Map(GraphicsDevice, camera, WIDTH*10, HEIGHT); //parameters
+            map = new Screen(GraphicsDevice, camera, WIDTH, HEIGHT);
         }
 
         private void ProcessInputs() {

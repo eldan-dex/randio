@@ -1,5 +1,8 @@
 ﻿PROGRESS LOG
 
+26.1
++ Added Intro/Outro screen (...and messed up Map and Tile pretty bad during the process. Needs cleanup.)
+
 21.1
 * Fixed image tearing when camera is moving along with player
 * Player size changed to 37*37

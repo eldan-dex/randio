@@ -8,24 +8,31 @@ using Microsoft.Xna.Framework.Input;
 namespace Randio_2 {
     class Map {
         #region Public variables  
-        public Player Player { get; private set; }
-        public bool ReachedExit { get; private set; }
-        public int Width { get; private set; }
-        public int Height { get; private set; }
+        public Player Player { get; protected set; }
+        public bool ReachedExit { get; protected set; }
+        public int Width { get; protected set; }
+        public int Height { get; protected set; }
         public int TileCount { get { return tiles.Count; } }
         //public List<NPC> NPCs { get; private set; }
         public EventManager<Entity> entityEvents;
         public QuestManager quests;
         public List<Zone> questZones;
+        public Screen mapScreen; //screen for intro/outro stuff
         #endregion
 
         #region Private variables
-        private List<Tile> tiles;
-        private Camera camera;
+        protected List<Tile> tiles;
+        protected Camera camera;
         private List<Item> items;
         #endregion
 
         #region Public methods
+        public Map(int width, int height)
+        {
+            Width = width;
+            Height = height;
+        }
+
         public Map(GraphicsDevice graphicsDevice, Camera camera, int width, int height) {
             this.camera = camera;
             Width = width;
@@ -38,7 +45,7 @@ namespace Randio_2 {
             CreateQuests(graphicsDevice);
         }
 
-        public void Update(GameTime gameTime, KeyboardState keyboardState) {
+        public virtual void Update(GameTime gameTime, KeyboardState keyboardState) {
             Player.Update(gameTime, keyboardState);
             UpdateTiles(gameTime);
             UpdateEvents();
@@ -53,7 +60,7 @@ namespace Randio_2 {
             }
         }
 
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
+        public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
             List<NPC> visibleNPCs = new List<NPC>();
             foreach (Tile t in GetVisibleTiles()) {
                 t.Draw(spriteBatch);
@@ -139,16 +146,16 @@ namespace Randio_2 {
         #endregion
 
         #region Private methods
-        private void CreatePlayer(GraphicsDevice graphicsDevice) {
+        protected void CreatePlayer(GraphicsDevice graphicsDevice) {
             Player = new Player(graphicsDevice, this, Vector2.Zero); //generate position
             CameraToPlayer();
         }
 
-        private void CameraToPlayer() {
+        protected void CameraToPlayer() {
             camera.CenterXTo(new Rectangle((int)Player.Position.X, (int)Player.Position.Y, Player.Width, Player.Height));
         }
 
-        private void MoveCamera() {
+        protected void MoveCamera() {
             float leftEdge = camera.Position.X;
             float rightEdge = leftEdge + Game.WIDTH;
 
@@ -203,7 +210,7 @@ namespace Randio_2 {
             }
         }
 
-        private void CreateEventManagers()
+        protected void CreateEventManagers()
         {
             entityEvents = new EventManager<Entity>();
         }
@@ -300,7 +307,7 @@ namespace Randio_2 {
             }
         }
 
-        private Zone GetNewZone(GraphicsDevice device, Color zoneColor)
+        protected Zone GetNewZone(GraphicsDevice device, Color zoneColor)
         {
             Tile tile = tiles[AlgorithmHelper.BiasedRandom(0, tiles.Count-1, 1.3)];
             int xblocks = tile.Coords.Width / Block.Width;
@@ -365,18 +372,18 @@ namespace Randio_2 {
                 tile.Update(gameTime);
         }
 
-        private void UpdateEvents()
+        protected void UpdateEvents()
         {
             entityEvents.Update();
         }
 
-        private void UpdateItems(GameTime gameTime)
+        protected void UpdateItems(GameTime gameTime)
         {
             foreach (Item i in items)
                 i.Update(gameTime);
         }
 
-        private void UpdateQuests()
+        protected void UpdateQuests()
         {
             quests.Update();
         }

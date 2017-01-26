@@ -1,7 +1,6 @@
 ﻿TODO:
 - improve quests
 
-- Terrain collisions - fix "skip" when going right on a new tile
 - entities can push each other away (and bug each other through walls)
 
 - tweak target picking algorithm
@@ -10,17 +9,15 @@
 
 - improve AI
 
-- Splotches - from rectangles
-- Create a whole-splotch (splotch-over-splotch) background (even splotching darker versions of the same colour inside other splotches might work...
-- Background textures
-	- Colour splashes (monocolor, or fading towards the edges)
-	- Shapes on a dark/light background (or faded out splashes)
-	- L-Systems (pixelated, darker outlines)
-	- use old city-style blocks with another background (shapes?)
+- add backgrounds
+
+- improve block textures
+
+- work on "insert" screen (starting, ending)
+
+- add "demo" map for getting familiar with the controls (if I decide to go with randomly assigned buttons)
 
 - Refactoring
-
-- Timed events/animations
 
 ISSUES:
 - Entities clip/bug through blocks and themselves

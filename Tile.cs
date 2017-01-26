@@ -10,6 +10,7 @@ namespace Randio_2 {
             Shapes,
             LSystem,
             City,
+            Screen = 998,
             Invalid = 999
         }
         public const int TileTypeCount = 3;
@@ -49,6 +50,8 @@ namespace Randio_2 {
                 Background = new LSystemBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height);
             else if (Type == TileType.City)
                 Background = new CityBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height);
+            else if (Type == TileType.Screen)
+                Background = new ScreenBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height);
             else
             {
                 throw new NotSupportedException("This is not supposed to happen. Ever.");
@@ -56,10 +59,16 @@ namespace Randio_2 {
 
             CreateTileTexture(graphicsDevice);
             CreateBlockTexture(graphicsDevice);
-
             CreateBlocks();
 
-            CreateEntities(graphicsDevice); //separate into CreateNPCs and CreateEnemies?
+            if (Type != TileType.Screen)
+            {
+                CreateEntities(graphicsDevice); //separate into CreateNPCs and CreateEnemies?
+            }
+            else
+            {
+                NPCs = new List<NPC>();
+            }
 
         }
 
@@ -133,11 +142,6 @@ namespace Randio_2 {
                 for (int h = 0; h < hblocks; ++h) {
                     blockGrid[w, h] = false;
 
-                    if (w < 4 || w > wblocks - 5) {
-                        blockGrid[w, hblocks-3] = true;
-                        continue;
-                    }
-
                     //generate solid ground
                     if (h > GroundLevel)
                     {
@@ -147,13 +151,22 @@ namespace Randio_2 {
 
                     //todo: holes in the ground (trenches, etc)
 
-                    int tmp = AlgorithmHelper.GetRandom(0, 15);
-                    if (tmp > 3 && tmp < 7)
-                        blockGrid[w, h] = true;
-                    if (tmp == 1 && w < wblocks - 2)
-                        blockGrid[w + 1, h] = true;
-                    if (tmp == 5 && h < hblocks - 2)
-                        blockGrid[w, h + 1] = true;
+                    if (Type != TileType.Screen)
+                    {
+                        if (w < 4 || w > wblocks - 5)
+                        {
+                            blockGrid[w, hblocks - 3] = true;
+                            continue;
+                        }
+
+                        int tmp = AlgorithmHelper.GetRandom(0, 15);
+                        if (tmp > 3 && tmp < 7)
+                            blockGrid[w, h] = true;
+                        if (tmp == 1 && w < wblocks - 2)
+                            blockGrid[w + 1, h] = true;
+                        if (tmp == 5 && h < hblocks - 2)
+                            blockGrid[w, h + 1] = true;
+                    }
                 }
             }
 
