@@ -38,7 +38,7 @@ namespace Randio_2
         {
             var texture = new Texture2D(device, width, height);
 
-            GraphicsHelper.DrawRectangle(texture, Color.Red);
+            GraphicsHelper.DrawRectangle(texture, Color.Brown);
 
             BlockTexture = texture;
         }

@@ -15,6 +15,7 @@ namespace Randio_2
         {
             CreateBackgroundTexture(device, batch, width, height);
             CreateBlockTexture(device, batch, Block.Width, Block.Height);
+            CreateTopmostBlockTexture(device, batch, Block.Width, Block.Height);
         }
 
         public void CreateBackgroundTexture(GraphicsDevice device, SpriteBatch batch, int width, int height)
@@ -40,6 +41,12 @@ namespace Randio_2
             //While tile background is RenderTarget2D, Blocks are Texture2D. If that doesn't suit you, you can use RenderTarget2D and return .GetTexture() in the end
 
             BlockTexture = texture;
+        }
+
+        //This function will generate a separate texture for all blocks, which are the topmost of a stack of blocks.
+        public void CreateTopmostBlockTexture(GraphicsDevice device, SpriteBatch batch, int width, int height)
+        {
+            BlockTopmostTexture = BlockTexture; //Leave this here for topmost bloks to be identical to normal blocks. Replace with own texture generation to make them different.
         }
         #endregion
 

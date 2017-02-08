@@ -40,35 +40,35 @@
   </PropertyGroup>
   <PropertyGroup />
   <ItemGroup>
-    <Compile Include="AlgorithmHelper.cs" />
-    <Compile Include="Background.cs" />
-    <Compile Include="Screen.cs" />
-    <Compile Include="ScreenBG.cs" />
-    <Compile Include="Zone.cs" />
-    <Compile Include="Block.cs" />
-    <Compile Include="Camera.cs" />
-    <Compile Include="CityBG.cs" />
-    <Compile Include="Entity.cs" />
-    <Compile Include="EventManager.cs" />
-    <Compile Include="Event.cs" />
+    <Compile Include="Helpers\AlgorithmHelper.cs" />
+    <Compile Include="Backgrounds\Background.cs" />
+    <Compile Include="Map\Screen\Screen.cs" />
+    <Compile Include="Backgrounds\ScreenBG.cs" />
+    <Compile Include="Map\Level\Zone.cs" />
+    <Compile Include="Map\Level\Block.cs" />
+    <Compile Include="Camera\Camera.cs" />
+    <Compile Include="Backgrounds\CityBG.cs" />
+    <Compile Include="Entities\Entity.cs" />
+    <Compile Include="Events\EventManager.cs" />
+    <Compile Include="Events\Event.cs" />
     <Compile Include="Game.cs" />
-    <Compile Include="GeometryHelper.cs" />
-    <Compile Include="GraphicsHelper.cs" />
-    <Compile Include="Item.cs" />
-    <Compile Include="ItemProperties.cs" />
-    <Compile Include="LSystem.cs" />
-    <Compile Include="LSystemBG.cs" />
-    <Compile Include="Map.cs" />
-    <Compile Include="NPC.cs" />
-    <Compile Include="Player.cs" />
+    <Compile Include="Helpers\GeometryHelper.cs" />
+    <Compile Include="Helpers\GraphicsHelper.cs" />
+    <Compile Include="Items\Item.cs" />
+    <Compile Include="Items\ItemProperties.cs" />
+    <Compile Include="Backgrounds\Additional\LSystem.cs" />
+    <Compile Include="Backgrounds\LSystemBG.cs" />
+    <Compile Include="Map\Map.cs" />
+    <Compile Include="Entities\NPC.cs" />
+    <Compile Include="Entities\Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="QuestManager.cs" />
-    <Compile Include="Quest.cs" />
-    <Compile Include="ShapesBG.cs" />
-    <Compile Include="StringHelper.cs" />
-    <Compile Include="TemplateBG.cs" />
-    <Compile Include="Tile.cs" />
+    <Compile Include="Quests\QuestManager.cs" />
+    <Compile Include="Quests\Quest.cs" />
+    <Compile Include="Backgrounds\ShapesBG.cs" />
+    <Compile Include="Helpers\StringHelper.cs" />
+    <Compile Include="Backgrounds\TemplateBG.cs" />
+    <Compile Include="Map\Level\Tile.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">

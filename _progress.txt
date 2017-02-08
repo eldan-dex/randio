@@ -1,5 +1,14 @@
 ﻿PROGRESS LOG
 
+8.2
+* Sorted files into folders
+* Fixed TemplateBG
++ Player name stays consistent across the entire game
++ Screen is now aware of whether it's intro or outro
+
+31.1
++ Screen now supports displaying animated text
+
 26.1
 + Added Intro/Outro screen (...and messed up Map and Tile pretty bad during the process. Needs cleanup.)
 

@@ -1,4 +1,14 @@
 ﻿TODO:
+- one square at the beginning of the map, which, when entered, will end the game and display results (with a prompt!)
+
+- result counting (enemies killed, damage taken, time played, etc.)
+
+
+- intro/outro manager - implement switching intro-game and game-outro
+
+- intro as a "demo" map for testing the controls - force the player to move in all directions, kill a npc, etc. before letting him go
+  do this only once when program is started, afterwards only restart the game, maybe with a different generated introtext
+
 - improve quests
 
 - entities can push each other away (and bug each other through walls)
@@ -13,9 +23,6 @@
 
 - improve block textures
 
-- work on "insert" screen (starting, ending)
-
-- add "demo" map for getting familiar with the controls (if I decide to go with randomly assigned buttons)
 
 - Refactoring
 

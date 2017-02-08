@@ -12,6 +12,7 @@ namespace Randio_2 {
         public const int WIDTH = 1280; //1280 small, 1280 medium, 1296 big
         public const int HEIGHT = 720; //704 small, 1280 medium, 720 big
         public static SpriteFont font;
+        public static bool endIntro = false;
         #endregion
 
         #region Private variables
@@ -33,6 +34,8 @@ namespace Randio_2 {
         //"P" - play next frame (in debug mode)
         private bool nextFrame = false;
         private bool pEnabled = false; //for the P button
+
+        private string playerName = "";
         #endregion
 
         #region Public methods
@@ -55,7 +58,9 @@ namespace Randio_2 {
             graphics.ApplyChanges();
 
             camera = new Camera(GraphicsDevice.Viewport);
-            CreateMap();
+
+            playerName = StringHelper.GenerateName(1); //only generate player name once, our player will be the same all the time.
+            CreateMap(true);
 
             base.Initialize();
         }
@@ -99,8 +104,17 @@ namespace Randio_2 {
             }
 
             if (map.ReachedExit)
-                Exit(); //temporary. Normally this would reinitialize everything and create a new level
-                
+            {
+                CreateMap(true, false); //TODO: create end screen
+                StringHelper.Reset();
+            }
+
+            if (endIntro) //switch from intro to normal game
+            {
+                endIntro = false;
+                CreateMap(false);
+            }
+
             base.Update(gameTime);
         }
 
@@ -145,9 +159,15 @@ namespace Randio_2 {
             osdSpriteBatch.End();
         }
 
-        private void CreateMap() {
-            //map = new Map(GraphicsDevice, camera, WIDTH*10, HEIGHT); //parameters
-            map = new Screen(GraphicsDevice, camera, WIDTH, HEIGHT);
+        private void CreateMap(bool createScreenInstead, bool isIntro = true) {
+            if (createScreenInstead)
+            {
+                map = new Screen(GraphicsDevice, camera, WIDTH, HEIGHT, playerName, isIntro);
+            }
+
+            else
+                map = new Map(GraphicsDevice, camera, WIDTH * 10, HEIGHT, playerName);
+            
         }
 
         private void ProcessInputs() {
@@ -156,13 +176,10 @@ namespace Randio_2 {
             if (keyboardState.IsKeyDown(Keys.Escape))
                 Exit();
 
-            if (keyboardState.IsKeyDown(Keys.L)) //todo: remove this in final game?
-                map.ResetPlayer();
-
-            if (keyboardState.IsKeyDown(Keys.G))
+            if (keyboardState.IsKeyDown(Keys.L))
             {
-                StringHelper.Reset();
-                CreateMap();
+                //todo: remove this in final game?
+                map.ResetPlayer();
             }
 
             //"O" key enables/disables debugging features
