@@ -13,10 +13,11 @@ namespace Randio_2 {
         public int Width { get; protected set; }
         public int Height { get; protected set; }
         public int TileCount { get { return tiles.Count; } }
-        //public List<NPC> NPCs { get; private set; }
+
         public EventManager<Entity> entityEvents;
         public QuestManager quests;
         public List<Zone> questZones;
+        public Zone exitZone;
         public Screen mapScreen; //screen for intro/outro stuff
         #endregion
 
@@ -43,6 +44,7 @@ namespace Randio_2 {
             CreateEventManagers();
             CreateItems(graphicsDevice);
             CreateQuests(graphicsDevice);
+            CreateExitZone(graphicsDevice);
         }
 
         public virtual void Update(GameTime gameTime, KeyboardState keyboardState) {
@@ -51,6 +53,7 @@ namespace Randio_2 {
             UpdateEvents();
             UpdateItems(gameTime);
             UpdateQuests();
+            CheckExitZone();
 
             MoveCamera();
 
@@ -74,6 +77,8 @@ namespace Randio_2 {
             {
                 z.Draw(spriteBatch);
             }
+
+            exitZone.Draw(spriteBatch);
 
             foreach (NPC n in visibleNPCs)
                 n.Draw(gameTime, spriteBatch);
@@ -226,7 +231,6 @@ namespace Randio_2 {
             int count = AlgorithmHelper.GetRandom(1, 5);
             for (int i = 0; i < count; ++i)
             {
-                Quest quest;
                 Quest.QuestType type = (Quest.QuestType)AlgorithmHelper.GetRandom(0, Quest.QuestTypeCount);
 
                 string name = "";
@@ -286,12 +290,12 @@ namespace Randio_2 {
                             name += ", ";
                     }
 
-                    name += " to " + "the green area."; //todo: improve destination marking - all "green areas" look the same atm
+                    name += " to " + "a green area in tile " + GetTileForX(newZone.Coords.X).Index.ToString(); //todo: improve destination marking - all "green areas" look the same atm
                 }
 
                 else if (type == Quest.QuestType.ReachBlock)
                 {
-                    name = "Reach areas with these colors: ";
+                    name = "Reach orange areas located in these tiles: ";
                     zones = new List<Zone>();
                     int pointCount = AlgorithmHelper.GetRandom(1, 4); //todo: balance
                     for (int j = 0; j < pointCount; ++j)
@@ -300,7 +304,7 @@ namespace Randio_2 {
                         zones.Add(newZone);
                         questZones.Add(newZone);
 
-                        name += "Orange";
+                        name += GetTileForX(newZone.Coords.X).Index.ToString();
                         if (j < pointCount - 1)
                             name += ", ";
                     }
@@ -359,6 +363,53 @@ namespace Randio_2 {
             return new Zone(device, new Rectangle(tile.Coords.X + valX[rnd] * Block.Width, tile.Coords.Y + valY[rnd] * Block.Height, Block.Width, Block.Height), zoneColor);
         }
 
+        protected Zone GetCloseZone(GraphicsDevice device, Color zoneColor)
+        {
+            var tile = GetTileByIndex(0);
+            int xblocks = tile.Coords.Width / Block.Width;
+            int yblocks = tile.Coords.Height / Block.Height;
+
+            int selX = -1;
+            int selY = -1;
+
+            while (selX == -1) //debug: possible infinite loop, but should never happen
+            {
+                for (int x = 1; x < xblocks; ++x)
+                {
+                    for (int y = 1; y < tile.GroundLevel; ++y)
+                    {
+                        int rand = AlgorithmHelper.GetRandom(0, (xblocks * yblocks) / 10);
+                        if (rand % 42 == 0 && tile.Blocks[x, y] != null)
+                        {
+                            rand = AlgorithmHelper.GetRandom(0, 5);
+                            if (rand == 1 && tile.Blocks[x, y - 1] == null && (tile.Blocks[x - 1, y - 1] == null || tile.Blocks[x + 1, y - 1] == null))
+                            {
+                                selX = x;
+                                selY = y - 1;
+                            }
+                            else if (rand == 2 && tile.Blocks[x, y + 1] == null && (tile.Blocks[x - 1, y + 1] == null || tile.Blocks[x + 1, y + 1] == null))
+                            {
+                                selX = x;
+                                selY = y + 1;
+                            }
+                            else if (rand == 3 && tile.Blocks[x - 1, y] == null && tile.Blocks[x - 2, y] == null)
+                            {
+                                selX = x - 1;
+                                selY = y;
+                            }
+                            else if (rand == 4 && tile.Blocks[x + 1, y] == null && tile.Blocks[x + 2, y] == null)
+                            {
+                                selX = x + 1;
+                                selY = y;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return new Zone(device, new Rectangle(tile.Coords.X + selX * Block.Width, tile.Coords.Y + selY * Block.Height, Block.Width, Block.Height), zoneColor);
+        }
+
         private void CreateItems(GraphicsDevice device)
         {
             //just for testing
@@ -366,6 +417,11 @@ namespace Randio_2 {
             items.Add(new Item(this, device, Item.ItemType.Flop, new Vector2(100, 550), 0, 16, 16));
             items.Add(new Item(this, device, Item.ItemType.Armor, new Vector2(300, 450), 0, 16, 16));
             items.Add(new Item(this, device, Item.ItemType.Weapon, new Vector2(700, 500), 0, 16, 16, properties: new ItemProperties("TEST WEAPON NAME", strength: 10)));
+        }
+
+        protected void CreateExitZone(GraphicsDevice device)
+        {
+            exitZone = GetCloseZone(device, Color.Red);
         }
 
         //Updates Tiles and NPCs on them
@@ -389,6 +445,15 @@ namespace Randio_2 {
         protected void UpdateQuests()
         {
             quests.Update();
+        }
+
+        //If player reached the exit zone, exit game and show outro screen
+        private void CheckExitZone()
+        {
+            var block = exitZone.Coords;
+            var newPlayerRect = GeometryHelper.TileToGlobalCoordinates(Player.BoundingRectangle, GetTileByIndex(Player.CurrentTile));
+            if (GeometryHelper.GetIntersectionDepth(block, newPlayerRect) != Vector2.Zero)
+                ReachedExit = true;
         }
 
         private Tile[] GetVisibleTiles() {

@@ -3,8 +3,12 @@
 8.2
 * Sorted files into folders
 * Fixed TemplateBG
+* Updated quest descriptions
 + Player name stays consistent across the entire game
 + Screen is now aware of whether it's intro or outro
++ Player statistics are now displayed when game ends
++ Basic game flow (intro-[game-outro-game-outro-...]) works now
+
 
 31.1
 + Screen now supports displaying animated text

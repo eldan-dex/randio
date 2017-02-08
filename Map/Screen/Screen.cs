@@ -31,16 +31,17 @@ namespace Randio_2
 
             CreatePlayer(graphicsDev, playerName);
             CreateEventManagers();
+            CreateScreenExitZone(graphicsDev);
 
             TextAnimationMgr = new EventManager<Screen>();
 
             if (isIntro)
             {
-                SetText("Lorem ipsum dolor sit amet.\nGame will start when this text finishes printing out.\nSmall lag will occur...", 100);
+                SetText("Game will start when this text finishes printing out.\nSmall lag will occur...\nOr you can jump into the red square, that works too.", 100);
             }
             else
             {
-                SetText("Game ended.\nThis is a placeholder for displaying game statistics.\nReset the game by restarting the program (I have to implement resetting yet).", 100);
+                SetText("Game ended.\nGame statistics:\nEnemies Killed: " + Game.stats.EnemiesKilled + "\nDamage Sustained: " + Game.stats.DamageSustained + "\nTimes Dead: " + Game.stats.TimesDead + "\nQuests Completed: " + Game.stats.QuestsCompleted + "\nGame Duration: " + (DateTime.Now - Game.stats.gameStarted).TotalHours + ":" + (DateTime.Now - Game.stats.gameStarted).TotalMinutes + ":" + (DateTime.Now - Game.stats.gameStarted).TotalSeconds + "\n\nResetting to be implemented.", 100);
             }
         }
 
@@ -58,6 +59,8 @@ namespace Randio_2
                 //player fell down, reset player
                 ResetPlayer();
             }
+
+            CheckExitZone();
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -70,6 +73,8 @@ namespace Randio_2
                 n.Draw(gameTime, spriteBatch);
 
             spriteBatch.DrawString(Game.font, ShownText, new Vector2(100, 100), Color.Black);
+
+            exitZone.Draw(spriteBatch);
 
             Player.Draw(gameTime, spriteBatch);
         }
@@ -101,6 +106,61 @@ namespace Randio_2
             {
                 Game.endIntro = true; //end the intro screen and start game itself
             }
+        }
+
+        private void CheckExitZone()
+        {
+            var block = exitZone.Coords;
+            var newPlayerRect = GeometryHelper.TileToGlobalCoordinates(Player.BoundingRectangle, GetTileByIndex(Player.CurrentTile));
+            if (GeometryHelper.GetIntersectionDepth(block, newPlayerRect) != Vector2.Zero)
+                Game.endIntro = true;
+        }
+
+        protected void CreateScreenExitZone(GraphicsDevice device)
+        {
+            exitZone = GetCloseScreenZone(device, Color.Red);
+        }
+
+        protected Zone GetCloseScreenZone(GraphicsDevice device, Color zoneColor)
+        {
+            var tile = GetTileByIndex(0);
+            int xblocks = tile.Coords.Width / Block.Width;
+            int yblocks = tile.Coords.Height / Block.Height;
+
+            int selX = -1;
+            int selY = -1;
+
+            while (selX == -1) //debug: possible infinite loop, but should never happen
+            {
+                for (int x = 1; x < xblocks; ++x)
+                {
+                    for (int y = tile.GroundLevel+1; y < tile.GroundLevel+2; ++y)
+                    {
+                        int rand = AlgorithmHelper.GetRandom(0, (xblocks * yblocks) / 10);
+                        if (rand % 12 == 0 && tile.Blocks[x, y] != null)
+                        {
+                            rand = AlgorithmHelper.GetRandom(0, 3);
+                            if (rand == 0 && tile.Blocks[x, y - 1] == null)
+                            {
+                                selX = x;
+                                selY = y - 1;
+                            }
+                            else if (rand == 1 && tile.Blocks[x, y - 2] == null)
+                            {
+                                selX = x;
+                                selY = y - 2;
+                            }
+                            else if (rand == 2 && tile.Blocks[x, y - 3] == null)
+                            {
+                                selX = x;
+                                selY = y - 3;
+                            }
+                            return new Zone(device, new Rectangle(tile.Coords.X + selX * Block.Width, tile.Coords.Y + selY * Block.Height, Block.Width, Block.Height), zoneColor);
+                        }
+                    }
+                }
+            }
+            return null;
         }
         #endregion
     }

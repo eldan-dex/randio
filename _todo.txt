@@ -1,9 +1,4 @@
 ﻿TODO:
-- one square at the beginning of the map, which, when entered, will end the game and display results (with a prompt!)
-
-- result counting (enemies killed, damage taken, time played, etc.)
-
-
 - intro/outro manager - implement switching intro-game and game-outro
 
 - intro as a "demo" map for testing the controls - force the player to move in all directions, kill a npc, etc. before letting him go
@@ -22,7 +17,6 @@
 - add backgrounds
 
 - improve block textures
-
 
 - Refactoring
 

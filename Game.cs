@@ -13,6 +13,7 @@ namespace Randio_2 {
         public const int HEIGHT = 720; //704 small, 1280 medium, 720 big
         public static SpriteFont font;
         public static bool endIntro = false;
+        public static Stats stats;
         #endregion
 
         #region Private variables
@@ -105,6 +106,7 @@ namespace Randio_2 {
 
             if (map.ReachedExit)
             {
+                stats = new Stats(map.Player.Stats);
                 CreateMap(true, false); //TODO: create end screen
                 StringHelper.Reset();
             }

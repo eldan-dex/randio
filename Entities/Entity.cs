@@ -153,6 +153,11 @@ namespace Randio_2 {
             {
                 HP -= realDamage;
 
+                if (IsPlayer) //add to stats
+                {
+                    ((Player)this).Stats.DamageSustained += realDamage;
+                }
+
                 //when damaged, entity flashes red for 200ms
                 OverwriteColor = Color.Red;
                 map.entityEvents.AddEvent(new Event<Entity>(200, delegate (Entity e) { e.OverwriteColor = Color.White; }, this));
@@ -168,6 +173,15 @@ namespace Randio_2 {
             if (HP <= 0)
             {
                 Alive = false; //now OutOfMap check will recognise this NPC as dead and will remove it.
+
+                if (IsPlayer) //add to stats
+                {
+                    ((Player)this).Stats.TimesDead++;
+                }
+                if (source.IsPlayer)
+                {
+                    ((Player)source).Stats.EnemiesKilled++;
+                }
             }
         }
 

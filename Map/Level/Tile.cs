@@ -116,7 +116,7 @@ namespace Randio_2 {
             for (int i = 0; i < npcCount; ++i) {
                 int w = AlgorithmHelper.GetRandom(24, 57); //16-49 small, 24-57 medium
                 int h = AlgorithmHelper.GetRandom(24, 57); //32-65 big
-                Vector2 position = new Vector2(Coords.X + AlgorithmHelper.GetRandom(0, Coords.Width - w + 1), AlgorithmHelper.GetRandom(0, map.Height - h + 1));
+                Vector2 position = new Vector2(Coords.X + AlgorithmHelper.GetRandom(0, map.Width - w + 1), AlgorithmHelper.GetRandom(0, map.Height - h + 1));
 
                 //BALANCE THIS
                 int additionalBase = AlgorithmHelper.GetRandom(Index, 2 * Index);
@@ -128,9 +128,7 @@ namespace Randio_2 {
                 NPC npc = new NPC(graphicsDevice, map, position, Index, w, h, addHP, addStr, addDef, addSpd);
 
                 NPCs.Add(npc);
-            }
-
-            
+            }        
         }
 
         private void CreateBlocks() {

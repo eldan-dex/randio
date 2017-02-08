@@ -11,6 +11,7 @@ namespace Randio_2 {
         public int SafeMargin { get; private set; } //how close to the border can player go before the camera starts moving;
         public const int PlayerWidth = 37; //32 small, 48big
         public const int PlayerHeight = 37; //32 small, 48big
+        public Stats Stats;
         #endregion
 
         #region Private variables
@@ -86,6 +87,7 @@ namespace Randio_2 {
             DefaultDefense = 0;
 
             IsPlayer = true;
+            Stats = new Stats();
     }
 
         private void GetInput(KeyboardState keyboardState) {

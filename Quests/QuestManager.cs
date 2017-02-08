@@ -9,7 +9,7 @@ namespace Randio_2
         Map map;
         #endregion
 
-        #region Public variables
+        #region Public methods
         public QuestManager(Map map)
         { 
             quests = new List<Quest>();
@@ -36,11 +36,17 @@ namespace Randio_2
 
             //Iterate for the second time, get names and perpare layout
             bool allCompleted = false;
+
+            int completed = 0;
             foreach (Quest q in quests)
             {
                 result += q.Name.PadRight(longest + 2) + q.Progress + "\n";
                 allCompleted = q.Completed;
+                if (q.Completed)
+                    ++completed;
             }
+
+            map.Player.Stats.QuestsCompleted = completed;
 
             if (allCompleted)
                 result += "All quests are completed, press G to win.\n";
