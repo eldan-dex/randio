@@ -1,4 +1,6 @@
 ﻿TODO:
+- quest compeltion marker displays even when one quest is done
+
 - entities sometimes disappear when jumping - collisions with invisible entities still active, attacks don't work
 
 - entities can push each other away (and bug each other through walls)

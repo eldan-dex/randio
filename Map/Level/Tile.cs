@@ -125,7 +125,7 @@ namespace Randio_2 {
                 float addDef = AlgorithmHelper.GetRandom((float)additionalBase / 4, additionalBase);
                 float addSpd = AlgorithmHelper.GetRandom(0, (float)additionalBase / 100); //balance additional speed
 
-                NPC npc = new NPC(graphicsDevice, map, position, Index, w, h, addHP, addStr, addDef, addSpd);
+                NPC npc = new NPC(graphicsDevice, map, position, Index, this, w, h, addHP, addStr, addDef, addSpd);
 
                 NPCs.Add(npc);
             }        

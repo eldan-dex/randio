@@ -347,11 +347,8 @@ namespace Randio_2 {
             position.X += velocity.X * elapsed;
             position.X = (float)Math.Round(position.X);
 
-            //Limit the player to stay on the map horizontally
-            if (position.X < 0)
-                position.X = 0;
-            else if (position.X+Width > map.Width)
-                position.X = map.Width-Width;
+            if (IsPlayer) //debug
+                IsPlayer = IsPlayer;
 
             //X axis collisions
             TerrainCollisionsXY(true);
@@ -450,7 +447,7 @@ namespace Randio_2 {
                         Vector2 depth = GeometryHelper.GetIntersectionDepth(bounds, otherElement);
                         if (depth != Vector2.Zero) {
 
-                            if (IsPlayer)
+                            if (IsPlayer) //debug
                                 IsPlayer = IsPlayer;
 
                             //In the first call, we check for X-axis collisions
@@ -481,6 +478,11 @@ namespace Randio_2 {
                 }
             }
 
+            if (position.X < 0)
+                position.X = 0;
+            else if (position.X + Width > map.Width)
+                position.X = map.Width - Width;
+
             if (rightBlockX == wblocks -1 && nextTile == null)
             {
                 var next = map.GetTileByIndex(CurrentTile + 1);
@@ -496,24 +498,30 @@ namespace Randio_2 {
             List<Entity> collidableEntities = GetEntitiesInSight(Width, Height);
 
             Rectangle bounds = BoundingRectangle;
-            foreach (Entity e in collidableEntities) {
-                if (IsPlayer)
-                    IsPlayer = IsPlayer;
+            foreach (Entity e in collidableEntities)
+            {
                 Vector2 depth = GeometryHelper.GetIntersectionDepth(bounds, e.BoundingRectangle);
-                if (depth != Vector2.Zero) {
+                if (depth != Vector2.Zero)
+                {
+                    if (IsPlayer)
+                        IsPlayer = IsPlayer;
 
-                    if (doCollisionX) {
+                    if (doCollisionX)
+                    {
                         position = new Vector2(Position.X + depth.X, Position.Y);
                         bounds = BoundingRectangle;
                     }
-                    else {
-                        if ((bounds.Top < e.BoundingRectangle.Top) && (bounds.Bottom > e.BoundingRectangle.Top)) {
+                    else
+                    {
+                        if ((bounds.Top < e.BoundingRectangle.Top) && (bounds.Bottom > e.BoundingRectangle.Top))
+                        {
                             isOnGround = true;
                             position = new Vector2(Position.X, Position.Y + depth.Y);
                             bounds = BoundingRectangle;
                         }
 
-                        else if ((bounds.Bottom > e.BoundingRectangle.Bottom) && (bounds.Top < e.BoundingRectangle.Bottom)) {
+                        else if ((bounds.Bottom > e.BoundingRectangle.Bottom) && (bounds.Top < e.BoundingRectangle.Bottom))
+                        {
                             position = new Vector2(Position.X, Position.Y + depth.Y);
                             bounds = BoundingRectangle;
                             jumpTime = MaxJumpTime; //we reached the apex of our jump                        
@@ -521,6 +529,10 @@ namespace Randio_2 {
                     }
                 }
             }
+            if (position.X < 0)
+                position.X = 0;
+            else if (position.X + Width > map.Width)
+                position.X = map.Width - Width;
         }
         #endregion
 

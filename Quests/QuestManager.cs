@@ -35,13 +35,10 @@ namespace Randio_2
             }
 
             //Iterate for the second time, get names and perpare layout
-            bool allCompleted = false;
-
             int completed = 0;
             foreach (Quest q in quests)
             {
                 result += q.Name.PadRight(longest + 2) + q.Progress + "\n";
-                allCompleted = q.Completed;
                 if (q.Completed)
                     ++completed;
             }
@@ -49,7 +46,7 @@ namespace Randio_2
             if (completed > map.Player.Stats.QuestsCompleted)
                 map.Player.Stats.QuestsCompleted = completed;
 
-            if (allCompleted)
+            if (completed == quests.Count)
                 result += "All quests are completed! Jump into the red door on tile 0 to end the game.\n";
 
             //Remove last \n

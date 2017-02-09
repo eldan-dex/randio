@@ -89,7 +89,7 @@ namespace Randio_2
                 {
                     movementTestZones = null;
                     SetText("Good.\nNow, let's try something more fun!\nThere are two action keys. One picks up / puts down items...\nwhile the other one attacks your enemies.\nFind out which one is which... and try not to die.", 100);
-                    tiles[0].NPCs.Add(new NPC(device, this, new Vector2(400, 400), 0, 32, 32));
+                    tiles[0].NPCs.Add(new NPC(device, this, new Vector2(400, 400), 0, tiles[0], 32, 32));
                     items.Add(new Item(this, device, Item.ItemType.Weapon, new Vector2(600, 600), 0, 16, 16, true, null, null));
                 }
             }

@@ -24,8 +24,8 @@ namespace Randio_2 {
         #endregion
 
         #region Public methods
-        public NPC(GraphicsDevice graphicsDevice, Map map, Vector2 position, int parentTile, int width, int height, int additionalHP = 0, float additionalStrength = 0, float additionalDefense = 0, float additionalSpeed = 0) : base(map, position, parentTile, width, height) {
-            ParentTile = map.GetTileByIndex(parentTile);
+        public NPC(GraphicsDevice graphicsDevice, Map map, Vector2 position, int parentTile, Tile parentTileObject, int width, int height, int additionalHP = 0, float additionalStrength = 0, float additionalDefense = 0, float additionalSpeed = 0) : base(map, position, parentTile, width, height) {
+            ParentTile = parentTileObject;
             InitNPC();
             Behaviour = CreateBehaviour();
             Texture = CreateTexture(graphicsDevice);

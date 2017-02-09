@@ -1,5 +1,9 @@
 ﻿PROGRESS LOG
 
+9.2
+* Fixed NPCs not being drawn bug
+* Fixed "all quests done" displaying when only last quest was completed
+
 8.2
 * Sorted files into folders
 * Fixed TemplateBG

@@ -65,13 +65,8 @@ namespace Randio_2 {
 
         public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
             List<NPC> visibleNPCs = new List<NPC>();
-            foreach (Tile t in GetVisibleTiles()) {
+            foreach (Tile t in GetVisibleTiles())
                 t.Draw(spriteBatch);
-
-                //Draw Tile NPCs (not a part of Tile.Draw because we need to have GameTime available)
-                foreach (NPC n in t.NPCs)
-                    visibleNPCs.Add(n);
-            }
 
             foreach (Zone z in questZones)
             {
@@ -80,7 +75,7 @@ namespace Randio_2 {
 
             exitZone?.Draw(spriteBatch);
 
-            foreach (NPC n in visibleNPCs)
+            foreach (NPC n in GetVisibleNPCs())
                 n.Draw(gameTime, spriteBatch);
 
             Player.Draw(gameTime, spriteBatch);
@@ -228,10 +223,10 @@ namespace Randio_2 {
             quests = new QuestManager(this);
             questZones = new List<Zone>();
 
-            int count = 1;//AlgorithmHelper.GetRandom(1, 5);
+            int count = AlgorithmHelper.GetRandom(1, 5);
             for (int i = 0; i < count; ++i)
             {
-                Quest.QuestType type = (Quest.QuestType)2;// AlgorithmHelper.GetRandom(0, Quest.QuestTypeCount);
+                Quest.QuestType type = (Quest.QuestType)AlgorithmHelper.GetRandom(0, Quest.QuestTypeCount);
 
                 string name = "";
                 string description = "";
@@ -491,6 +486,28 @@ namespace Randio_2 {
                 visibleTiles.Add(other);
 
             return visibleTiles.ToArray();
+        }
+
+        private NPC[] GetVisibleNPCs()
+        {
+            var visibleTiles = GetVisibleTiles();
+            var result = new List<NPC>();
+
+            foreach (Tile t in tiles)
+            {
+                foreach (NPC n in t.NPCs)
+                {
+                    if (n.Alive)
+                    {
+                        foreach (Tile visible in visibleTiles)
+                        {
+                            if (visible.Index == n.CurrentTile)
+                                result.Add(n);
+                        }
+                    }
+                }
+            }
+            return result.ToArray();
         }
         #endregion
     }
