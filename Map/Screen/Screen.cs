@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -16,32 +17,43 @@ namespace Randio_2
         #endregion
 
         #region Private variables
+        private GraphicsDevice device;
         private bool isIntro;
+
+        private List<Zone> movementTestZones;
+        private bool pickedUpItem = false;
+        private bool lastStage = false;
         #endregion
 
         #region Public methods
         public Screen(GraphicsDevice graphicsDev, Camera camera, int width, int height, string playerName, bool isIntro) : base(width, height)
         {
+            device = graphicsDev;
             this.camera = camera;
             Width = width;
             Height = height;
             this.isIntro = isIntro;
 
             CreateGraphics(graphicsDev);
-
             CreatePlayer(graphicsDev, playerName);
             CreateEventManagers();
-            CreateScreenExitZone(graphicsDev);
-
             TextAnimationMgr = new EventManager<Screen>();
+
+            items = new List<Item>();
+            questZones = new List<Zone>();
 
             if (isIntro)
             {
-                SetText("Game will start when this text finishes printing out.\nSmall lag will occur...\nOr you can jump into the red square, that works too.", 100);
+                SetText("First, try moving around...\nA set of doors appeared around you. Try to reach them!", 100);
+                movementTestZones = new List<Zone>();
+                movementTestZones.Add(GetCloseScreenZone(graphicsDev, Color.Green));
+                movementTestZones.Add(GetCloseScreenZone(graphicsDev, Color.Green));
+                movementTestZones.Add(GetCloseScreenZone(graphicsDev, Color.Green));
             }
             else
             {
-                SetText("Game ended.\nGame statistics:\nEnemies Killed: " + Game.stats.EnemiesKilled + "\nDamage Sustained: " + Game.stats.DamageSustained + "\nTimes Dead: " + Game.stats.TimesDead + "\nQuests Completed: " + Game.stats.QuestsCompleted + "\nGame Duration: " + (DateTime.Now - Game.stats.gameStarted).TotalHours + ":" + (DateTime.Now - Game.stats.gameStarted).TotalMinutes + ":" + (DateTime.Now - Game.stats.gameStarted).TotalSeconds + "\n\nResetting to be implemented.", 100);
+                SetText("Game ended.\n\nGame statistics:\nEnemies Killed: " + Game.stats.EnemiesKilled + "\nDamage Sustained: " + Game.stats.DamageSustained + "\nTimes Dead: " + Game.stats.TimesDead + "\nQuests Completed: " + Game.stats.QuestsCompleted + "\nGame Duration: " + new DateTime(DateTime.Now.Subtract(Game.stats.gameStarted).Ticks).ToString("HH:mm:ss") + "\n\nThe red door is waiting for your next attempt...", 100);
+                exitZone = GetCloseScreenZone(device, Color.Red);
             }
         }
 
@@ -49,7 +61,9 @@ namespace Randio_2
         {
             Player.Update(gameTime, keyboardState);
 
-            tiles[0].Update(gameTime);
+            tiles[0].Update(gameTime); //tile will update it's NPCs as well
+
+            UpdateItems(gameTime);
 
             UpdateEvents();
             TextAnimationMgr.Update();
@@ -60,23 +74,51 @@ namespace Randio_2
                 ResetPlayer();
             }
 
-            CheckExitZone();
+            if (exitZone != null && CheckZone(exitZone))
+                Game.endIntro = true;
+
+            if (movementTestZones != null)
+            {
+                foreach (Zone z in movementTestZones)
+                {
+                    if (CheckZone(z))
+                        z.Deactivate();
+                }
+
+                if (!movementTestZones.Any(x=> x.Active == true))
+                {
+                    movementTestZones = null;
+                    SetText("Good.\nNow, let's try something more fun!\nThere are two action keys. One picks up / puts down items...\nwhile the other one attacks your enemies.\nFind out which one is which... and try not to die.", 100);
+                    tiles[0].NPCs.Add(new NPC(device, this, new Vector2(400, 400), 0, 32, 32));
+                    items.Add(new Item(this, device, Item.ItemType.Weapon, new Vector2(600, 600), 0, 16, 16, true, null, null));
+                }
+            }
+
+            if (Player.HeldItem != null)
+                pickedUpItem = true;
+
+            if (!lastStage && pickedUpItem && tiles[0].NPCs.Count == 0) //0 NPCs if item has been held means the NPC is dead
+            {
+                lastStage = true;
+                SetText("Well done!\nYou seem ready, " + Player.Name + ".\nYou can start your adventure by jumping in the red door.\n...\nGood luck!", 100);
+                exitZone = GetCloseScreenZone(device, Color.Red);
+            }
         }
 
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            List<NPC> visibleNPCs = new List<NPC>();
-            tiles[0].Draw(spriteBatch);
-
-            //Draw Tile NPCs
-            foreach (NPC n in tiles[0].NPCs)
-                n.Draw(gameTime, spriteBatch);
+            base.Draw(gameTime, spriteBatch);
 
             spriteBatch.DrawString(Game.font, ShownText, new Vector2(100, 100), Color.Black);
 
-            exitZone.Draw(spriteBatch);
+            if (movementTestZones != null)
+            {
+                foreach (Zone z in movementTestZones)
+                    if (z.Active)
+                        z.Draw(spriteBatch);
+            }
 
-            Player.Draw(gameTime, spriteBatch);
+            exitZone?.Draw(spriteBatch);
         }
 
         public void SetText(string text, int letterInterval)
@@ -84,7 +126,7 @@ namespace Randio_2
             Text = text;
             TextInterval = letterInterval;
             ShownText = "";
-            TextAnimationMgr.AddEvent(new Event<Screen>(letterInterval, AddLetterA, this));
+            TextAnimationMgr.AddEvent(new Event<Screen>(letterInterval, AddLetter, this));
         }
         #endregion
 
@@ -95,30 +137,23 @@ namespace Randio_2
             tiles.Add(new Tile(graphicsDevice, this, (Tile.TileType)998, new Rectangle(0, 0, Game.WIDTH, Height), 0));
         }
 
-        private void AddLetterA(Screen screen)
+        private void AddLetter(Screen screen)
         {
             if (screen.ShownText.Length < screen.Text.Length)
             {
                 screen.ShownText = screen.Text.Substring(0, screen.ShownText.Length + 1);
-                screen.TextAnimationMgr.AddEvent(new Event<Screen>(screen.TextInterval, AddLetterA, this));
-            }
-            else if (isIntro) //debug: this will not be here in the final version - game will start when a "portal" zone appears and is entered by player
-            {
-                Game.endIntro = true; //end the intro screen and start game itself
+                screen.TextAnimationMgr.AddEvent(new Event<Screen>(screen.TextInterval, AddLetter, this));
             }
         }
 
-        private void CheckExitZone()
+        private bool CheckZone(Zone zone)
         {
-            var block = exitZone.Coords;
+            if (!zone.Active)
+                return false;
+
+            var block = zone.Coords;
             var newPlayerRect = GeometryHelper.TileToGlobalCoordinates(Player.BoundingRectangle, GetTileByIndex(Player.CurrentTile));
-            if (GeometryHelper.GetIntersectionDepth(block, newPlayerRect) != Vector2.Zero)
-                Game.endIntro = true;
-        }
-
-        protected void CreateScreenExitZone(GraphicsDevice device)
-        {
-            exitZone = GetCloseScreenZone(device, Color.Red);
+            return GeometryHelper.GetIntersectionDepth(block, newPlayerRect) != Vector2.Zero;
         }
 
         protected Zone GetCloseScreenZone(GraphicsDevice device, Color zoneColor)

@@ -46,10 +46,11 @@ namespace Randio_2
                     ++completed;
             }
 
-            map.Player.Stats.QuestsCompleted = completed;
+            if (completed > map.Player.Stats.QuestsCompleted)
+                map.Player.Stats.QuestsCompleted = completed;
 
             if (allCompleted)
-                result += "All quests are completed, press G to win.\n";
+                result += "All quests are completed! Jump into the red door on tile 0 to end the game.\n";
 
             //Remove last \n
             return result.Substring(0, result.Length-1);

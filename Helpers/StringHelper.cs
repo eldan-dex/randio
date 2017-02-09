@@ -19,11 +19,11 @@ namespace Randio_2
             string result = "";
             if (words == -1)
                 words = AlgorithmHelper.GetRandom(1, 3); //1 or 2 words
-            int maxTotalLen = 12;
+            int maxTotalLen = 10;
             int remaining = maxTotalLen;
             for (int i = 0; i < words; ++i)
             {
-                int len = AlgorithmHelper.GetRandom(3, Math.Min(remaining, 9)); //todo: think about tweaking
+                int len = AlgorithmHelper.GetRandom(3, Math.Max(3, Math.Min(remaining, 9))); //todo: think about tweaking
                 string word = FirstLetterToUpper(GenerateWord(len));
 
                 result += word + " ";

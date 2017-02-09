@@ -24,7 +24,7 @@ namespace Randio_2 {
         #region Private variables
         protected List<Tile> tiles;
         protected Camera camera;
-        private List<Item> items;
+        protected List<Item> items;
         #endregion
 
         #region Public methods
@@ -78,7 +78,7 @@ namespace Randio_2 {
                 z.Draw(spriteBatch);
             }
 
-            exitZone.Draw(spriteBatch);
+            exitZone?.Draw(spriteBatch);
 
             foreach (NPC n in visibleNPCs)
                 n.Draw(gameTime, spriteBatch);
@@ -228,10 +228,10 @@ namespace Randio_2 {
             quests = new QuestManager(this);
             questZones = new List<Zone>();
 
-            int count = AlgorithmHelper.GetRandom(1, 5);
+            int count = 1;//AlgorithmHelper.GetRandom(1, 5);
             for (int i = 0; i < count; ++i)
             {
-                Quest.QuestType type = (Quest.QuestType)AlgorithmHelper.GetRandom(0, Quest.QuestTypeCount);
+                Quest.QuestType type = (Quest.QuestType)2;// AlgorithmHelper.GetRandom(0, Quest.QuestTypeCount);
 
                 string name = "";
                 string description = "";

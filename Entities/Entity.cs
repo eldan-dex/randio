@@ -173,6 +173,7 @@ namespace Randio_2 {
             if (HP <= 0)
             {
                 Alive = false; //now OutOfMap check will recognise this NPC as dead and will remove it.
+                position = new Vector2(-1000, 2000);
 
                 if (IsPlayer) //add to stats
                 {

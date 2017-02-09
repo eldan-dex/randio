@@ -111,7 +111,10 @@ namespace Randio_2
 
             //Set the display value
             if (percent == 100)
+            {
                 Progress = "Done";
+                Completed = true;
+            }
 
             else
                 Progress = percent.ToString() + "%";

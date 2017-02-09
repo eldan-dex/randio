@@ -5,9 +5,9 @@
 * Fixed TemplateBG
 * Updated quest descriptions
 + Player name stays consistent across the entire game
-+ Screen is now aware of whether it's intro or outro
-+ Player statistics are now displayed when game ends
-+ Basic game flow (intro-[game-outro-game-outro-...]) works now
++ Intro (demo) screen
++ Outro (stats) screen
++ Switching between screens now works
 
 
 31.1

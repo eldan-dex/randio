@@ -1,14 +1,9 @@
 ﻿TODO:
-- intro/outro manager - implement switching intro-game and game-outro
-
-- intro as a "demo" map for testing the controls - force the player to move in all directions, kill a npc, etc. before letting him go
-  do this only once when program is started, afterwards only restart the game, maybe with a different generated introtext
-
-- improve quests
+- entities sometimes disappear when jumping - collisions with invisible entities still active, attacks don't work
 
 - entities can push each other away (and bug each other through walls)
 
-- tweak target picking algorithm
+- tweak target picking algorithm?
 
 - entity fill as type indicator (boss has black slant lines, etc.)
 
@@ -28,16 +23,3 @@ ISSUES:
 IDEAS:
 - keep the bug where player can get a quest to kill themselves as a feature
 - switch all entities to the global coordination model
-
-QUESTS:
-1. hrac musi presne vedet co se po nem chce
-2. TYP - zabit oznacena NPCKA
-3. TYP - najit a donest item
-4. TYP - dostat se nekam nahoru?
-5. TYP - zavod?
-
-
------
-CO S TÍM?
-- futuristicky (konvenčně)
-- abstraktně (wtf)
