@@ -1,5 +1,14 @@
 ﻿PROGRESS LOG
 
+11.2
++ Items now generate and are placed randomly
++ Disabled ShapesBG
+
+10.2
+* Removed tile outlines
++ Map now generates two similar tiles next to each other for a feeling of one "larger" tile
++ LSystemBG now has a blue background, clouds and trees are more dense
+
 9.2
 * Fixed NPCs not being drawn bug
 * Fixed "all quests done" displaying when only last quest was completed

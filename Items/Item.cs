@@ -10,10 +10,12 @@ namespace Randio_2
         #region Public enums
         public enum ItemType
         {
-            Armor,
+            HP,
             Weapon,
-            Flop
+            Armor,
+            Speed
         }
+        public const int TypeCount = 4;
         #endregion
 
         #region Public variables
@@ -123,16 +125,20 @@ namespace Randio_2
                 switch (Type)
                 {
                     case ItemType.Armor:
-                        Properties.Name = "TEST ARMOR";
-                        Properties.ArmorBonus = 1;
+                        Properties.Name = "BETTER RESISTANCE";
+                        Properties.ArmorBonus = 2f * (map.TileCount-1) / Math.Max(0.1f, CurrentTile);
                         break;
                     case ItemType.Weapon:
-                        Properties.Name = "TEST WEAPON";
-                        Properties.StrengthBonus = 1;
+                        Properties.Name = "STRONGER PUNCH";
+                        Properties.StrengthBonus = 4f * (map.TileCount - 1) / Math.Max(0.1f, CurrentTile);
                         break;
-                    case ItemType.Flop:
-                        Properties.Name = "TEST SPEED";
-                        Properties.SpeedBonus = 0.5f;
+                    case ItemType.Speed:
+                        Properties.Name = "FASTER MOVEMENT";
+                        Properties.SpeedBonus = 2f * (map.TileCount - 1) / Math.Max(0.1f, CurrentTile);
+                        break;
+                    case ItemType.HP:
+                        Properties.Name = "MORE HP";
+                        Properties.HPBonus = (int)(10 * (map.TileCount - 1) / Math.Max(0.1f, CurrentTile));
                         break;
                 }
             }

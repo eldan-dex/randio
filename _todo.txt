@@ -1,7 +1,9 @@
 ﻿TODO:
-- quest compeltion marker displays even when one quest is done
+- test items and tweak properties
 
-- entities sometimes disappear when jumping - collisions with invisible entities still active, attacks don't work
+- shapes bg is retarded - fix or remove entirely
+
+- NPCs group at the end of the level - why?
 
 - entities can push each other away (and bug each other through walls)
 

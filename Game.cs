@@ -80,6 +80,7 @@ namespace Randio_2 {
             //testBG = new ShapesBG(GraphicsDevice, testSB, WIDTH, HEIGHT).Texture; //remove this
             //testBG = new LSystemBG(GraphicsDevice, testSB, WIDTH, HEIGHT).Texture; //remove this
             //testBG = new CityBG(GraphicsDevice, testSB, WIDTH, HEIGHT).Texture; //remove this
+            //testBG = new MountainsBG(GraphicsDevice, testSB, WIDTH, HEIGHT).Texture; //remove this
         }
 
         /// <summary>

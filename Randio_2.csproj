@@ -40,6 +40,7 @@
   </PropertyGroup>
   <PropertyGroup />
   <ItemGroup>
+    <Compile Include="Backgrounds\MountainsBG.cs" />
     <Compile Include="Entities\Stats.cs" />
     <Compile Include="Helpers\AlgorithmHelper.cs" />
     <Compile Include="Backgrounds\Background.cs" />

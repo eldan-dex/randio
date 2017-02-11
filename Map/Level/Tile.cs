@@ -7,9 +7,10 @@ namespace Randio_2 {
     class Tile {
         #region Public variables
         public enum TileType {
-            Shapes,
             LSystem,
             City,
+            Mountains,
+            Shapes, //this one is currently disabled
             Screen = 998,
             Invalid = 999
         }
@@ -44,14 +45,16 @@ namespace Randio_2 {
             wblocks = coords.Width / Block.Width;
             hblocks = coords.Height / Block.Height;
 
-            if (Type == TileType.Shapes)
-                Background = new ShapesBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height);
-            else if (Type == TileType.LSystem)
+            if (Type == TileType.LSystem)
                 Background = new LSystemBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height);
             else if (Type == TileType.City)
                 Background = new CityBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height);
+            else if (Type == TileType.Mountains)
+                Background = new MountainsBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height);
             else if (Type == TileType.Screen)
                 Background = new ScreenBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height);
+            /*else if (Type == TileType.Shapes)
+                Background = new ShapesBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height);*/
             else
             {
                 throw new NotSupportedException("This is not supposed to happen. Ever.");
@@ -100,7 +103,7 @@ namespace Randio_2 {
         private void CreateTileTexture(GraphicsDevice graphicsDevice)
         {
             TileTexture = Background.Texture;
-            GraphicsHelper.OutlineRectangleSide(TileTexture, Color.Black, 4, true, false, true, false);
+            //GraphicsHelper.OutlineRectangleSide(TileTexture, Color.Black, 4, true, false, true, false);
         }
 
         private void CreateBlockTexture(GraphicsDevice graphicsDevice) {

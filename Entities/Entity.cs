@@ -579,6 +579,12 @@ namespace Randio_2 {
                 HP -= HeldItem.Properties.HPBonus;
                 MaxHP -= HeldItem.Properties.HPBonus;
 
+                if (HP <= 0)
+                    HP = 1;
+
+                if (MaxHP <= 0)
+                    MaxHP = 1;
+
                 UpdateOutlineColor();
             }
         }

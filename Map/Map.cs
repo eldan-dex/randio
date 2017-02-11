@@ -187,6 +187,7 @@ namespace Randio_2 {
             int maxWidth = 3 * Game.WIDTH;
             int totalWidth = 0;
             int tileIndex = 0;
+            int nextType = -1;
 
             while (totalWidth < Width) {
                 //Generate a random width for the next tile, but keep it divisible by Block.Width
@@ -203,7 +204,18 @@ namespace Randio_2 {
                 }
 
                 //Generate TileType
-                var type = (Tile.TileType)AlgorithmHelper.GetRandom(0, Tile.TileTypeCount);
+                //Generate two similar tiles next to each other
+                Tile.TileType type;
+                if (nextType == -1)
+                {
+                    type = (Tile.TileType)AlgorithmHelper.GetRandom(0, Tile.TileTypeCount);
+                    nextType = (int)type;
+                }
+                else
+                {
+                    type = (Tile.TileType)nextType;
+                    nextType = -1;
+                }
 
                 //Create and add Tile
                 tiles.Add(new Tile(graphicsDevice, this, type, new Rectangle(totalWidth, 0, newWidth, Height), tileIndex));
@@ -257,7 +269,7 @@ namespace Randio_2 {
                     name = "Bring ";
                     itemFetchList = new List<Item>();
                     zones = new List<Zone>();
-                    int itemCount = AlgorithmHelper.GetRandom(1, 4); //todo: balance
+                    int itemCount = AlgorithmHelper.GetRandom(1, items.Count);
 
                     var newZone = GetNewZone(device, Color.Green);
                     zones.Add(newZone);
@@ -407,11 +419,40 @@ namespace Randio_2 {
 
         private void CreateItems(GraphicsDevice device)
         {
-            //just for testing
             items = new List<Item>();
+            int count = AlgorithmHelper.GetRandom(1, 2 * TileCount); //how many items there will be in the game
+            int nextX = AlgorithmHelper.GetRandom(0, Width / count);
+            for (int i = 0; i < count; ++i)
+            {
+                //set nextY by looking for a space without any tiles
+                var tile = GetTileForX(nextX);
+                var tileX = (int)GlobalToTileCoordinates(new Vector2(nextX, 0), tile.Index).X;
+                int tileIndexX = tileX / Block.Width; //tweak this, might not be accurate
+                int tileBase = tile.Coords.Left;
+                List<int> availableY = new List<int>();
+                for(int y = 0; y < tile.GroundLevel; ++y)
+                {
+                    if (tile.Blocks[tileIndexX, y] == null)
+                        availableY.Add(y);  
+                }
+                if (availableY.Count > 0)
+                {
+                    int selectedY = availableY[AlgorithmHelper.GetRandom(0, availableY.Count)];
+                    Item.ItemType type = (Item.ItemType)AlgorithmHelper.GetRandom(0, Item.TypeCount);
+
+                    Item item = new Item(this, device, type, new Vector2(tileBase + tileIndexX*Block.Width, selectedY*Block.Height), tile.Index, 16, 16);
+                    items.Add(item);
+                }
+
+                nextX += AlgorithmHelper.GetRandom(16, Width / count);
+            }
+            
+
+
+            /*
             items.Add(new Item(this, device, Item.ItemType.Flop, new Vector2(100, 550), 0, 16, 16));
             items.Add(new Item(this, device, Item.ItemType.Armor, new Vector2(300, 450), 0, 16, 16));
-            items.Add(new Item(this, device, Item.ItemType.Weapon, new Vector2(700, 500), 0, 16, 16, properties: new ItemProperties("TEST WEAPON NAME", strength: 10)));
+            items.Add(new Item(this, device, Item.ItemType.Weapon, new Vector2(700, 500), 0, 16, 16, properties: new ItemProperties("TEST WEAPON NAME", strength: 10)));*/
         }
 
         protected void CreateExitZone(GraphicsDevice device)
