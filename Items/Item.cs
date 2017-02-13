@@ -103,10 +103,17 @@ namespace Randio_2
         public void PutDown(int Direction)
         {
             //Put down right next to the entity in the direction the entity is looking
+            Vector2 newPos;
             if (Direction == 1)
-                position = new Vector2(Owner.Position.X + Owner.Width, Owner.Position.Y);
+                newPos = new Vector2(Owner.Position.X + Owner.Width, Owner.Position.Y);
             else
-                position = new Vector2(Owner.Position.X - Width, Owner.Position.Y);
+                newPos = new Vector2(Owner.Position.X - Width, Owner.Position.Y);
+
+            //If we're trying to place the item into a block, place it where we stand instead
+            if (map.IsBlock(newPos))
+                newPos = map.Player.Position;
+
+            position = newPos;
 
             Owner = null;
             IsPlaced = true;
@@ -122,23 +129,24 @@ namespace Randio_2
             if (Properties == null)
             {
                 Properties = new ItemProperties();
+                float potence = (map.TileCount) / (map.TileCount - Math.Max(1f, CurrentTile));
                 switch (Type)
                 {
                     case ItemType.Armor:
                         Properties.Name = "BETTER RESISTANCE";
-                        Properties.ArmorBonus = 2f * (map.TileCount-1) / Math.Max(0.1f, CurrentTile);
+                        Properties.ArmorBonus = 2f * potence;
                         break;
                     case ItemType.Weapon:
                         Properties.Name = "STRONGER PUNCH";
-                        Properties.StrengthBonus = 4f * (map.TileCount - 1) / Math.Max(0.1f, CurrentTile);
+                        Properties.StrengthBonus = 4f * potence;
                         break;
                     case ItemType.Speed:
                         Properties.Name = "FASTER MOVEMENT";
-                        Properties.SpeedBonus = 2f * (map.TileCount - 1) / Math.Max(0.1f, CurrentTile);
+                        Properties.SpeedBonus = 2f * potence;
                         break;
                     case ItemType.HP:
                         Properties.Name = "MORE HP";
-                        Properties.HPBonus = (int)(10 * (map.TileCount - 1) / Math.Max(0.1f, CurrentTile));
+                        Properties.HPBonus = (int)(10 * potence);
                         break;
                 }
             }

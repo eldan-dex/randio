@@ -146,6 +146,27 @@ namespace Randio_2 {
 
             return result;
         }
+
+        public bool IsBlock(Vector2 globalCoords)
+        {
+            int x = (int)globalCoords.X;
+            if (x < 0)
+                x = 0;
+
+            var tile = GetTileForX(x);
+
+            if (tile == null)
+                return false;
+
+            var tileCoords = GlobalToTileCoordinates(new Vector2(x, globalCoords.Y), tile.Index);
+            int tileIndexX = Math.Max(0, (int)Math.Round(tileCoords.X / Block.Width));
+            int tileIndexY = Math.Max(0, (int)Math.Round(tileCoords.Y / Block.Height));
+
+            if (tileIndexX >= tile.Blocks.GetLength(0) || tileIndexY >= tile.Blocks.GetLength(1)) //hackaround
+                return false;
+
+            return tile.Blocks[tileIndexX, tileIndexY] != null;
+        }
         #endregion
 
         #region Private methods
@@ -269,7 +290,7 @@ namespace Randio_2 {
                     name = "Bring ";
                     itemFetchList = new List<Item>();
                     zones = new List<Zone>();
-                    int itemCount = AlgorithmHelper.GetRandom(1, items.Count);
+                    int itemCount = AlgorithmHelper.GetRandom(1, 4); //so that item names would fit into view -.-
 
                     var newZone = GetNewZone(device, Color.Green);
                     zones.Add(newZone);
@@ -297,7 +318,7 @@ namespace Randio_2 {
                             name += ", ";
                     }
 
-                    name += " to " + "a green area in tile " + GetTileForX(newZone.Coords.X).Index.ToString(); //todo: improve destination marking - all "green areas" look the same atm
+                    name += " to " + "a green area in tile " + GetTileForX(newZone.Coords.X).Index.ToString();
                 }
 
                 else if (type == Quest.QuestType.ReachBlock)
@@ -446,13 +467,6 @@ namespace Randio_2 {
 
                 nextX += AlgorithmHelper.GetRandom(16, Width / count);
             }
-            
-
-
-            /*
-            items.Add(new Item(this, device, Item.ItemType.Flop, new Vector2(100, 550), 0, 16, 16));
-            items.Add(new Item(this, device, Item.ItemType.Armor, new Vector2(300, 450), 0, 16, 16));
-            items.Add(new Item(this, device, Item.ItemType.Weapon, new Vector2(700, 500), 0, 16, 16, properties: new ItemProperties("TEST WEAPON NAME", strength: 10)));*/
         }
 
         protected void CreateExitZone(GraphicsDevice device)

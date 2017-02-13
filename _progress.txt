@@ -1,5 +1,10 @@
 ﻿PROGRESS LOG
 
+12.2
+* Items now cannot be placed into blocks
++ Started upgrading NPC AI
+
+
 11.2
 + Items now generate and are placed randomly
 + Disabled ShapesBG

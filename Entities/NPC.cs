@@ -21,6 +21,8 @@ namespace Randio_2 {
 
         #region Private variables
         int lastDirection = 0;
+        int horizontalDirection = 0; //-1 = left, 0 = steady, 1 = up
+        int verticalDirection = 0; //-1 = down, 0 = steady, 1 = up
         #endregion
 
         #region Public methods
@@ -63,7 +65,7 @@ namespace Randio_2 {
             GraphicsHelper.DrawRectangle(texture, color);
 
             if (IsBoss)
-                outlineWidth = 4;
+                outlineWidth = 6;
             else
                 outlineWidth = 3;
 
@@ -109,66 +111,121 @@ namespace Randio_2 {
 
             else
                 AIIdle();
+
+            AIPerformMovement();
         }
 
-        private void AITrackPlayer() {
+        private void AITrackPlayer() { //Following player
             Vector2 playerPos = map.Player.Position;
 
-            if (playerPos.X < Position.X) {
-                //go left
-                movement = -1f;
-            }
-            else if (playerPos.X > Position.X) {
-                //go right
-                movement = 1f;
-            }
+            if (playerPos.X < Position.X)
+                horizontalDirection = -1; //go left
 
-            if (playerPos.Y < Position.Y) {
-                //go up
-                if (!isJumping)
-                    isJumping = true;
-            }
-            else if (playerPos.Y > Position.Y) {
-                //go down
+            else if (playerPos.X > Position.X)
+                horizontalDirection = 1; //go right
 
-            }
+            else 
+                horizontalDirection = 0; //stay still
+
+            var yDiff = playerPos.Y - Position.Y;
+            if (yDiff < 0 && Math.Abs(yDiff) >= Block.Height/2)
+                verticalDirection = 1; //go up
+
+            else if (yDiff > 0 && Math.Abs(yDiff) >= Block.Height /2)
+                verticalDirection = -1; //go down
+
+            else
+                verticalDirection = 0; //stay on the same level
 
         }
 
         private void AIIdle() { //Idle
-            int ran = AlgorithmHelper.GetRandom(0, 27);
-            if (ran == 0)
-                lastDirection = 1;
+            int randX = AlgorithmHelper.GetRandom(0, 11);
+            int randY = AlgorithmHelper.GetRandom(0, 11);
+            int changeDir = AlgorithmHelper.GetRandom(0, 51);
 
-            else if (ran == 1)
-                lastDirection = -1;
+            if (changeDir == 50) //2% chance that direction will be changed
+            {
+                if (randX < 3)
+                    horizontalDirection = -1;
+                else if (randX > 6)
+                    horizontalDirection = 1;
+                else
+                    horizontalDirection = 0;
 
-            else if (ran > 23)
-                lastDirection = 0;
-
-            movement = lastDirection * 0.7f;
+                if (randY < 3)
+                    verticalDirection = -1;
+                else if (randY > 6)
+                    verticalDirection = 1;
+                else
+                    verticalDirection = 0;
+            }
         }
 
         private void AIRunAway() { //Basically inverted AITrackPlayer()
             Vector2 playerPos = map.Player.Position;
 
-            if (playerPos.X < Position.X) {
-                //go right
-                movement = 1f;
-            }
-            else if (playerPos.X > Position.X) {
-                //go left
-                movement = -1f;
+            if (playerPos.X < Position.X)
+                horizontalDirection = 1; //go right
+
+            else if (playerPos.X > Position.X)
+                horizontalDirection = -1; //go left
+
+            else
+                horizontalDirection = 0; //stay still
+
+
+            var yDiff = playerPos.Y - Position.Y;
+            if (yDiff < 0 && Math.Abs(yDiff) >= Block.Height / 2)
+                verticalDirection = -1; //go down
+
+            else if (yDiff > 0 && Math.Abs(yDiff) >= Block.Height / 2)
+                verticalDirection = 1; //go up
+
+            else
+                verticalDirection = 0; //stay on the same level
+
+        }
+
+        private void AIPerformMovement()
+        {
+            bool canFallDown = false;
+            isJumping = false;
+
+            //Vertical movement
+            var nextVertBlock = position + new Vector2(0, verticalDirection * Block.Height);
+            if (!map.IsBlock(nextVertBlock))
+            {
+                if (verticalDirection == 1)
+                    isJumping = true;
+
+                else if (verticalDirection == -1)
+                    canFallDown = true;
             }
 
-            if (playerPos.Y < Position.Y) {
-                //go down
+            //Horizontal movement
+            var nextHorizBlock = position + new Vector2(horizontalDirection * Block.Width, 0);
+            if (!map.IsBlock(nextHorizBlock))
+            {
+                var gndBlockA = nextHorizBlock + new Vector2(0, 1 * Block.Height);
+                var gndBlockB = gndBlockA + new Vector2(horizontalDirection * 3 * Block.Width, 0);
+
+                if (map.IsBlock(gndBlockA) || canFallDown) //just go sideways
+                    movement = horizontalDirection * 1f;
+
+                else if (!map.IsBlock(gndBlockA) && map.IsBlock(gndBlockB)) //try to jump over holes
+                {
+                    movement = horizontalDirection * 1f;
+                    isJumping = true;
+                }
+                    
             }
-            else if (playerPos.Y > Position.Y) {
-                //go up
+
+            else //todo: is this fine?
+            {
                 isJumping = true;
+                movement = horizontalDirection * 1f;
             }
-
         }
 
         private void AIScan() {

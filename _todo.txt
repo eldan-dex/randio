@@ -1,7 +1,7 @@
 ﻿TODO:
-- test items and tweak properties
+- "bring items" quest - how to point player to the correct item? (mutliple items with the same name - make names somehow unique?)
 
-- shapes bg is retarded - fix or remove entirely
+- finish tweaking NPC movement
 
 - NPCs group at the end of the level - why?
 
