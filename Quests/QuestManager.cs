@@ -47,7 +47,7 @@ namespace Randio_2
                 map.Player.Stats.QuestsCompleted = completed;
 
             if (completed == quests.Count)
-                result += "All quests are completed! Jump into the red door on tile 0 to end the game.\n";
+                map.ReachedExit = true;
 
             //Remove last \n
             return result.Substring(0, result.Length-1);

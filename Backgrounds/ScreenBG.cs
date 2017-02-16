@@ -11,8 +11,9 @@ namespace Randio_2
         #endregion
 
         #region Public methods
-        public ScreenBG(GraphicsDevice device, SpriteBatch batch, int width, int height)
+        public ScreenBG(GraphicsDevice device, SpriteBatch batch, int width, int height, Color[] palette)
         {
+            this.palette = palette;
             CreateBackgroundTexture(device, batch, width, height);
             CreateBlockTexture(device, batch, Block.Width, Block.Height);
             BlockTopmostTexture = BlockTexture;
@@ -25,7 +26,7 @@ namespace Randio_2
             //Initialize whatever you need here
             
             device.SetRenderTarget(Texture);
-            device.Clear(Color.Beige);
+            device.Clear(palette[0]);
             batch.Begin();
 
             //Draw onto batch here
@@ -38,7 +39,7 @@ namespace Randio_2
         {
             var texture = new Texture2D(device, width, height);
 
-            GraphicsHelper.DrawRectangle(texture, Color.Brown);
+            GraphicsHelper.DrawRectangle(texture, palette[1]);
 
             BlockTexture = texture;
         }

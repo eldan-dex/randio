@@ -56,7 +56,7 @@ namespace Randio_2
         #endregion
 
         #region Public methods
-        public Item(Map map, GraphicsDevice device, ItemType type, Vector2 position, int currentTile, int width, int height, bool placed = true, Entity owner = null, ItemProperties properties = null)
+        public Item(Map map, GraphicsDevice device, ItemType type, int index, Vector2 position, int currentTile, int width, int height, bool placed = true, Entity owner = null, ItemProperties properties = null)
         {
             this.map = map;
             Type = type;
@@ -68,12 +68,13 @@ namespace Randio_2
             Owner = owner;
             Properties = properties;
             InitializeItem();
+            Properties.Name += " " + index.ToString();
             CreateTexture(device);
         }
 
         public void Update(GameTime gameTime)
         {
-            AlignWithBlockBottom();
+            ItemGravity();
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -134,18 +135,22 @@ namespace Randio_2
                 {
                     case ItemType.Armor:
                         Properties.Name = "BETTER RESISTANCE";
+                        Properties.Adjective = "Resilient";
                         Properties.ArmorBonus = 2f * potence;
                         break;
                     case ItemType.Weapon:
                         Properties.Name = "STRONGER PUNCH";
+                        Properties.Adjective = "Strong";
                         Properties.StrengthBonus = 4f * potence;
                         break;
                     case ItemType.Speed:
                         Properties.Name = "FASTER MOVEMENT";
+                        Properties.Adjective = "Fast";
                         Properties.SpeedBonus = 2f * potence;
                         break;
                     case ItemType.HP:
                         Properties.Name = "MORE HP";
+                        Properties.Adjective = "Healthly";
                         Properties.HPBonus = (int)(10 * potence);
                         break;
                 }
@@ -166,12 +171,13 @@ namespace Randio_2
         }
 
         //ensure item is horizontally aligned with blocks
-        private void AlignWithBlockBottom()
+        private void ItemGravity()
         {
-            if ((Position.Y + 16) % 32 != 0)
-            {
-                position.Y += 32 - ((Position.Y + 16) % 32);
-            }
+            if (!map.IsBlock(position + new Vector2(0, Height)))
+                position.Y += Height / 2;
+
+            else if (!map.IsBlock(position + new Vector2(0, 1)))
+                position.Y += Block.Height - position.Y % Block.Height - Height;
         }
         #endregion
     }

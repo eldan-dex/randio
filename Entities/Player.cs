@@ -32,9 +32,10 @@ namespace Randio_2 {
             CurrentTile = 0;
             Origin = position;
             Texture = CreateTexture(graphicsDevice, Width, Height);
-            SafeMargin = 240; //temporary
+            SafeMargin = 280;
 
-            Name = name;
+            Name = name.ToUpper();
+
             InitStats();
             //First setting the outline color must be done in child classes
             UpdateOutlineColor();
@@ -108,7 +109,13 @@ namespace Randio_2 {
             {
                 if (!AkeyDown)
                 {
-                    Attack();
+                    if (CanAttack)
+                    {
+                        Attack();
+                        //Prevent key-spamming
+                        CanAttack = false;
+                        map.entityEvents.AddEvent(new Event<Entity>(100, delegate (Entity e) { e.CanAttack = true; }, this));
+                    }
                     AkeyDown = true;
                 }
             }

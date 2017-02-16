@@ -189,7 +189,7 @@ namespace Randio_2 {
 
         private void AIPerformMovement()
         {
-            bool canFallDown = false;
+            bool canFallDown = Behaviour == NPCBehaviour.RunAwayFromPlayer; //Greens don't fear holes and are happy to fall in them -.-
             isJumping = false;
 
             //Vertical movement

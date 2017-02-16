@@ -131,11 +131,13 @@ namespace Randio_2
         Moment defaultMoment;
         Stack<Moment> time;
         Color currentColor;
+        Color[] palette;
         #endregion
 
         #region Public methods
-        public Turtle(GraphicsDevice device, SpriteBatch spriteBatch, Vector2 startingPosition, double startingAngle, Color currentColor)
+        public Turtle(GraphicsDevice device, SpriteBatch spriteBatch, Vector2 startingPosition, double startingAngle, Color currentColor, Color[] palette)
         {
+            this.palette = palette;
             this.device = device;
             this.spriteBatch = spriteBatch;
             this.currentColor = currentColor;
@@ -174,19 +176,19 @@ namespace Randio_2
 
                 //TODO: rework color system
                 else if (c == '0')
-                    currentColor = Color.White;
+                    currentColor = palette[2];
 
                 else if (c == '1')
-                    currentColor = Color.Brown;
+                    currentColor = palette[3];
 
                 else if (c == '2')
-                    currentColor = Color.Green;
+                    currentColor = palette[4];
 
                 else if (c == '3')
-                    currentColor = Color.Red;
+                    currentColor = palette[5];
 
                 else if (c == '4')
-                    currentColor = Color.Blue;
+                    currentColor = palette[6];
 
                 else if (c == '+')
                     now.angle -= System.Angle;

@@ -44,6 +44,7 @@
     <Compile Include="Entities\Stats.cs" />
     <Compile Include="Helpers\AlgorithmHelper.cs" />
     <Compile Include="Backgrounds\Background.cs" />
+    <Compile Include="Helpers\ColorHelper.cs" />
     <Compile Include="Map\Screen\Screen.cs" />
     <Compile Include="Backgrounds\ScreenBG.cs" />
     <Compile Include="Map\Level\Zone.cs" />

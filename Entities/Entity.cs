@@ -90,7 +90,7 @@ namespace Randio_2 {
         private float oldBottom;
 
         //Outline (HP indicator) width
-        protected int outlineWidth = 2;
+        protected int outlineWidth = 4;
         #endregion
 
         #region Public methods
@@ -142,7 +142,7 @@ namespace Randio_2 {
 
             Vector2 namePos = new Vector2(Position.X - (Name.Length / 2) * 4, Position.Y - 22);
 
-            spriteBatch.DrawString(Game.font, Name, namePos, Color.Red);
+            spriteBatch.DrawString(Game.font, Name, namePos, Color.Red, 0f, Vector2.Zero, IsPlayer ? 1.2f : 1f, SpriteEffects.None, 0f);
             spriteBatch.Draw(Texture, position, null, OverwriteColor, 0.0f, Vector2.Zero, 1.0f, effect, 0.0f);
         }
 
@@ -284,9 +284,9 @@ namespace Randio_2 {
                 int closest = int.MaxValue;
                 foreach (Item i in items)
                 {
-                    if (i.Position.X >= Position.X && Math.Abs(i.Position.X - Position.X) + Math.Abs(i.Position.Y - Position.Y) <= range * 3) //range/2? really?
+                    int distance = (int)(Math.Abs(i.Position.X - (position.X + Width)) + Math.Abs((i.Position.Y + i.Height) - (position.Y + Height)));
+                    if (i.Position.X >= position.X && distance <= range * 3) //range/2? really?
                     {
-                        int distance = (int)(Math.Abs(i.Position.X - position.X) + Math.Abs(i.Position.Y - position.Y));
                         if (distance < closest)
                         {
                             closest = distance;
@@ -300,9 +300,9 @@ namespace Randio_2 {
                 int closest = int.MaxValue;
                 foreach (Item i in items)
                 {
-                    if (i.Position.X <= Position.X && Math.Abs(i.Position.X - Position.X) + Math.Abs(i.Position.Y - Position.Y) <= range * 3)
+                    int distance = (int)(Math.Abs((i.Position.X + i.Width) - position.X) + Math.Abs((i.Position.Y + i.Height) - (position.Y + Height)));
+                    if (i.Position.X <= position.X + Width && distance <= range * 3)
                     {
-                        int distance = (int)(Math.Abs(i.Position.X - position.X) + Math.Abs(i.Position.Y - position.Y));
                         if (distance < closest) //aaa, so much duplicity. Now squared!
                         {
                             closest = distance;

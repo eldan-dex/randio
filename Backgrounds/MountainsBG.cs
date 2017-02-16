@@ -14,8 +14,9 @@ namespace Randio_2 {
         #endregion
 
         #region Public methods
-        public MountainsBG( GraphicsDevice device, SpriteBatch batch, int width, int height )
+        public MountainsBG( GraphicsDevice device, SpriteBatch batch, int width, int height, Color[] palette)
         {
+            this.palette = palette;
             heightLines = new double[3, width / 2];
             Stars = new List<Point>();
 
@@ -62,19 +63,20 @@ namespace Randio_2 {
             //Initialize whatever you need here
 
             device.SetRenderTarget(Texture);
-            device.Clear(Color.Black);
+            device.Clear(palette[0]);
             batch.Begin();
 
             //Draw onto batch here
-            Color StarWhite = new Color(210, 210, 210);
-            Color StarBloom = new Color(150, 150, 150);
+            Color StarWhite = palette[2];
+            Color StarBloom = ColorHelper.ChangeColorBrightness(palette[2], +0.4f);
+            Color StarBig = ColorHelper.ChangeColorBrightness(palette[2], +0.6f);
             foreach (Point Star in Stars)
             {
                 //big star
                 if (AlgorithmHelper.GetRandom(0, 5) == 4)
                 {
                     RenderTarget2D BigStarSprite = new RenderTarget2D(device, 2, 2);
-                    GraphicsHelper.DrawRectangle(BigStarSprite, Color.White);
+                    GraphicsHelper.DrawRectangle(BigStarSprite, StarBig);
 
                     batch.Draw(BigStarSprite, new Rectangle(Star.X - 2, Star.Y, 2, 2), StarBloom);
                     batch.Draw(BigStarSprite, new Rectangle(Star.X + 2, Star.Y, 2, 2), StarBloom);
@@ -86,7 +88,7 @@ namespace Randio_2 {
                 }
 
                 RenderTarget2D StarSprite = new RenderTarget2D(device, 1, 1);
-                GraphicsHelper.DrawRectangle(StarSprite, Color.White);
+                GraphicsHelper.DrawRectangle(StarSprite, StarBig);
 
                 batch.Draw(StarSprite, new Rectangle(Star.X - 1, Star.Y, 1, 1), StarBloom);
                 batch.Draw(StarSprite, new Rectangle(Star.X + 1, Star.Y, 1, 1), StarBloom);
@@ -105,9 +107,9 @@ namespace Randio_2 {
                 RenderTarget2D spike = new RenderTarget2D(device, 2, sh);
                 GraphicsHelper.DrawRectangle(spike, Color.White);
 
-                batch.Draw(spike, new Rectangle(line, height - sh3, 2, sh3), new Color(0, 12, 41));
-                batch.Draw(spike, new Rectangle(line, height - sh2, 2, sh2), new Color(90, 0, 91));
-                batch.Draw(spike, new Rectangle(line, height - sh, 2, sh), new Color(30, 0, 91));
+                batch.Draw(spike, new Rectangle(line, height - sh3, 2, sh3), palette[3]);
+                batch.Draw(spike, new Rectangle(line, height - sh2, 2, sh2), palette[4]);
+                batch.Draw(spike, new Rectangle(line, height - sh, 2, sh), palette[5]);
                 line += 2;
             }
 
@@ -120,19 +122,7 @@ namespace Randio_2 {
             //Base color
             var texture = new Texture2D(device, width, height);
 
-            Color[] color = new Color[texture.Width * texture.Height];
-            texture.GetData(color); //Texture size limit is 4096*4096. Textures bigger than that crash when being converted to Color[]
-
-            //noise
-            for (int i = 0; i < texture.Width * texture.Height; ++i)
-            {
-                /*
-                float scale = AlgorithmHelper.GetRandom(75, 100) / 100f;
-                color[i] = Color.FromNonPremultiplied((byte)(diffuse.R*scale), (byte)(diffuse.G * scale), (byte)(diffuse.B * scale), diffuse.A);*/
-                color[i] = new Color(30, 42, 30);
-            }
-
-            texture.SetData(color);
+            GraphicsHelper.DrawRectangle(texture, palette[1]);
 
             BlockTexture = texture;
         }
@@ -143,19 +133,7 @@ namespace Randio_2 {
             //Base color
             var texture = new Texture2D(device, width, height);
 
-            Color[] color = new Color[texture.Width * texture.Height];
-            texture.GetData(color); //Texture size limit is 4096*4096. Textures bigger than that crash when being converted to Color[]
-
-            //noise
-            for (int i = 0; i < texture.Width * texture.Height; ++i)
-            {
-                /*
-                float scale = AlgorithmHelper.GetRandom(75, 100) / 100f;
-                color[i] = Color.FromNonPremultiplied((byte)(diffuse.R*scale), (byte)(diffuse.G * scale), (byte)(diffuse.B * scale), diffuse.A);*/
-                color[i] = new Color(0, 42, 0);
-            }
-
-            texture.SetData(color);
+            GraphicsHelper.DrawRectangle(texture, ColorHelper.ChangeColorBrightness(palette[1], +0.3f));
 
             BlockTopmostTexture = texture; //Leave this here for topmost bloks to be identical to normal blocks. Replace with own texture generation to make them different.
         }

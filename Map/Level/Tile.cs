@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Linq;
 
 namespace Randio_2 {
     class Tile {
@@ -26,6 +27,7 @@ namespace Randio_2 {
         public int Index { get; private set; }
         public List<NPC> NPCs { get; private set; }
         public int GroundLevel = 15;
+        public Color[] Palette { get; private set; }
         #endregion
 
         #region Private variables
@@ -45,20 +47,29 @@ namespace Randio_2 {
             wblocks = coords.Width / Block.Width;
             hblocks = coords.Height / Block.Height;
 
-            if (Type == TileType.LSystem)
-                Background = new LSystemBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height);
-            else if (Type == TileType.City)
-                Background = new CityBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height);
+            int gens = AlgorithmHelper.GetRandom(16, 33);
+            int gskip = AlgorithmHelper.GetRandom(0, gens - 8);
+            Palette = ColorHelper.Generate(gens).Skip(gskip).ToArray();
+            
+            for (int p = 0; p < Palette.Length; ++p)
+            {
+                Palette[p] = ColorHelper.ChangeColorBrightness(Palette[p], -0.5f);
+            }
+
+            /*if (Type == TileType.LSystem)*/
+                Background = new LSystemBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height, Palette);
+            /*else if (Type == TileType.City)
+                Background = new CityBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height, Palette);
             else if (Type == TileType.Mountains)
-                Background = new MountainsBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height);
+                Background = new MountainsBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height, Palette);
             else if (Type == TileType.Screen)
-                Background = new ScreenBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height);
+                Background = new ScreenBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height, Palette);*/
             /*else if (Type == TileType.Shapes)
-                Background = new ShapesBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height);*/
-            else
+                Background = new ShapesBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height, Palette);*/
+            /*else
             {
                 throw new NotSupportedException("This is not supposed to happen. Ever.");
-            }
+            }*/
 
             CreateTileTexture(graphicsDevice);
             CreateBlockTexture(graphicsDevice);
@@ -68,29 +79,11 @@ namespace Randio_2 {
             {
                 CreateEntities(graphicsDevice); //separate into CreateNPCs and CreateEnemies?
             }
-            else
-            {
-                NPCs = new List<NPC>();
-            }
 
         }
 
         public void Update(GameTime gameTime) {
-            List<NPC> toRemove = new List<NPC>();
-            foreach (NPC n in NPCs)
-            {
-                n.Update(gameTime);
-                if (map.CheckOutOfMap((int)n.Position.Y) == -1 |! n.Alive)
-                {
-                    toRemove.Add(n);
-                }
-            }
 
-            foreach (NPC n in toRemove)
-            {
-                if (NPCs.Contains(n))
-                    NPCs.Remove(n);
-            }
         }
 
         public void Draw(SpriteBatch spriteBatch) {
@@ -112,8 +105,6 @@ namespace Randio_2 {
         }
 
         private void CreateEntities(GraphicsDevice graphicsDevice) {
-            NPCs = new List<NPC>();
-
             //temporary testing code
             int npcCount = AlgorithmHelper.GetRandom(1, 17);
             for (int i = 0; i < npcCount; ++i) {
@@ -130,7 +121,7 @@ namespace Randio_2 {
 
                 NPC npc = new NPC(graphicsDevice, map, position, Index, this, w, h, addHP, addStr, addDef, addSpd);
 
-                NPCs.Add(npc);
+                map.NPCs.Add(npc);
             }        
         }
 

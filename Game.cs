@@ -159,6 +159,10 @@ namespace Randio_2 {
                 Vector2 questPosition = (debugEnabled ? new Vector2(10, 120) : new Vector2(10, 10));
                 osdSpriteBatch.DrawString(font, map.quests.QuestsStatus(), questPosition, Color.DarkGreen);
             }
+
+            Color invColor = ColorHelper.InvertColor(map.GetTileByIndex(map.Player.CurrentTile).Palette[1]);
+            osdSpriteBatch.DrawString(font, "Item: " + ((map.Player.HeldItem == null) ? "none" : map.Player.HeldItem.Properties.Name), new Vector2(970, 660), invColor, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
+            osdSpriteBatch.DrawString(font, "WSAD - move    J - attack    K - pick up/put down items    L - reset player    L-SHIFT - slow down", new Vector2(10, 700), invColor, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
             osdSpriteBatch.End();
         }
 

@@ -13,8 +13,9 @@ namespace Randio_2
         #endregion
 
         #region Public methods
-        public LSystemBG(GraphicsDevice device, SpriteBatch batch, int width, int height)
+        public LSystemBG(GraphicsDevice device, SpriteBatch batch, int width, int height, Color[] palette)
         {
+            this.palette = palette;
             CreateBackgroundTexture(device, batch, width, height);
             CreateBlockTexture(device, batch, Block.Width, Block.Height);
             BlockTopmostTexture = BlockTexture;
@@ -27,10 +28,10 @@ namespace Randio_2
             rules.Add(new LSystem.Rule("F", "1FF-[2-F+F-F]+[2+F-F+F]")); //basic tree
  
             defaultSystem = new LSystem("F", 10, 22, rules); //TODO: generate ctor args
-            turtle = new Turtle(device, batch, new Vector2(200, 640), -90, Color.White);
+            turtle = new Turtle(device, batch, new Vector2(200, 640), -90, Color.White, palette);
 
             device.SetRenderTarget(Texture);
-            device.Clear(Color.AliceBlue);
+            device.Clear(palette[0]);
             batch.Begin();
 
             RenderTarget2D target = new RenderTarget2D(device, width, height);
@@ -49,7 +50,7 @@ namespace Randio_2
             }
 
             //create clouds
-            int count = AlgorithmHelper.GetRandom(width / 512, width / 72);
+            int count = Math.Max(1, AlgorithmHelper.GetRandom(width / 512, width / 72));
             int nextX = AlgorithmHelper.GetRandom(0, width / count);
             int nextY;
 
@@ -60,8 +61,8 @@ namespace Randio_2
                 int h = AlgorithmHelper.GetRandom(32, 128);
 
                 Texture2D cloud = new Texture2D(device, w, h);
-                GraphicsHelper.DrawRectangle(cloud, Color.WhiteSmoke);
-                GraphicsHelper.OutlineRectangle(cloud, Color.LightGray, 8);
+                GraphicsHelper.DrawRectangle(cloud, palette[7]);
+                GraphicsHelper.OutlineRectangle(cloud, ColorHelper.ChangeColorBrightness(palette[5], -0.2f), 8);
 
                 batch.Draw(cloud, new Rectangle(nextX, nextY, w, h), Color.White);
 
@@ -70,7 +71,7 @@ namespace Randio_2
                     nextX -= AlgorithmHelper.GetRandom(w, (int)(width / 1.5));
             }
 
-            count = AlgorithmHelper.GetRandom(width/256, width/64);
+            count = Math.Max(1, AlgorithmHelper.GetRandom(width / 256, width / 64));
             nextX = AlgorithmHelper.GetRandom(0, width/count);
             for (int i = 0; i < count; ++i)
             {
@@ -104,7 +105,7 @@ namespace Randio_2
         {
             //implement block texture generation
             var tex = new Texture2D(device, width, height);
-            GraphicsHelper.DrawRectangle(tex, Color.Yellow);
+            GraphicsHelper.DrawRectangle(tex, palette[1]);
             BlockTexture = tex;
         }
         #endregion

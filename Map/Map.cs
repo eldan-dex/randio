@@ -9,10 +9,11 @@ namespace Randio_2 {
     class Map {
         #region Public variables  
         public Player Player { get; protected set; }
-        public bool ReachedExit { get; protected set; }
+        public bool ReachedExit { get; set; }
         public int Width { get; protected set; }
         public int Height { get; protected set; }
-        public int TileCount { get { return tiles.Count; } }
+        public int TileCount { get { return (tiles==null) ? 1 : tiles.Count; } }
+        public List<NPC> NPCs { get; protected set; }
 
         public EventManager<Entity> entityEvents;
         public QuestManager quests;
@@ -39,6 +40,8 @@ namespace Randio_2 {
             Width = width;
             Height = height;
 
+            NPCs = new List<NPC>();
+
             CreatePlayer(graphicsDevice, playerName);
             CreateTiles(graphicsDevice);
             CreateEventManagers();
@@ -49,7 +52,7 @@ namespace Randio_2 {
 
         public virtual void Update(GameTime gameTime, KeyboardState keyboardState) {
             Player.Update(gameTime, keyboardState);
-            UpdateTiles(gameTime);
+            UpdateNPCs(gameTime);
             UpdateEvents();
             UpdateItems(gameTime);
             UpdateQuests();
@@ -126,8 +129,7 @@ namespace Randio_2 {
             List<Entity> result = new List<Entity>();
 
             result.Add(Player);
-            foreach (Tile t in tiles)
-                result.AddRange(t.NPCs);
+            result.AddRange(NPCs);
 
             return result;
         }
@@ -192,7 +194,7 @@ namespace Randio_2 {
             }
             else if (rightEdge - (Player.Position.X + Player.Width) < Player.SafeMargin) {
                 //move camera right is possible
-                if (camera.Position.X < Width)
+                if (camera.Position.X < Width-Game.WIDTH)
                     camera.Position = new Vector2(Player.Position.X + Player.Width + Player.SafeMargin - Game.WIDTH, 0);
             }
         }
@@ -256,10 +258,15 @@ namespace Randio_2 {
             quests = new QuestManager(this);
             questZones = new List<Zone>();
 
-            int count = AlgorithmHelper.GetRandom(1, 5);
+            int count = AlgorithmHelper.GetRandom(1, 4);
+            List<Quest.QuestType> usedTypes = new List<Quest.QuestType>();
             for (int i = 0; i < count; ++i)
             {
-                Quest.QuestType type = (Quest.QuestType)AlgorithmHelper.GetRandom(0, Quest.QuestTypeCount);
+                Quest.QuestType type;
+                do
+                    type = (Quest.QuestType)AlgorithmHelper.GetRandom(0, Quest.QuestTypeCount);
+                while (usedTypes.Contains(type));
+                usedTypes.Add(type);
 
                 string name = "";
                 string description = "";
@@ -272,7 +279,7 @@ namespace Randio_2 {
                     name = "Kill ";
                     targets = new List<Entity>();
                     var entities = GetAllEntites();
-                    int enemyCount = AlgorithmHelper.GetRandom(1, 4); //todo: balance
+                    int enemyCount = AlgorithmHelper.GetRandom(1, 5);
                     for (int j = 0; j < enemyCount; ++j)
                     {
                         var target = entities[AlgorithmHelper.GetRandom(0, entities.Count)];
@@ -323,9 +330,9 @@ namespace Randio_2 {
 
                 else if (type == Quest.QuestType.ReachBlock)
                 {
-                    name = "Reach orange areas located in these tiles: ";
+                    name = "Reach orange areas located in these directions: ";
                     zones = new List<Zone>();
-                    int pointCount = AlgorithmHelper.GetRandom(1, 4); //todo: balance
+                    int pointCount = AlgorithmHelper.GetRandom(1, 5); //todo: balance
                     for (int j = 0; j < pointCount; ++j)
                     {
                         var newZone = GetNewZone(device, Color.Orange);
@@ -359,22 +366,22 @@ namespace Randio_2 {
                     if (rand % 42 == 0 && tile.Blocks[x, y] != null)
                     {
                         rand = AlgorithmHelper.GetRandom(0, 5);
-                        if (rand == 1 && tile.Blocks[x, y - 1] == null && (tile.Blocks[x - 1, y - 1] == null || tile.Blocks [x + 1, y - 1] == null))
+                        if (rand == 1 && tile.Blocks[x, y - 1] == null && tile.Blocks[x, y] != null && (tile.Blocks[x - 1, y - 1] == null || tile.Blocks [x + 1, y - 1] == null))
                         {
                             valX.Add(x);
                             valY.Add(y - 1);
                         }
-                        else if (rand == 2 && tile.Blocks[x, y + 1] == null && (tile.Blocks[x - 1, y + 1] == null || tile.Blocks[x + 1, y + 1] == null))
+                        else if (rand == 2 && tile.Blocks[x, y + 1] == null && tile.Blocks[x, y + 2] != null && (tile.Blocks[x - 1, y + 1] == null || tile.Blocks[x + 1, y + 1] == null))
                         {
                             valX.Add(x);
                             valY.Add(y + 1);
                         }
-                        else if (rand == 3 && tile.Blocks[x - 1, y] == null && tile.Blocks[x - 2, y] == null)
+                        else if (rand == 3 && tile.Blocks[x - 1, y] == null && tile.Blocks[x - 1, y + 1] != null && tile.Blocks[x - 2, y] == null)
                         {
                             valX.Add(x - 1);
                             valY.Add(y);
                         }
-                        else if (rand == 4 && tile.Blocks[x + 1, y] == null && tile.Blocks[x + 2, y] == null)
+                        else if (rand == 4 && tile.Blocks[x + 1, y] == null && tile.Blocks[x + 1, y + 1] != null && tile.Blocks[x + 2, y] == null)
                         {
                             valX.Add(x + 1);
                             valY.Add(y);
@@ -461,7 +468,7 @@ namespace Randio_2 {
                     int selectedY = availableY[AlgorithmHelper.GetRandom(0, availableY.Count)];
                     Item.ItemType type = (Item.ItemType)AlgorithmHelper.GetRandom(0, Item.TypeCount);
 
-                    Item item = new Item(this, device, type, new Vector2(tileBase + tileIndexX*Block.Width, selectedY*Block.Height), tile.Index, 16, 16);
+                    Item item = new Item(this, device, type, i, new Vector2(tileBase + tileIndexX*Block.Width, selectedY*Block.Height), tile.Index, 16, 16);
                     items.Add(item);
                 }
 
@@ -475,11 +482,21 @@ namespace Randio_2 {
         }
 
         //Updates Tiles and NPCs on them
-        private void UpdateTiles(GameTime gameTime) {
-            var visibleTiles = GetVisibleTiles();
-            foreach (Tile tile in visibleTiles)
-                tile.Update(gameTime);
-        }
+        protected void UpdateNPCs(GameTime gameTime) {
+            List<NPC> toRemove = new List<NPC>();
+
+            foreach (NPC n in NPCs) { 
+                n.Update(gameTime);
+                if (CheckOutOfMap((int)n.Position.Y) == -1 || !n.Alive)
+                    toRemove.Add(n);
+            }
+
+            foreach (NPC n in toRemove)
+            {
+                if (NPCs.Contains(n))
+                    NPCs.Remove(n);
+            }
+}
 
         protected void UpdateEvents()
         {
@@ -548,20 +565,18 @@ namespace Randio_2 {
             var visibleTiles = GetVisibleTiles();
             var result = new List<NPC>();
 
-            foreach (Tile t in tiles)
+            foreach (NPC n in NPCs)
             {
-                foreach (NPC n in t.NPCs)
+                if (n.Alive)
                 {
-                    if (n.Alive)
+                    foreach (Tile visible in visibleTiles)
                     {
-                        foreach (Tile visible in visibleTiles)
-                        {
-                            if (visible.Index == n.CurrentTile)
-                                result.Add(n);
-                        }
+                        if (visible.Index == n.CurrentTile)
+                            result.Add(n);
                     }
                 }
             }
+            
             return result.ToArray();
         }
         #endregion

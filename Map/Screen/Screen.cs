@@ -34,6 +34,8 @@ namespace Randio_2
             Height = height;
             this.isIntro = isIntro;
 
+            NPCs = new List<NPC>();
+
             CreateGraphics(graphicsDev);
             CreatePlayer(graphicsDev, playerName);
             CreateEventManagers();
@@ -61,7 +63,7 @@ namespace Randio_2
         {
             Player.Update(gameTime, keyboardState);
 
-            tiles[0].Update(gameTime); //tile will update it's NPCs as well
+            UpdateNPCs(gameTime);
 
             UpdateItems(gameTime);
 
@@ -89,15 +91,15 @@ namespace Randio_2
                 {
                     movementTestZones = null;
                     SetText("Good.\nNow, let's try something more fun!\nThere are two action keys. One picks up / puts down items...\nwhile the other one attacks your enemies.\nFind out which one is which... and try not to die.", 100);
-                    tiles[0].NPCs.Add(new NPC(device, this, new Vector2(400, 400), 0, tiles[0], 32, 32));
-                    items.Add(new Item(this, device, Item.ItemType.Weapon, new Vector2(600, 600), 0, 16, 16, true, null, new ItemProperties("ITEM")));
+                    NPCs.Add(new NPC(device, this, new Vector2(400, 400), 0, tiles[0], 32, 32));
+                    items.Add(new Item(this, device, Item.ItemType.Weapon, 0, new Vector2(600, 600), 0, 16, 16, true, null, new ItemProperties("ITEM")));
                 }
             }
 
             if (Player.HeldItem != null)
                 pickedUpItem = true;
 
-            if (!lastStage && pickedUpItem && tiles[0].NPCs.Count == 0) //0 NPCs if item has been held means the NPC is dead
+            if (!lastStage && pickedUpItem && NPCs.Count == 0) //0 NPCs if item has been held means the NPC is dead
             {
                 lastStage = true;
                 SetText("Well done!\nYou seem ready, " + Player.Name + ".\nYou can start your adventure by jumping in the red door.\n...\nGood luck!", 100);
@@ -109,7 +111,7 @@ namespace Randio_2
         {
             base.Draw(gameTime, spriteBatch);
 
-            spriteBatch.DrawString(Game.font, ShownText, new Vector2(100, 100), Color.Black);
+            spriteBatch.DrawString(Game.font, ShownText, new Vector2(100, 100), ColorHelper.InvertColor(GetTileByIndex(Player.CurrentTile).Palette[1]));
 
             if (movementTestZones != null)
             {

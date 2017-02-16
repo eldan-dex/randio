@@ -26,6 +26,7 @@ namespace Randio_2
         public List<Entity> Targets { get; private set; }
         public List<Item> RequiredItems { get; private set; }
         public List<Zone> DestinationBlocks { get; private set; }
+        public int TargetTileIndex { get; private set; }
         #endregion
 
         #region Private variables

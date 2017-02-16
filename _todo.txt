@@ -1,13 +1,11 @@
 ﻿TODO:
-- "bring items" quest - how to point player to the correct item? (mutliple items with the same name - make names somehow unique?)
+- better unique item naming to distinguish between items for "bring" quests
 
 - finish tweaking NPC movement
 
 - NPCs group at the end of the level - why?
 
 - entities can push each other away (and bug each other through walls)
-
-- tweak target picking algorithm?
 
 - entity fill as type indicator (boss has black slant lines, etc.)
 
@@ -21,9 +19,8 @@
 
 ISSUES:
 - Entities clip/bug through blocks and themselves
-- Tile texture size might be too big for the engine to handle and it thus crashes (happens only once in a while) <- temporarily fixed by limiting max newTileSize to 4096
--> opticky prodlouzit tile polozenim 1-3 podobnych (stejny type) vedle sebe
 
 IDEAS:
+- show HP and stats (+ held item properties?)
 - keep the bug where player can get a quest to kill themselves as a feature
 - switch all entities to the global coordination model

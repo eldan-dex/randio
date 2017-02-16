@@ -1,5 +1,11 @@
 ﻿PROGRESS LOG
 
+16.2
+* Tweaks and fixes
++ Colors are now generated using a random complementary palette
++ Items now have unique indexes to allow better item recognition in "bring item" quests
++ Added key descriptions and held item info
+
 12.2
 * Items now cannot be placed into blocks
 + Started upgrading NPC AI
