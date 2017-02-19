@@ -241,7 +241,7 @@ namespace Randio_2 {
             if (CanAttack)
             {
                 var dist = GeometryHelper.VectorDistance(Position, map.Player.Position);
-                if ((Direction == -1 && map.Player.Position.X < Position.X && dist <= Range + map.Player.Width) || (Direction == 1 && map.Player.Position.X >= Position.X && dist <= Range + Width))
+                if ((Direction == -1 && map.Player.Position.X <= Position.X && dist <= Range + map.Player.Width) || (Direction == 1 && map.Player.Position.X + map.Player.Width >= Position.X && dist <= Range + Width))
                 {
                     map.Player.TakeDamage(this, Strength);
                     CanAttack = false;

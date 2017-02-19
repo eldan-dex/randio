@@ -1,4 +1,8 @@
 ﻿TODO:
+- Tweak quest generation further
+
+- quest generation contains an infinite loop
+
 - better unique item naming to distinguish between items for "bring" quests
 
 - finish tweaking NPC movement
@@ -9,11 +13,7 @@
 
 - entity fill as type indicator (boss has black slant lines, etc.)
 
-- improve AI
-
 - add backgrounds
-
-- improve block textures
 
 - Refactoring
 
@@ -24,3 +24,13 @@ IDEAS:
 - show HP and stats (+ held item properties?)
 - keep the bug where player can get a quest to kill themselves as a feature
 - switch all entities to the global coordination model
+
+
+LAST REVISION:
+- pokud jdu zleva do NPC, NPC mě nezraňuje (nearest entity detction)dw
+
+- šipka, která ukazuje směr questu (třeba místo čísla tilu, do kterého mám jít) (případně alespoň ukazovat current tile dole)
+
+- NPC se občas bugnou skrz texturu, je možné i bugnout skrz texturu hráče - tweaknout systém kolizí
+
+- key na ukončení hry a přechod do statistik (+ confirm)

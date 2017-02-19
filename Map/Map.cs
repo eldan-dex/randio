@@ -330,9 +330,9 @@ namespace Randio_2 {
 
                 else if (type == Quest.QuestType.ReachBlock)
                 {
-                    name = "Reach orange areas located in these directions: ";
+                    name = "Reach orange areas located in these tiles: "; //todo: rewrite to "directions"?
                     zones = new List<Zone>();
-                    int pointCount = AlgorithmHelper.GetRandom(1, 5); //todo: balance
+                    int pointCount = AlgorithmHelper.GetRandom(1, 5);
                     for (int j = 0; j < pointCount; ++j)
                     {
                         var newZone = GetNewZone(device, Color.Orange);
@@ -347,6 +347,12 @@ namespace Randio_2 {
 
                 quests.AddQuest(new Quest(this, type, name, description, targets, itemFetchList, zones));
             }
+
+            CreateQuestBackground(device);
+        }
+
+        protected void CreateQuestBackground(GraphicsDevice device) {
+            quests.Background = new Texture2D(device, (quests.QuestsStatus().Length / quests.Count) * 17 + 10, quests.Count * 20);
         }
 
         protected Zone GetNewZone(GraphicsDevice device, Color zoneColor)

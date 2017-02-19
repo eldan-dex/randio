@@ -147,7 +147,7 @@ namespace Randio_2 {
 
         private void DrawOSDs()
         {
-            osdSpriteBatch.Begin();
+            osdSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
             if (debugEnabled)
             {
                 osdSpriteBatch.DrawString(debugFont, "DEBUG ENABLED", new Vector2(10, 10), Color.Red);
@@ -157,10 +157,14 @@ namespace Randio_2 {
             if (map.quests != null)
             {
                 Vector2 questPosition = (debugEnabled ? new Vector2(10, 120) : new Vector2(10, 10));
-                osdSpriteBatch.DrawString(font, map.quests.QuestsStatus(), questPosition, Color.DarkGreen);
+                string status = map.quests.QuestsStatus();
+                GraphicsHelper.DrawRectangle(map.quests.Background, new Color(180, 180, 180));
+                osdSpriteBatch.Draw(map.quests.Background, new Rectangle((int)questPosition.X - 5, (int)questPosition.Y - 5, map.quests.Background.Width, map.quests.Background.Height), Color.White * 0.8f);
+                osdSpriteBatch.DrawString(font, status, questPosition, ColorHelper.InvertColor(map.GetTileByIndex(map.Player.CurrentTile).Palette[0]));
             }
 
             Color invColor = ColorHelper.InvertColor(map.GetTileByIndex(map.Player.CurrentTile).Palette[1]);
+            osdSpriteBatch.DrawString(font, "Current tile: " + map.Player.CurrentTile, new Vector2(100, 660), invColor, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
             osdSpriteBatch.DrawString(font, "Item: " + ((map.Player.HeldItem == null) ? "none" : map.Player.HeldItem.Properties.Name), new Vector2(970, 660), invColor, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
             osdSpriteBatch.DrawString(font, "WSAD - move    J - attack    K - pick up/put down items    L - reset player    L-SHIFT - slow down", new Vector2(10, 700), invColor, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
             osdSpriteBatch.End();

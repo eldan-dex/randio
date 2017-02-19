@@ -1,9 +1,15 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Randio_2
 {
     class QuestManager
     {
+        #region Public variables
+        public int Count { get { return quests.Count; } }
+        public Texture2D Background;
+        #endregion
+
         #region Private variables
         List<Quest> quests;
         Map map;

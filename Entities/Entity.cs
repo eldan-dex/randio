@@ -226,14 +226,11 @@ namespace Randio_2 {
                 int closest = int.MaxValue;
                 foreach (Entity e in entities)
                 {
-                    if (e.Position.X >= Position.X && Math.Abs(e.Position.Y - Position.Y) <= range * 3) //range/2? really?
+                    int distance = (int)(Math.Abs(e.Position.X - (position.X + Width)) + Math.Abs((e.Position.Y + e.Height) - (position.Y + Height)));
+                    if (distance < closest)
                     {
-                        int distance = (int)(Math.Abs(e.Position.X - position.X) + Math.Abs(e.Position.Y - position.Y));
-                        if (distance < closest)
-                        {
-                            closest = distance;
-                            found = e;
-                        }
+                        closest = distance;
+                        found = e;
                     }
                 }
             }
@@ -242,14 +239,11 @@ namespace Randio_2 {
                 int closest = int.MaxValue;
                 foreach (Entity e in entities)
                 {
-                    if (e.Position.X <= Position.X && Math.Abs(e.Position.Y - Position.Y) <= range * 3)
+                    int distance = (int)(Math.Abs((e.Position.X + e.Width) - position.X) + Math.Abs((e.Position.Y + e.Height) - (position.Y + Height)));
+                    if (distance < closest) //aaa, so much duplicity.
                     {
-                        int distance = (int)(Math.Abs(e.Position.X - position.X) + Math.Abs(e.Position.Y - position.Y));
-                        if (distance < closest) //aaa, so much duplicity
-                        {
-                            closest = distance;
-                            found = e;
-                        }
+                        closest = distance;
+                        found = e;
                     }
                 }
             }
@@ -285,7 +279,7 @@ namespace Randio_2 {
                 foreach (Item i in items)
                 {
                     int distance = (int)(Math.Abs(i.Position.X - (position.X + Width)) + Math.Abs((i.Position.Y + i.Height) - (position.Y + Height)));
-                    if (i.Position.X >= position.X && distance <= range * 3) //range/2? really?
+                    if (i.Position.X >= position.X && distance <= range * 3)
                     {
                         if (distance < closest)
                         {

@@ -1,5 +1,9 @@
 ﻿PROGRESS LOG
 
+19.2
+* Fixed target picking
+* Other minor fixes
+
 16.2
 * Tweaks and fixes
 + Colors are now generated using a random complementary palette
