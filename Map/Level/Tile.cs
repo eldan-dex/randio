@@ -56,14 +56,14 @@ namespace Randio_2 {
                 Palette[p] = ColorHelper.ChangeColorBrightness(Palette[p], -0.5f);
             }
 
-            /*if (Type == TileType.LSystem)*/
+            if (Type == TileType.LSystem)
                 Background = new LSystemBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height, Palette);
-            /*else if (Type == TileType.City)
+            else if (Type == TileType.City)
                 Background = new CityBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height, Palette);
             else if (Type == TileType.Mountains)
                 Background = new MountainsBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height, Palette);
             else if (Type == TileType.Screen)
-                Background = new ScreenBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height, Palette);*/
+                Background = new ScreenBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height, Palette);
             /*else if (Type == TileType.Shapes)
                 Background = new ShapesBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height, Palette);*/
             /*else

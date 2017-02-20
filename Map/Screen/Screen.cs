@@ -14,11 +14,11 @@ namespace Randio_2
         public EventManager<Screen> TextAnimationMgr { get; private set; }
         public string ShownText = ""; //publicly editable because of Event requirements
         public int TextInterval { get; private set; }
+        public bool IsIntro { get; private set; }
         #endregion
 
         #region Private variables
         private GraphicsDevice device;
-        private bool isIntro;
 
         private List<Zone> movementTestZones;
         private bool pickedUpItem = false;
@@ -32,7 +32,7 @@ namespace Randio_2
             this.camera = camera;
             Width = width;
             Height = height;
-            this.isIntro = isIntro;
+            IsIntro = isIntro;
 
             NPCs = new List<NPC>();
 
@@ -54,7 +54,7 @@ namespace Randio_2
             }
             else
             {
-                SetText("Game ended.\n\nGame statistics:\nEnemies Killed: " + Game.stats.EnemiesKilled + "\nDamage Sustained: " + Game.stats.DamageSustained + "\nTimes Dead: " + Game.stats.TimesDead + "\nQuests Completed: " + Game.stats.QuestsCompleted + "\nGame Duration: " + new DateTime(DateTime.Now.Subtract(Game.stats.gameStarted).Ticks).ToString("HH:mm:ss") + "\n\nThe red door is waiting for your next attempt...", 100);
+                SetText("Game ended.\n\nGame statistics:\nEnemies Killed: " + Game.stats.EnemiesKilled + "\nDamage Sustained: " + Game.stats.DamageSustained + "\nTimes Dead: " + Game.stats.TimesDead + "\nQuests Completed: " + Game.stats.QuestsCompleted + "\nGame Duration: " + new DateTime(DateTime.Now.Subtract(Game.stats.gameStarted).Ticks).ToString("HH:mm:ss") + "\n\nJump into the red door to continue your adventure. Pres ESC to quit the game.", 100);
                 exitZone = GetCloseScreenZone(device, Color.Red);
             }
         }
@@ -77,7 +77,9 @@ namespace Randio_2
             }
 
             if (exitZone != null && CheckZone(exitZone))
-                Game.endIntro = true;
+            {
+                Game.Dialogue = new Dialogue(device, this, "Start your adventure now?", delegate { exitZone = null; Game.endIntro = true; }, delegate { ResetPlayer(); });
+            }
 
             if (movementTestZones != null)
             {

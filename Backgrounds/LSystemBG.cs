@@ -50,7 +50,7 @@ namespace Randio_2
             }
 
             //create clouds
-            int count = Math.Max(1, AlgorithmHelper.GetRandom(width / 512, width / 72));
+            int count = Math.Max(1, AlgorithmHelper.GetRandom(width / 512, width / 96));
             int nextX = AlgorithmHelper.GetRandom(0, width / count);
             int nextY;
 

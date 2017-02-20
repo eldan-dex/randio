@@ -47,7 +47,10 @@ namespace Randio_2 {
             CreateEventManagers();
             CreateItems(graphicsDevice);
             CreateQuests(graphicsDevice);
-            CreateExitZone(graphicsDevice);
+            //CreateExitZone(graphicsDevice); exit zones are now disabled, exitting level via Esc or when all quests are completed
+
+            if (Game.Loading != null)
+                Game.Loading = null;
         }
 
         public virtual void Update(GameTime gameTime, KeyboardState keyboardState) {
@@ -56,7 +59,7 @@ namespace Randio_2 {
             UpdateEvents();
             UpdateItems(gameTime);
             UpdateQuests();
-            CheckExitZone();
+            //CheckExitZone();
 
             MoveCamera();
 
@@ -210,7 +213,7 @@ namespace Randio_2 {
             int maxWidth = 3 * Game.WIDTH;
             int totalWidth = 0;
             int tileIndex = 0;
-            int nextType = -1;
+            //int nextType = -1; don't repeat tiles of similar type intentionally
 
             while (totalWidth < Width) {
                 //Generate a random width for the next tile, but keep it divisible by Block.Width
@@ -226,10 +229,11 @@ namespace Randio_2 {
                         newWidth = 4096; //This breaks the purprose of the whole algorithm, because the next tile might be too small. But it fixes the crashing.
                 }
 
+                Tile.TileType type;
+
                 //Generate TileType
                 //Generate two similar tiles next to each other
-                Tile.TileType type;
-                if (nextType == -1)
+                /*if (nextType == -1)
                 {
                     type = (Tile.TileType)AlgorithmHelper.GetRandom(0, Tile.TileTypeCount);
                     nextType = (int)type;
@@ -238,7 +242,10 @@ namespace Randio_2 {
                 {
                     type = (Tile.TileType)nextType;
                     nextType = -1;
-                }
+                }*/
+
+                //Generate tiles normally
+                type = (Tile.TileType)AlgorithmHelper.GetRandom(0, Tile.TileTypeCount);
 
                 //Create and add Tile
                 tiles.Add(new Tile(graphicsDevice, this, type, new Rectangle(totalWidth, 0, newWidth, Height), tileIndex));
@@ -279,10 +286,14 @@ namespace Randio_2 {
                     name = "Kill ";
                     targets = new List<Entity>();
                     var entities = GetAllEntites();
-                    int enemyCount = AlgorithmHelper.GetRandom(1, 5);
+                    int enemyCount = AlgorithmHelper.GetRandom(1, Math.Min(5, entities.Count));
                     for (int j = 0; j < enemyCount; ++j)
                     {
-                        var target = entities[AlgorithmHelper.GetRandom(0, entities.Count)];
+                        Entity target;
+                        do
+                            target = entities[AlgorithmHelper.GetRandom(0, entities.Count)];
+                        while (targets.Contains(target));
+
                         targets.Add(target);
 
                         //Append target name to quest name
@@ -297,25 +308,20 @@ namespace Randio_2 {
                     name = "Bring ";
                     itemFetchList = new List<Item>();
                     zones = new List<Zone>();
-                    int itemCount = AlgorithmHelper.GetRandom(1, 4); //so that item names would fit into view -.-
-
+                    int itemCount = AlgorithmHelper.GetRandom(1, Math.Min(4, items.Count)); //so that item names would fit into view -.-
                     var newZone = GetNewZone(device, Color.Green);
                     zones.Add(newZone);
                     questZones.Add(newZone);
 
                     for (int j = 0; j < itemCount; ++j)
                     {
-                        var item = items[AlgorithmHelper.GetRandom(0, items.Count)];
+                        Item item;
 
-                        while (itemFetchList.Contains(item))
+                        do
                         {
-                            if (itemFetchList.Count == itemCount)
-                            {
-                                j = itemCount;
-                                break;
-                            }
                             item = items[AlgorithmHelper.GetRandom(0, items.Count)];
                         }
+                        while (itemFetchList.Contains(item));
                         
                         itemFetchList.Add(item);
 

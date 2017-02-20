@@ -1,15 +1,13 @@
 ﻿TODO:
-- Tweak quest generation further
+- mark compelted quests and quest parts
 
-- quest generation contains an infinite loop
+- intro & outro texts
+
+- Finish loading screen
 
 - better unique item naming to distinguish between items for "bring" quests
 
-- finish tweaking NPC movement
-
 - NPCs group at the end of the level - why?
-
-- entities can push each other away (and bug each other through walls)
 
 - entity fill as type indicator (boss has black slant lines, etc.)
 
@@ -17,20 +15,13 @@
 
 - Refactoring
 
-ISSUES:
-- Entities clip/bug through blocks and themselves
-
 IDEAS:
+- LOGO!
 - show HP and stats (+ held item properties?)
 - keep the bug where player can get a quest to kill themselves as a feature
-- switch all entities to the global coordination model
-
+- music!
 
 LAST REVISION:
-- pokud jdu zleva do NPC, NPC mě nezraňuje (nearest entity detction)dw
-
-- šipka, která ukazuje směr questu (třeba místo čísla tilu, do kterého mám jít) (případně alespoň ukazovat current tile dole)
+- šipka, která ukazuje směr questu (třeba místo čísla tilu, do kterého mám jít)
 
 - NPC se občas bugnou skrz texturu, je možné i bugnout skrz texturu hráče - tweaknout systém kolizí
-
-- key na ukončení hry a přechod do statistik (+ confirm)

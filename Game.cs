@@ -14,6 +14,8 @@ namespace Randio_2 {
         public static SpriteFont font;
         public static bool endIntro = false;
         public static Stats stats;
+        public static Dialogue Dialogue;
+        public static Loading Loading;
         #endregion
 
         #region Private variables
@@ -21,12 +23,13 @@ namespace Randio_2 {
         private SpriteBatch levelSpriteBatch;
         private SpriteBatch osdSpriteBatch;
         private SpriteFont debugFont;
-        private SpriteBatch testSB;
-        private Texture2D testBG;
+        private SpriteBatch testSB; //testing only
+        private Texture2D testBG; //testing only
 
         private Map map;
         private Camera camera;
         private KeyboardState keyboardState;
+        
         
         //"O" - toggle debug
         public static bool debugEnabled = false; //public because... eh.
@@ -35,6 +38,12 @@ namespace Randio_2 {
         //"P" - play next frame (in debug mode)
         private bool nextFrame = false;
         private bool pEnabled = false; //for the P button
+
+        //"L" - reset player
+        private bool lEnabled = false;
+
+        //"ESC" - end level/game
+        private bool escEnabled = false;
 
         private string playerName = "";
         #endregion
@@ -97,25 +106,34 @@ namespace Randio_2 {
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime) {
-            ProcessInputs();
-
-            //For step-by-step physics
-            if ((debugEnabled && nextFrame) || !debugEnabled) {
-                map.Update(gameTime, keyboardState);
-                nextFrame = false;
-            }
-
-            if (map.ReachedExit)
+            if (Dialogue != null)
             {
-                stats = new Stats(map.Player.Stats);
-                CreateMap(true, false); //TODO: create end screen
-                StringHelper.Reset();
+                ProcessDialogueInputs();
             }
-
-            if (endIntro) //switch from intro to normal game
+            else
             {
-                endIntro = false;
-                CreateMap(false);
+                ProcessInputs();
+
+                //For step-by-step physics
+                if ((debugEnabled && nextFrame) || !debugEnabled)
+                {
+                    map.Update(gameTime, keyboardState);
+                    nextFrame = false;
+                }
+
+                if (map.ReachedExit)
+                {
+                    stats = new Stats(map.Player.Stats);
+                    CreateMap(true, false); //TODO: create end screen
+                    StringHelper.Reset();
+                }
+
+                if (endIntro) //switch from intro to normal game
+                {
+                    endIntro = false;
+                    Loading = new Loading(GraphicsDevice, map, "Loading", 200);
+                    CreateMap(false);
+                }
             }
 
             base.Update(gameTime);
@@ -130,6 +148,9 @@ namespace Randio_2 {
 
             DrawLevel(gameTime);
             DrawOSDs();
+            Dialogue?.Draw(gameTime, levelSpriteBatch); //Draw dialogue if enabled
+
+            Loading?.Draw(gameTime, levelSpriteBatch); //Draw loading screen if enabled
 
             base.Draw(gameTime);
         }
@@ -140,8 +161,10 @@ namespace Randio_2 {
         {
             var viewMatrix = camera.GetViewMatrix();
             levelSpriteBatch.Begin(transformMatrix: viewMatrix);
+
             //levelSpriteBatch.Draw(testBG, new Rectangle(0, 0, WIDTH, HEIGHT), Color.White); //uncomment this for background testing
             map.Draw(gameTime, levelSpriteBatch); //comment this out for background testing
+
             levelSpriteBatch.End();
         }
 
@@ -160,13 +183,14 @@ namespace Randio_2 {
                 string status = map.quests.QuestsStatus();
                 GraphicsHelper.DrawRectangle(map.quests.Background, new Color(180, 180, 180));
                 osdSpriteBatch.Draw(map.quests.Background, new Rectangle((int)questPosition.X - 5, (int)questPosition.Y - 5, map.quests.Background.Width, map.quests.Background.Height), Color.White * 0.8f);
-                osdSpriteBatch.DrawString(font, status, questPosition, ColorHelper.InvertColor(map.GetTileByIndex(map.Player.CurrentTile).Palette[0]));
+                osdSpriteBatch.DrawString(font, status, questPosition, ColorHelper.ChangeColorBrightness(ColorHelper.InvertColor(map.GetTileByIndex(map.Player.CurrentTile).Palette[0]), -0.6f));
             }
 
-            Color invColor = ColorHelper.InvertColor(map.GetTileByIndex(map.Player.CurrentTile).Palette[1]);
+            var tu = map.GetTileByIndex(map.Player.CurrentTile);
+            Color invColor = ColorHelper.BlackWhiteContrasting(tu.Palette[1]);
             osdSpriteBatch.DrawString(font, "Current tile: " + map.Player.CurrentTile, new Vector2(100, 660), invColor, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
-            osdSpriteBatch.DrawString(font, "Item: " + ((map.Player.HeldItem == null) ? "none" : map.Player.HeldItem.Properties.Name), new Vector2(970, 660), invColor, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
-            osdSpriteBatch.DrawString(font, "WSAD - move    J - attack    K - pick up/put down items    L - reset player    L-SHIFT - slow down", new Vector2(10, 700), invColor, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
+            osdSpriteBatch.DrawString(font, "Item: " + ((map.Player.HeldItem == null) ? "none" : map.Player.HeldItem.Properties.Name), new Vector2(930, 660), invColor, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
+            osdSpriteBatch.DrawString(font, "WSAD - move    J - attack    K - pick/put item    L - reset    L-SHIFT - slow movement   ESC - end level", new Vector2(10, 700), invColor, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
             osdSpriteBatch.End();
         }
 
@@ -185,13 +209,26 @@ namespace Randio_2 {
             keyboardState = Keyboard.GetState();
 
             if (keyboardState.IsKeyDown(Keys.Escape))
-                Exit();
+            {
+                if (escEnabled)
+                {
+                    var palette = map.GetTileByIndex(map.Player.CurrentTile).Palette;
+                    Dialogue = new Dialogue(GraphicsDevice, map, "Do you want to quit the game?", DialogueActionEscape);
+                    escEnabled = false;
+                }
+            }
+            else
+                escEnabled = true;
 
             if (keyboardState.IsKeyDown(Keys.L))
             {
-                //todo: remove this in final game?
-                map.ResetPlayer();
+                if (lEnabled) {
+                    lEnabled = false;
+                    map.ResetPlayer();
+                }
             }
+            else
+                lEnabled = true;
 
             //"O" key enables/disables debugging features
             if (keyboardState.IsKeyDown(Keys.O)) {
@@ -221,10 +258,41 @@ namespace Randio_2 {
                 else if (keyboardState.IsKeyDown(Keys.Left))
                     camera.Position -= new Vector2(5f, 0);
             }
+        }
 
+        private void ProcessDialogueInputs()
+        {
+            keyboardState = Keyboard.GetState();
 
-            //Additional global keyboard inputs - global menu key, etc
+            if (keyboardState.IsKeyDown(Keys.J))
+            {
+                Dialogue.Action?.Invoke();
+                Dialogue = null;
+            }
 
+            if (keyboardState.IsKeyDown(Keys.K) || (keyboardState.IsKeyDown(Keys.Escape) && escEnabled))
+            {
+                Dialogue.CancelAction?.Invoke();
+                Dialogue = null;
+                escEnabled = false;
+            }
+
+            if (!keyboardState.IsKeyDown(Keys.Escape))
+                escEnabled = true;
+        }
+
+        private void DialogueActionEscape()
+        {
+            if (map.GetType() == typeof(Screen))
+            {
+                if (((Screen)map).IsIntro)
+                    endIntro = true;
+                else
+                    Exit();
+            }
+
+            else
+                map.ReachedExit = true;
         }
         #endregion
     }

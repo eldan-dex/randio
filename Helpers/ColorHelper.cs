@@ -12,6 +12,11 @@ namespace Randio_2
             return new Color(255 - color.R, 255 - color.G, 255 - color.B, color.A);
         }
 
+        public static Color BlackWhiteContrasting(Color color)
+        {
+            return ((color.R + color.G  + color.B) / 3 > 127) ? Color.Black : Color.White;
+        }
+
 
         public static Color ChangeColorBrightness(Color color, float correctionFactor)
         {

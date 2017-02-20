@@ -174,6 +174,12 @@ namespace Randio_2 {
             {
                 Alive = false; //now OutOfMap check will recognise this NPC as dead and will remove it.
                 position = new Vector2(-1000, 2000);
+                if (HeldItem != null)
+                {
+                    HeldItem.PutDown(Direction);
+                    DisapplyItemProperties();
+                    HeldItem = null;
+                }
 
                 if (IsPlayer) //add to stats
                 {
@@ -476,6 +482,18 @@ namespace Randio_2 {
                 position.X = 0;
             else if (position.X + Width > map.Width)
                 position.X = map.Width - Width;
+
+            //hack for fixing start-of-tile falling bug
+            Tile a = map.GetTileForX((int)position.X);
+            Tile b = map.GetTileForX((int)position.X + Width);
+
+            if (a != null && b != null && a != b)
+            {
+                if (IsPlayer)
+                    IsPlayer = IsPlayer;
+                if (position.Y > tile.GroundLevel * Block.Height)
+                    position.Y = tile.GroundLevel * Block.Height;
+            }
 
             if (rightBlockX == wblocks -1 && nextTile == null)
             {
