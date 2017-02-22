@@ -174,7 +174,6 @@ namespace Randio_2
                 if (c == 'F' || c == 'G' || c == 'H')
                     MoveTurtle(System.Step, target);
 
-                //TODO: rework color system
                 else if (c == '0')
                     currentColor = palette[2];
 

@@ -19,8 +19,8 @@ namespace Randio_2
         public bool Completed { get; private set; }
         public QuestType Type { get; private set; }
         public string Name { get; private set; }
+        public string BaseName { get; private set; }
         public string Progress { get; private set; }
-        public string Description { get; private set; } //todo:do we need this?
 
         //not necessary to initialize and use all the fields
         public List<Entity> Targets { get; private set; }
@@ -35,13 +35,12 @@ namespace Randio_2
         #endregion
 
         #region Public methods
-        //todo: do we need to have the Completed parameter?
-        public Quest(Map map, QuestType type, string name, string description, List<Entity> targets = null, List<Item> items = null, List<Zone> blocks = null, bool completed = false)
+        public Quest(Map map, QuestType type, string name, List<Entity> targets = null, List<Item> items = null, List<Zone> blocks = null, bool completed = false)
         {
             this.map = map;
             Type = type;
             Name = name;
-            Description = description;
+            BaseName = name;
 
             Targets = targets;
             RequiredItems = items;
@@ -62,11 +61,15 @@ namespace Randio_2
             {
                 int deadCount = 0;
                 //it doesn't matter how they die. If they're dead we got 'em.
+                Name = BaseName;
                 foreach (Entity e in Targets)
                 {
                     if (!e.Alive)
                         ++deadCount;
+
+                    Name += e.Name + (!e.Alive ? "*" : "") + ", ";
                 }
+                Name = Name.Remove(Name.Length - 2);
 
                 percent = (int)((float)deadCount / Targets.Count * 100);    
             }
@@ -75,27 +78,37 @@ namespace Randio_2
             {
                 //hackish way of detecting whether items are placed where they need to be
                 int finishedItems = 0;
+                Name = BaseName;
+
                 foreach (Item i in RequiredItems)
                 {
                     //check whether the item is where it's supposed to be
                     var dest = DestinationBlocks[0].Coords;
                     var pos = i.Position;
+                    bool ok = false;
 
-                    if (i.IsPlaced && //don't account for held items 
-                        pos.X >= dest.Left && pos.Y >= dest.Top && pos.X+i.Width <= dest.Right && pos.Y+i.Height <= dest.Bottom)
+                    if (i.IsPlaced && pos.X >= dest.Left && pos.Y >= dest.Top && pos.X + i.Width <= dest.Right && pos.Y + i.Height <= dest.Bottom)
+                    {
                         ++finishedItems;
+                        ok = true;
+                    }
+
+
+                    Name += i.Properties.Name + (ok ? "*" : "") + ", ";
                 }
+                Name = Name.Remove(Name.Length - 2);
+                Name = (Name + " to a green area in tile " + map.GetTileForX(DestinationBlocks[0].Coords.X).Index.ToString());
 
                 percent = (int)((float)finishedItems / RequiredItems.Count * 100);
             }
 
             else if (Type == QuestType.ReachBlock)
             {
+                Name = BaseName;
                 //for each point, check whether we've reached it
                 foreach (Zone zone in DestinationBlocks)
-                {
-                    if (!zone.Active) //don't concern ourselves with inactive zones
-                        continue;
+                { 
+                    bool ok = false;
 
                     var block = zone.Coords;
                     var newPlayerRect = GeometryHelper.TileToGlobalCoordinates(map.Player.BoundingRectangle, map.GetTileByIndex(map.Player.CurrentTile));
@@ -105,7 +118,13 @@ namespace Randio_2
                             reachedBlocks.Add(block);
                             zone.Deactivate();
                         }
+
+                    if (reachedBlocks.Contains(zone.Coords))
+                        ok = true;
+
+                    Name += map.GetTileForX(zone.Coords.X).Index + (ok ? "*" : "") + ", ";
                 }
+                Name = Name.Remove(Name.Length - 2);
 
                 percent = (int)((float)reachedBlocks.Count / DestinationBlocks.Count * 100);
             }

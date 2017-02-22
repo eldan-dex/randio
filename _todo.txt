@@ -1,25 +1,16 @@
 ﻿TODO:
-- mark compelted quests and quest parts
-
-- intro & outro texts
-
-- Finish loading screen
-
-- better unique item naming to distinguish between items for "bring" quests
+- possibly tweak intro & outro texts
 
 - NPCs group at the end of the level - why?
-
-- entity fill as type indicator (boss has black slant lines, etc.)
-
-- add backgrounds
 
 - Refactoring
 
 IDEAS:
 - LOGO!
 - show HP and stats (+ held item properties?)
-- keep the bug where player can get a quest to kill themselves as a feature
+- entity fill as type indicator (boss has black slant lines, etc.)
 - music!
+- add backgrounds
 
 LAST REVISION:
 - šipka, která ukazuje směr questu (třeba místo čísla tilu, do kterého mám jít)

@@ -188,8 +188,6 @@ namespace Randio_2 {
             float leftEdge = camera.Position.X;
             float rightEdge = leftEdge + Game.WIDTH;
 
-            //TODO: nastavit kamere pevne X souradnice podle vzdalenosti hrace od okraje
-
             if (Player.Position.X - leftEdge < Player.SafeMargin) {
                 //move camera left if possible
                 if (camera.Position.X > 0)
@@ -276,7 +274,6 @@ namespace Randio_2 {
                 usedTypes.Add(type);
 
                 string name = "";
-                string description = "";
                 List<Entity> targets = null;
                 List<Item> itemFetchList = null;
                 List<Zone> zones = null;
@@ -295,11 +292,6 @@ namespace Randio_2 {
                         while (targets.Contains(target));
 
                         targets.Add(target);
-
-                        //Append target name to quest name
-                        name += target.Name;
-                        if (j < enemyCount - 1)
-                            name += ", ";
                     }
                 }
 
@@ -308,7 +300,7 @@ namespace Randio_2 {
                     name = "Bring ";
                     itemFetchList = new List<Item>();
                     zones = new List<Zone>();
-                    int itemCount = AlgorithmHelper.GetRandom(1, Math.Min(4, items.Count)); //so that item names would fit into view -.-
+                    int itemCount = AlgorithmHelper.GetRandom(1, Math.Min(3, items.Count)); //so that item names would fit into view -.-
                     var newZone = GetNewZone(device, Color.Green);
                     zones.Add(newZone);
                     questZones.Add(newZone);
@@ -324,19 +316,12 @@ namespace Randio_2 {
                         while (itemFetchList.Contains(item));
                         
                         itemFetchList.Add(item);
-
-                        //Append target name to quest name
-                        name += item.Properties.Name;
-                        if (j < itemCount - 1)
-                            name += ", ";
                     }
-
-                    name += " to " + "a green area in tile " + GetTileForX(newZone.Coords.X).Index.ToString();
                 }
 
                 else if (type == Quest.QuestType.ReachBlock)
                 {
-                    name = "Reach orange areas located in these tiles: "; //todo: rewrite to "directions"?
+                    name = "Reach orange areas located in these tiles: ";
                     zones = new List<Zone>();
                     int pointCount = AlgorithmHelper.GetRandom(1, 5);
                     for (int j = 0; j < pointCount; ++j)
@@ -344,21 +329,25 @@ namespace Randio_2 {
                         var newZone = GetNewZone(device, Color.Orange);
                         zones.Add(newZone);
                         questZones.Add(newZone);
-
-                        name += GetTileForX(newZone.Coords.X).Index.ToString();
-                        if (j < pointCount - 1)
-                            name += ", ";
                     }
                 }
 
-                quests.AddQuest(new Quest(this, type, name, description, targets, itemFetchList, zones));
+                quests.AddQuest(new Quest(this, type, name, targets, itemFetchList, zones));
             }
 
-            CreateQuestBackground(device);
+            CreateQuestBackground(device, usedTypes);
         }
 
-        protected void CreateQuestBackground(GraphicsDevice device) {
-            quests.Background = new Texture2D(device, (quests.QuestsStatus().Length / quests.Count) * 17 + 10, quests.Count * 20);
+        protected void CreateQuestBackground(GraphicsDevice device, List<Quest.QuestType> usedTypes)
+        {
+            int longest = 0;
+            quests.Update();
+            foreach (Quest q in quests.Quests)
+            {
+                if (q.Name.Length > longest)
+                    longest = q.Name.Length;
+            }
+            quests.Background = new Texture2D(device, longest * 18 + 20, quests.Count * 20 + 3);
         }
 
         protected Zone GetNewZone(GraphicsDevice device, Color zoneColor)
@@ -402,7 +391,6 @@ namespace Randio_2 {
                 }
             }
 
-            //todo: dangerous, possible infinite loop. although very improbable
             if (valX.Count == 0)
                 return GetNewZone(device, zoneColor);
 
@@ -419,7 +407,7 @@ namespace Randio_2 {
             int selX = -1;
             int selY = -1;
 
-            while (selX == -1) //debug: possible infinite loop, but should never happen
+            while (selX == -1)
             {
                 for (int x = 1; x < xblocks; ++x)
                 {

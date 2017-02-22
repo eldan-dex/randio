@@ -27,7 +27,7 @@ namespace Randio_2
             List<LSystem.Rule> rules = new List<LSystem.Rule>();
             rules.Add(new LSystem.Rule("F", "1FF-[2-F+F-F]+[2+F-F+F]")); //basic tree
  
-            defaultSystem = new LSystem("F", 10, 22, rules); //TODO: generate ctor args
+            defaultSystem = new LSystem("F", 10, 22, rules);
             turtle = new Turtle(device, batch, new Vector2(200, 640), -90, Color.White, palette);
 
             device.SetRenderTarget(Texture);
@@ -35,10 +35,6 @@ namespace Randio_2
             batch.Begin();
 
             RenderTarget2D target = new RenderTarget2D(device, width, height);
-
-            //TODO: either pregenerate a limited set of systems to use (but systems can be more complex)
-            //      or generate systems over and over again, but keep the iteration counts low and rules short, to take less time
-
 
             //Pregenerate trees
             List<LSystem> trees = new List<LSystem>();

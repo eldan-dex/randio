@@ -5,8 +5,7 @@ namespace Randio_2
 {
     class StringHelper
     {
-        static List<string> knownNames = new List<string>(); //todo: is there a better place to place this list?
-        //todo: when map-resetting, this needs to be reinitialized
+        static List<string> knownNames = new List<string>();
 
         #region Public methods
         public static void Reset()
@@ -23,7 +22,7 @@ namespace Randio_2
             int remaining = maxTotalLen;
             for (int i = 0; i < words; ++i)
             {
-                int len = AlgorithmHelper.GetRandom(3, Math.Max(3, Math.Min(remaining, 9))); //todo: think about tweaking
+                int len = AlgorithmHelper.GetRandom(3, Math.Max(3, Math.Min(remaining, 9)));
                 string word = FirstLetterToUpper(GenerateWord(len));
 
                 result += word + " ";

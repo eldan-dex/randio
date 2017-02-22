@@ -124,14 +124,13 @@ namespace Randio_2 {
                 if (map.ReachedExit)
                 {
                     stats = new Stats(map.Player.Stats);
-                    CreateMap(true, false); //TODO: create end screen
+                    CreateMap(true, false);
                     StringHelper.Reset();
                 }
 
                 if (endIntro) //switch from intro to normal game
                 {
                     endIntro = false;
-                    Loading = new Loading(GraphicsDevice, map, "Loading", 200);
                     CreateMap(false);
                 }
             }
@@ -190,7 +189,7 @@ namespace Randio_2 {
             Color invColor = ColorHelper.BlackWhiteContrasting(tu.Palette[1]);
             osdSpriteBatch.DrawString(font, "Current tile: " + map.Player.CurrentTile, new Vector2(100, 660), invColor, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
             osdSpriteBatch.DrawString(font, "Item: " + ((map.Player.HeldItem == null) ? "none" : map.Player.HeldItem.Properties.Name), new Vector2(930, 660), invColor, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
-            osdSpriteBatch.DrawString(font, "WSAD - move    J - attack    K - pick/put item    L - reset    L-SHIFT - slow movement   ESC - end level", new Vector2(10, 700), invColor, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
+            osdSpriteBatch.DrawString(font, "  WSAD - move   J - attack   K - pick/put item   L - reset   L-SHIFT - slowmove   ESC - end level", new Vector2(10, 700), invColor, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
             osdSpriteBatch.End();
         }
 

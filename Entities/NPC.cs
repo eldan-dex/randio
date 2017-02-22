@@ -77,7 +77,7 @@ namespace Randio_2 {
         }
 
         private void InitNPC() {
-            SightRange = new Vector2(640, 368); //TODO: adjust range
+            SightRange = new Vector2(640, 368); //todo: range can be adjusted
             IsBoss = AlgorithmHelper.GetRandom(0, 11) == 0; //currently 10% chance of being a boss
 
             //NPC defaults
@@ -97,8 +97,6 @@ namespace Randio_2 {
             }
 
             Name = StringHelper.GenerateName();
-
-            //TODO: edit stats on a per-entity basis
         }
 
         //All AI behaviour
@@ -221,7 +219,7 @@ namespace Randio_2 {
                     
             }
 
-            else //todo: is this fine?
+            else
             {
                 isJumping = true;
                 movement = horizontalDirection * 1f;
@@ -249,8 +247,6 @@ namespace Randio_2 {
                 }
             }
         }
-
-        //todo: allow npcs to pick/drop items?
         #endregion
     }
 }

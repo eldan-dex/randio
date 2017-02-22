@@ -44,7 +44,7 @@ namespace Randio_2 {
         public void Update(GameTime gameTime, KeyboardState keyboardState) {
             if (!Alive)
             {
-                map.ResetPlayer(); //todo: will have to do somethign when player dies instead of just resetting
+                map.ResetPlayer();
             }
 
             GetInput(keyboardState);
@@ -77,7 +77,6 @@ namespace Randio_2 {
         private void InitStats()
         {
             //atm player is a little faster and jumps higher and faster than an average entity
-            //TODO: are these good default values for player?
             MaxMoveSpeed = 1750.0f;
             MaxJumpTime = 0.35f; //0.35f small
             JumpLaunchVelocity = -3500.0f; //-3500 small

@@ -141,7 +141,7 @@ namespace Randio_2 {
                         continue;
                     }
 
-                    //todo: holes in the ground (trenches, etc)
+                    //todo: maybe add holes in the ground? (trenches, etc.)
 
                     if (Type != TileType.Screen)
                     {
@@ -221,7 +221,6 @@ namespace Randio_2 {
                         int nX = (int)(Coords.X + x * Block.Size.X);
                         int nY = (int)(Coords.Y + y * Block.Size.Y);
                         // Draw it in screen space.
-                        //todo: will probably be edited to reflect global position of tile (render to RenderTarget and then add the RenderTarget to global render?)
                         var texture = block.Texture == null ? block.TopmostTexture : block.Texture; //draw topmost blocks with a different texture (if needed)
 
                         spriteBatch.Draw(texture, new Rectangle(nX, nY, Block.Width, Block.Height), Color.White); //or use this.BlockTexture?

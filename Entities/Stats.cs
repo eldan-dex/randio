@@ -8,7 +8,6 @@ namespace Randio_2
         public int TimesDead = 0;
         public int QuestsCompleted = 0;
         public DateTime gameStarted;
-        public string PlayerEval = ""; //todo: maybe remove this
 
         public Stats()
         {
@@ -22,7 +21,6 @@ namespace Randio_2
             TimesDead = other.TimesDead;
             QuestsCompleted = other.QuestsCompleted;
             gameStarted = other.gameStarted;
-            PlayerEval = other.PlayerEval;
         }
     }
 }

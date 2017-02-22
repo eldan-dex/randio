@@ -46,7 +46,7 @@ namespace Randio_2
 
             if (isIntro)
             {
-                SetText("First, try moving around...\nA set of doors appeared around you. Try to reach them!", 100);
+                SetText("Hello and welcome to RANDIO!\nThis is a game based on randomness and procedural generation.\nEverything you see here is generated procedurally with some degree of\nrandomness.\n\nYou will now learn how to play the game.\nFirst, try to reach all the green doors, that appeared around you.", 50);
                 movementTestZones = new List<Zone>();
                 movementTestZones.Add(GetCloseScreenZone(graphicsDev, Color.Green));
                 movementTestZones.Add(GetCloseScreenZone(graphicsDev, Color.Green));
@@ -54,7 +54,7 @@ namespace Randio_2
             }
             else
             {
-                SetText("Game ended.\n\nGame statistics:\nEnemies Killed: " + Game.stats.EnemiesKilled + "\nDamage Sustained: " + Game.stats.DamageSustained + "\nTimes Dead: " + Game.stats.TimesDead + "\nQuests Completed: " + Game.stats.QuestsCompleted + "\nGame Duration: " + new DateTime(DateTime.Now.Subtract(Game.stats.gameStarted).Ticks).ToString("HH:mm:ss") + "\n\nJump into the red door to continue your adventure. Pres ESC to quit the game.", 100);
+                SetText("Game ended.\n\nGame statistics:\nEnemies Killed: " + Game.stats.EnemiesKilled + "\nDamage Sustained: " + Game.stats.DamageSustained + "\nTimes Dead: " + Game.stats.TimesDead + "\nQuests Completed: " + Game.stats.QuestsCompleted + "\nGame Duration: " + new DateTime(DateTime.Now.Subtract(Game.stats.gameStarted).Ticks).ToString("HH:mm:ss") + "\n\nJump into the red door to continue your adventure.\nPres ESC to quit the game entirely.", 50);
                 exitZone = GetCloseScreenZone(device, Color.Red);
             }
         }
@@ -78,7 +78,7 @@ namespace Randio_2
 
             if (exitZone != null && CheckZone(exitZone))
             {
-                Game.Dialogue = new Dialogue(device, this, "Start your adventure now?", delegate { exitZone = null; Game.endIntro = true; }, delegate { ResetPlayer(); });
+                Game.Dialogue = new Dialogue(device, this, "Start your adventure now?", delegate { exitZone = null; Game.endIntro = true; Game.Loading = new Loading(device, this, "Game is now loading..."); }, delegate { ResetPlayer(); });
             }
 
             if (movementTestZones != null)
@@ -92,7 +92,7 @@ namespace Randio_2
                 if (!movementTestZones.Any(x=> x.Active == true))
                 {
                     movementTestZones = null;
-                    SetText("Good.\nNow, let's try something more fun!\nThere are two action keys. One picks up / puts down items...\nwhile the other one attacks your enemies.\nFind out which one is which... and try not to die.", 100);
+                    SetText("Good.\nNow there is an Item and an NPC (which can move around and attack you).\nUse your action keys to pick the item up (K) and attack the NPC (J)!", 50);
                     NPCs.Add(new NPC(device, this, new Vector2(400, 400), 0, tiles[0], 32, 32));
                     items.Add(new Item(this, device, Item.ItemType.Weapon, 0, new Vector2(600, 600), 0, 16, 16, true, null, new ItemProperties("ITEM")));
                 }
@@ -104,7 +104,7 @@ namespace Randio_2
             if (!lastStage && pickedUpItem && NPCs.Count == 0) //0 NPCs if item has been held means the NPC is dead
             {
                 lastStage = true;
-                SetText("Well done!\nYou seem ready, " + Player.Name + ".\nYou can start your adventure by jumping in the red door.\n...\nGood luck!", 100);
+                SetText("Well done!\nYou seem ready, " + Player.Name + ".\nYour objective in the game is to complete all the quests.\nIf you can't or don't want to, press ESC to end the current map and see\ngame statistics.\n\nTo start the game, jump through the red door.", 50);
                 exitZone = GetCloseScreenZone(device, Color.Red);
             }
         }
@@ -169,7 +169,7 @@ namespace Randio_2
             int selX = -1;
             int selY = -1;
 
-            while (selX == -1) //debug: possible infinite loop, but should never happen
+            while (selX == -1)
             {
                 for (int x = 1; x < xblocks; ++x)
                 {

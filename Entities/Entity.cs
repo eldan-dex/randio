@@ -56,7 +56,7 @@ namespace Randio_2 {
         public Color OutlineColor = Color.Green; //HP indicator
 
         public bool IsPlayer = false;
-        public bool CanAttack = true; //used only by NPCs for attack events. todo: rename, todo: this seems very awful
+        public bool CanAttack = true; //used only by NPCs for attack events.
         #endregion
 
         #region Private/Protected variables
@@ -66,7 +66,6 @@ namespace Randio_2 {
 
         //Will be generated, not hardcoded
         //These values are entity defaults, every entity should adjust them as needed
-        //TODO: check whether these values are suitable to be entity defaults
 
         // Constants for controling horizontal movement
         protected float MoveAcceleration = 13000.0f;
@@ -347,9 +346,6 @@ namespace Randio_2 {
             position.X += velocity.X * elapsed;
             position.X = (float)Math.Round(position.X);
 
-            if (IsPlayer) //debug
-                IsPlayer = IsPlayer;
-
             //X axis collisions
             TerrainCollisionsXY(true);
             EntityCollisionsXY(true);
@@ -404,9 +400,6 @@ namespace Randio_2 {
 
             Vector2 entityTilePos = map.GlobalToTileCoordinates(position, tile.Index); //TODO: this might cause a problem with next-tile collision checking -> translate this too, or rewrite checking to use global positioning?
 
-            if (IsPlayer)
-                IsPlayer = IsPlayer;
-
             //add a condition when player is on tile edge - check next/prev tiles edge line
 
             int wblocks = tile.Coords.Width / Block.Width;
@@ -446,9 +439,6 @@ namespace Randio_2 {
 
                         Vector2 depth = GeometryHelper.GetIntersectionDepth(bounds, otherElement);
                         if (depth != Vector2.Zero) {
-
-                            if (IsPlayer) //debug
-                                IsPlayer = IsPlayer;
 
                             //In the first call, we check for X-axis collisions
                             if (doCollisionX) {

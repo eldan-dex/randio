@@ -1,5 +1,10 @@
 ﻿PROGRESS LOG
 
+22.2
++ Loading screen
++ Quest part completion markers (*)
++ Edited intro and outro texts
+
 20.2
 * Minor fixes
 + ESC now ends the current level and skips intro, exits game on outro screen
