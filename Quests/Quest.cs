@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace Randio_2
 {
+    //Handles quest properties, creation and checking for completion
     class Quest
     {
         #region Public variables
@@ -35,6 +34,7 @@ namespace Randio_2
         #endregion
 
         #region Public methods
+        //Default ctor
         public Quest(Map map, QuestType type, string name, List<Entity> targets = null, List<Item> items = null, List<Zone> blocks = null, bool completed = false)
         {
             this.map = map;
@@ -53,6 +53,7 @@ namespace Randio_2
             Completed = completed;
         }
 
+        //Checks how much of the quest is currently completed
         public void CheckCompletion()
         {
             int percent = 0;
@@ -67,7 +68,7 @@ namespace Randio_2
                     if (!e.Alive)
                         ++deadCount;
 
-                    Name += e.Name + (!e.Alive ? "*" : "") + ", ";
+                    Name += e.Name + (!e.Alive ? "*" : "") + ", "; //A star marks a completed part of the quest
                 }
                 Name = Name.Remove(Name.Length - 2);
 
@@ -111,7 +112,7 @@ namespace Randio_2
                     bool ok = false;
 
                     var block = zone.Coords;
-                    var newPlayerRect = GeometryHelper.TileToGlobalCoordinates(map.Player.BoundingRectangle, map.GetTileByIndex(map.Player.CurrentTile));
+                    var newPlayerRect = map.TileToGlobalCoordinates(map.Player.BoundingRectangle, map.GetTileByIndex(map.Player.CurrentTile));
                     if (GeometryHelper.GetIntersectionDepth(block, newPlayerRect) != Vector2.Zero)
                         if (!reachedBlocks.Contains(block)) //We only need to reach it once for it to count towards reachedPoints
                         {
@@ -142,11 +143,3 @@ namespace Randio_2
         #endregion
     }
 }
-
-/*
-1. hrac musi presne vedet co se po nem chce
-2. TYP - zabit oznacena NPCKA
-3. TYP - najit a donest item
-4. TYP - dostat se nekam nahoru?
-5. TYP - zavod?
-*/

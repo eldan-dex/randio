@@ -3,22 +3,12 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Randio_2
 {
-    class Loading
+    //"Loading" message, displayed when level is being generated. Inherits Dialogue
+    class Loading : Dialogue
     {
-        #region Public variables  
-        public string Text { get; private set; }
-        public Rectangle Coords { get; private set; }
-        public Texture2D Background { get; private set; }
-        #endregion
-
-        #region Private variables
-        private GraphicsDevice device;
-        private Map map;
-        private Color textColor;
-        #endregion
-
         #region Public methods
-        public Loading(GraphicsDevice graphicsDev, Map map, string text)
+        //Default ctor
+        public Loading(GraphicsDevice graphicsDev, Map map, string text) : base()
         {
             device = graphicsDev;
             Text = text;
@@ -27,7 +17,8 @@ namespace Randio_2
             CreateGraphics();
         }
 
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        //Draws the message in the center of the screen
+        public new void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             spriteBatch.Begin();
             spriteBatch.Draw(Background, Coords, Color.White);
@@ -38,17 +29,13 @@ namespace Randio_2
         #endregion
 
         #region Private methods
-        private void CreateCoords()
-        {
-            Coords = new Rectangle(Game.WIDTH / 2 - 260, Game.HEIGHT / 2 - 60, 520, 120);
-        }
-
+        //Initialize message colors (depends on current Tile and it's palette)
         private void CreateGraphics()
         {
             var palette = map.GetTileByIndex(map.Player.CurrentTile).Palette;
 
             Background = new Texture2D(device, Coords.Width, Coords.Height);
-            GraphicsHelper.DrawRectangle(Background, palette[4]);
+            GraphicsHelper.FillRectangle(Background, palette[4]);
             GraphicsHelper.OutlineRectangle(Background, palette[3], 6);
 
             textColor = palette[3];

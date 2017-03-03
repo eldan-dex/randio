@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System.Linq;
 
 namespace Randio_2
 {
+    //Base class for all backgrounds, unites common background properties
     class Background
     {
         #region Public variables
@@ -21,6 +19,7 @@ namespace Randio_2
         #endregion
 
         #region Public methods
+        //Inherited ctor
         public Background()
         {
         }

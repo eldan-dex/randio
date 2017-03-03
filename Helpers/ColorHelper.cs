@@ -5,19 +5,23 @@ using Microsoft.Xna.Framework;
 
 namespace Randio_2
 {
+    //Contains color generation and management
     public static class ColorHelper
     {
+        #region Public methods
+        //Inverts a color by flipping it's RGB values
         public static Color InvertColor(Color color)
         {
             return new Color(255 - color.R, 255 - color.G, 255 - color.B, color.A);
         }
 
+        //Based on the input color, return black or white, whichever is more contrasting
         public static Color BlackWhiteContrasting(Color color)
         {
             return ((color.R + color.G  + color.B) / 3 > 127) ? Color.Black : Color.White;
         }
 
-
+        //Adjusts color brightness (-1f = black, 1f = white)
         public static Color ChangeColorBrightness(Color color, float correctionFactor)
         {
             float red = (float)color.R;
@@ -40,9 +44,10 @@ namespace Randio_2
 
             return new Color((int)red, (int)green, (int)blue, color.A);
         }
+        #endregion
 
-
-        // RYB color space
+        #region Support classes
+        //RYB color space for creating complmetary colors
         private static class RYB
         {
             private static readonly double[] White = { 1, 1, 1 };
@@ -54,6 +59,7 @@ namespace Randio_2
             private static readonly double[] Orange = { 1, 0.5, 0 };
             private static readonly double[] Black = { 0.2, 0.094, 0.0 };
 
+            //Convert RYB to RGB
             public static double[] ToRgb(double r, double y, double b)
             {
                 var rgb = new double[3];
@@ -73,6 +79,7 @@ namespace Randio_2
             }
         }
 
+        //Color wheel (and color points)
         private class Points : IEnumerable<double[]>
         {
             private readonly int pointsCount;
@@ -164,6 +171,7 @@ namespace Randio_2
             }
         }
 
+        //Generates a color palette with a given color count
         public static IEnumerable<Color> Generate(int numOfColors)
         {
             var points = new Points(numOfColors);
@@ -178,4 +186,5 @@ namespace Randio_2
             }
         }
     }
+    #endregion
 }

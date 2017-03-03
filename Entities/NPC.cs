@@ -3,8 +3,10 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Randio_2 {
+    //NPC class, inherits Entity. Contains NPC controls (AI), properties and interactions
     class NPC : Entity {
         #region Public variables
+        //AI behaviour types
         public enum NPCBehaviour {
             GoToPlayer,
             IgnorePlayer,
@@ -16,16 +18,17 @@ namespace Randio_2 {
         public bool PlayerInRange { get; private set; }
         public Vector2 SightRange { get; private set; }
 
+        //"Boss" NPCs have higher stats and are generally tougher
         public bool IsBoss { get; private set; }
         #endregion
 
         #region Private variables
-        int lastDirection = 0;
         int horizontalDirection = 0; //-1 = left, 0 = steady, 1 = up
         int verticalDirection = 0; //-1 = down, 0 = steady, 1 = up
         #endregion
 
         #region Public methods
+        //Default ctor
         public NPC(GraphicsDevice graphicsDevice, Map map, Vector2 position, int parentTile, Tile parentTileObject, int width, int height, int additionalHP = 0, float additionalStrength = 0, float additionalDefense = 0, float additionalSpeed = 0) : base(map, position, parentTile, width, height) {
             ParentTile = parentTileObject;
             InitNPC();
@@ -41,6 +44,7 @@ namespace Randio_2 {
             UpdateOutlineColor();
         }
 
+        //First updates the NPC with AI controls, then updates it as a generic Entity
         new public void Update(GameTime gameTime) {
             AIMovement();
             AIScan();
@@ -50,10 +54,10 @@ namespace Randio_2 {
         #endregion
 
         #region Private methods
+        //Create the NPC texture (color indicates behaviour type)
         private Texture2D CreateTexture(GraphicsDevice graphicsDevice) {
             var texture = new Texture2D(graphicsDevice, Width, Height);
 
-            //Temporary placeholder code, will call texture generation here
             Color color;
             if (Behaviour == NPCBehaviour.GoToPlayer)
                 color = Color.Violet;
@@ -62,7 +66,7 @@ namespace Randio_2 {
             else
                 color = Color.Yellow;
 
-            GraphicsHelper.DrawRectangle(texture, color);
+            GraphicsHelper.FillRectangle(texture, color);
 
             if (IsBoss)
                 outlineWidth = 6;
@@ -72,10 +76,12 @@ namespace Randio_2 {
             return texture;
         }
 
+        //Picks a random behaviour type
         private NPCBehaviour CreateBehaviour() {
             return (NPCBehaviour)AlgorithmHelper.GetRandom(0, 3);
         }
 
+        //Initializes the NPC
         private void InitNPC() {
             SightRange = new Vector2(640, 368); //todo: range can be adjusted
             IsBoss = AlgorithmHelper.GetRandom(0, 11) == 0; //currently 10% chance of being a boss
@@ -100,6 +106,7 @@ namespace Randio_2 {
         }
 
         //All AI behaviour
+        //Moves according to behaviour type
         private void AIMovement() {
             if (PlayerInRange && Behaviour == NPCBehaviour.GoToPlayer)
                 AITrackPlayer();
@@ -113,6 +120,7 @@ namespace Randio_2 {
             AIPerformMovement();
         }
 
+        //Decide NPC direction based on position relative to player (follows)
         private void AITrackPlayer() { //Following player
             Vector2 playerPos = map.Player.Position;
 
@@ -137,6 +145,7 @@ namespace Randio_2 {
 
         }
 
+        //Just aimlessly wander around
         private void AIIdle() { //Idle
             int randX = AlgorithmHelper.GetRandom(0, 11);
             int randY = AlgorithmHelper.GetRandom(0, 11);
@@ -160,6 +169,7 @@ namespace Randio_2 {
             }
         }
 
+        //Decide NPC direction based on position relative to player (runs away)
         private void AIRunAway() { //Basically inverted AITrackPlayer()
             Vector2 playerPos = map.Player.Position;
 
@@ -185,9 +195,10 @@ namespace Randio_2 {
 
         }
 
+        //Performs moement based on set direction
         private void AIPerformMovement()
         {
-            bool canFallDown = Behaviour == NPCBehaviour.RunAwayFromPlayer; //Greens don't fear holes and are happy to fall in them -.-
+            bool canFallDown = (Behaviour == NPCBehaviour.RunAwayFromPlayer); //Greens don't fear holes and are happy to fall in them -.-
             isJumping = false;
 
             //Vertical movement
@@ -226,6 +237,7 @@ namespace Randio_2 {
             }
         }
 
+        //Check whether player is within range from this NPC
         private void AIScan() {
             Vector2 distance = map.Player.Position - Position;
             if (Math.Abs(distance.X) <= SightRange.X && Math.Abs(distance.Y) <= SightRange.Y)
@@ -234,6 +246,7 @@ namespace Randio_2 {
                 PlayerInRange = false;
         }
 
+        //Try attacking the player if possible
         private void AIInteract()
         {
             if (CanAttack)
@@ -243,7 +256,7 @@ namespace Randio_2 {
                 {
                     map.Player.TakeDamage(this, Strength);
                     CanAttack = false;
-                    map.entityEvents.AddEvent(new Event<Entity>(500, delegate (Entity e) { e.CanAttack = true; }, this));
+                    map.EntityEvents.AddEvent(new Event<Entity>(500, delegate (Entity e) { e.CanAttack = true; }, this));
                 }
             }
         }

@@ -3,16 +3,20 @@ using System.Collections.Generic;
 
 namespace Randio_2
 {
+    //Used to generate entity names
     class StringHelper
     {
+        //All names are strictly unique, this list remembers wich are used
         static List<string> knownNames = new List<string>();
 
         #region Public methods
+        //Resets known names - ex. when resetting map and generating a new set of NPCs
         public static void Reset()
         {
             knownNames = new List<string>();
         }
 
+        //Generates a new name with a given word count, character total between 3 and 7
         public static string GenerateName(int words = -1)
         {
             string result = "";
@@ -40,11 +44,12 @@ namespace Randio_2
             return GenerateName();
         }
 
+        //Generates a word of a given length with the use of some basic linguistic rules
         public static string GenerateWord(int len)
         {
             string result = "";
             string[] syllables = new string[] { "e", "a", "o", "i", "u", "y", "r", "l" };
-            string[] consonants = new string[] { "t", "n", "s", "h", "r", "d", "l", "c", "m", "w", "f", "g", "p", "b", "v", "k", "j", "x", "z", "qu" };
+            string[] consonants = new string[] { "t", "n", "s", "h", "r", "d", "l", "c", "m", "f", "g", "p", "b", "v", "w", "k", "j", "x", "z", "qu" };
             string disabled = "";
             bool lastType = AlgorithmHelper.GetRandom(0, 2) == 0;
             string next = "?";
@@ -56,7 +61,7 @@ namespace Randio_2
                 if (lastType)
                 {
                     do { 
-                        next = syllables[AlgorithmHelper.BiasedRandom(0, syllables.Length - 1, 1.6)];
+                        next = syllables[AlgorithmHelper.BiasedRandom(0, syllables.Length - 1, 1.7)];
                     }
                     while (disabled.Contains(next));
 
@@ -77,7 +82,7 @@ namespace Randio_2
                 {
                     do
                     {
-                        next = consonants[AlgorithmHelper.BiasedRandom(0, consonants.Length - 1, 1.5)];
+                        next = consonants[AlgorithmHelper.BiasedRandom(0, consonants.Length - 1, 1.6)];
                     }
                     while (disabled.Contains(next));
 
@@ -104,6 +109,7 @@ namespace Randio_2
             return result;
         }
 
+        //Capitalizes the first letter of a word in names
         public static string FirstLetterToUpper(string str)
         {
             if (str == null)

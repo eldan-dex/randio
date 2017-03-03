@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Randio_2
 {
+    //L-Trees and clouds
     class LSystemBG : Background
     {
         #region Private variables
@@ -13,6 +14,7 @@ namespace Randio_2
         #endregion
 
         #region Public methods
+        //Default ctor
         public LSystemBG(GraphicsDevice device, SpriteBatch batch, int width, int height, Color[] palette)
         {
             this.palette = palette;
@@ -21,6 +23,7 @@ namespace Randio_2
             BlockTopmostTexture = BlockTexture;
         }
 
+        //Generates the background texture
         public void CreateBackgroundTexture(GraphicsDevice device, SpriteBatch batch, int width, int height)
         {
             Texture = new RenderTarget2D(device, width, height);
@@ -57,7 +60,7 @@ namespace Randio_2
                 int h = AlgorithmHelper.GetRandom(32, 128);
 
                 Texture2D cloud = new Texture2D(device, w, h);
-                GraphicsHelper.DrawRectangle(cloud, palette[7]);
+                GraphicsHelper.FillRectangle(cloud, palette[7]);
                 GraphicsHelper.OutlineRectangle(cloud, ColorHelper.ChangeColorBrightness(palette[5], -0.2f), 8);
 
                 batch.Draw(cloud, new Rectangle(nextX, nextY, w, h), Color.White);
@@ -97,11 +100,11 @@ namespace Randio_2
             device.SetRenderTarget(null);
         }
 
+        //Generates texture of individual blocks
         public void CreateBlockTexture(GraphicsDevice device, SpriteBatch batch, int width, int height)
         {
-            //implement block texture generation
             var tex = new Texture2D(device, width, height);
-            GraphicsHelper.DrawRectangle(tex, palette[1]);
+            GraphicsHelper.FillRectangle(tex, palette[1]);
             BlockTexture = tex;
         }
         #endregion

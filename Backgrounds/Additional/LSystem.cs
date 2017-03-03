@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Randio_2
 {
+    //Helper class for LSystemBG, implements L-Systems and drawing turtle
     class LSystem
     {
         #region Public variables
@@ -18,70 +19,32 @@ namespace Randio_2
         #endregion
 
         #region Public methods
-        //Ctors
-        public LSystem()
+        //Default ctor
+        public LSystem(string template, int stepLength, double angle, List<Rule> rules)
         {
-            rules = new List<Rule>();
-        }
-
-        public LSystem(string template) : this()
-        {
-            SetTemplate(template);
-        }
-
-        public LSystem(string template, int stepLength, double angle) : this()
-        {
-            SetTemplate(template);
-            SetStepLength(stepLength);
-            SetAngle(angle);
-        }
-
-        public LSystem(string template, List<Rule> rules)
-        {
-            this.rules = rules;
-            SetTemplate(template);
-        }
-
-        public LSystem(string template, int stepLength, double angle, List<Rule> rules) : this()
-        {
-            SetTemplate(template);
-            SetStepLength(stepLength);
-            SetAngle(angle);
+            State = template;
+            Step = stepLength;
+            Angle = angle;
             this.rules = rules;
         }
 
         //Copying ctor
         public LSystem(LSystem other)
         {
-            SetTemplate(other.State);
-            SetStepLength(other.Step);
-            SetAngle(other.Angle);
+            State = other.State;
+            Step = other.Step;
+            Angle = other.Angle;
             rules = other.rules;
         }
 
-        //Preparation
-        public void SetTemplate(string template)
-        {
-            State = template;
-        }
-
-        public void SetStepLength(int stepLength)
-        {
-            Step = stepLength;
-        }
-
-        public void SetAngle(double angle)
-        {
-            Angle = angle;
-        }
-
+        //Adds a rule to the ruleset
         public void AddRule(Rule newRule)
         {
             rules.Add(newRule);
         }
 
 
-        //Iteration
+        //Applies a rule to the axiom
         public string ApplyRule(string element)
         {
             foreach (Rule rule in rules)
@@ -90,6 +53,7 @@ namespace Randio_2
             return element; //or empty string?
         }
 
+        //Iterates over the system, applying all rules to the axom
         public void Iterate()
         {
             string newState = "";
@@ -100,6 +64,7 @@ namespace Randio_2
             State = newState;
         }
 
+        //Iterates n times
         public void Iterate(int times)
         {
             for (int i = 0; i < times; ++i)
@@ -121,6 +86,7 @@ namespace Randio_2
         #endregion
     }
 
+    //Turtle used to draw L-Systems step by step
     class Turtle
     {
         #region Private variables
@@ -135,6 +101,7 @@ namespace Randio_2
         #endregion
 
         #region Public methods
+        //Derfault ctor
         public Turtle(GraphicsDevice device, SpriteBatch spriteBatch, Vector2 startingPosition, double startingAngle, Color currentColor, Color[] palette)
         {
             this.palette = palette;
@@ -147,6 +114,7 @@ namespace Randio_2
             lineTexture.SetData(new Color[] { Color.White });
         }
 
+        //Sets turtle default values
         public void SetDefaults(Vector2 currentPosition, double angle)
         {
             defaultMoment.currentPosition = currentPosition;
@@ -208,20 +176,17 @@ namespace Randio_2
         #endregion
 
         #region Private methods
+        //Executes one turtle step
         private void MoveTurtle(int length, RenderTarget2D target)
         {
             Vector2 newPos = now.currentPosition + (length * GeometryHelper.AngleToVector(GeometryHelper.DegToRad(now.angle)));
-
-            //device.SetRenderTarget(target);
-            //GraphicsHelper.DrawLine(spriteBatch, lineTexture, now.currentPosition, newPos, currentColor); //for drawing lines (conventional l-systems)
             GraphicsHelper.DrawSquareFromVector(spriteBatch, lineTexture, now.currentPosition, newPos, currentColor, length);
-            //device.SetRenderTarget(null);
-
-            now.currentPosition = newPos; //move next line to start inside parent?
+            now.currentPosition = newPos;
         }
         #endregion
 
         #region Nested classes
+        //Turtle proeprties in a given moment, allows for "teleportation" backwards
         class Moment
         {
             #region Public variables

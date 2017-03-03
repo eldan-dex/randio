@@ -4,16 +4,15 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 
 namespace Randio_2 {
-    //Thanks to ReyeMe for contributing this background
+    //Generates "mountains" or "waves"
     class MountainsBG : Background {
         #region Private variables
-        //Put any global variable declarations here.
-        double[,] heightLines;
+        private double[,] heightLines;
         List<Point> Stars;
-
         #endregion
 
         #region Public methods
+        //Default ctor
         public MountainsBG( GraphicsDevice device, SpriteBatch batch, int width, int height, Color[] palette)
         {
             this.palette = palette;
@@ -56,17 +55,15 @@ namespace Randio_2 {
             CreateTopmostBlockTexture(device, batch, Block.Width, Block.Height);
         }
 
+        //Generates the background texture
         public void CreateBackgroundTexture( GraphicsDevice device, SpriteBatch batch, int width, int height )
         {
             Texture = new RenderTarget2D(device, width, height);
-
-            //Initialize whatever you need here
 
             device.SetRenderTarget(Texture);
             device.Clear(palette[0]);
             batch.Begin();
 
-            //Draw onto batch here
             Color StarWhite = palette[2];
             Color StarBloom = ColorHelper.ChangeColorBrightness(palette[2], +0.4f);
             Color StarBig = ColorHelper.ChangeColorBrightness(palette[2], +0.6f);
@@ -76,7 +73,7 @@ namespace Randio_2 {
                 if (AlgorithmHelper.GetRandom(0, 5) == 4)
                 {
                     RenderTarget2D BigStarSprite = new RenderTarget2D(device, 2, 2);
-                    GraphicsHelper.DrawRectangle(BigStarSprite, StarBig);
+                    GraphicsHelper.FillRectangle(BigStarSprite, StarBig);
 
                     batch.Draw(BigStarSprite, new Rectangle(Star.X - 2, Star.Y, 2, 2), StarBloom);
                     batch.Draw(BigStarSprite, new Rectangle(Star.X + 2, Star.Y, 2, 2), StarBloom);
@@ -88,7 +85,7 @@ namespace Randio_2 {
                 }
 
                 RenderTarget2D StarSprite = new RenderTarget2D(device, 1, 1);
-                GraphicsHelper.DrawRectangle(StarSprite, StarBig);
+                GraphicsHelper.FillRectangle(StarSprite, StarBig);
 
                 batch.Draw(StarSprite, new Rectangle(Star.X - 1, Star.Y, 1, 1), StarBloom);
                 batch.Draw(StarSprite, new Rectangle(Star.X + 1, Star.Y, 1, 1), StarBloom);
@@ -105,7 +102,7 @@ namespace Randio_2 {
                 int sh3 = (int)(heightLines[2, i] * 1.3) + 50;
 
                 RenderTarget2D spike = new RenderTarget2D(device, 2, sh);
-                GraphicsHelper.DrawRectangle(spike, Color.White);
+                GraphicsHelper.FillRectangle(spike, Color.White);
 
                 batch.Draw(spike, new Rectangle(line, height - sh3, 2, sh3), palette[3]);
                 batch.Draw(spike, new Rectangle(line, height - sh2, 2, sh2), palette[4]);
@@ -117,30 +114,31 @@ namespace Randio_2 {
             device.SetRenderTarget(null);
         }
 
+        //Generates texture of individual blocks
         public void CreateBlockTexture( GraphicsDevice device, SpriteBatch batch, int width, int height )
         {
             //Base color
             var texture = new Texture2D(device, width, height);
 
-            GraphicsHelper.DrawRectangle(texture, palette[1]);
+            GraphicsHelper.FillRectangle(texture, palette[1]);
 
             BlockTexture = texture;
         }
 
-        //This function will generate a separate texture for all blocks, which are the topmost of a stack of blocks.
+        //Generates a separate texture for all blocks, which are the topmost of a stack of blocks.
         public void CreateTopmostBlockTexture( GraphicsDevice device, SpriteBatch batch, int width, int height )
         {
             //Base color
             var texture = new Texture2D(device, width, height);
 
-            GraphicsHelper.DrawRectangle(texture, ColorHelper.ChangeColorBrightness(palette[1], +0.3f));
+            GraphicsHelper.FillRectangle(texture, ColorHelper.ChangeColorBrightness(palette[1], +0.3f));
 
             BlockTopmostTexture = texture; //Leave this here for topmost bloks to be identical to normal blocks. Replace with own texture generation to make them different.
         }
         #endregion
 
         #region Private methods
-        //Any additional methods (for this class at least) are to be placed here
+        //Teragen algorithm
         void Teragen( double[] heightmap, int start, int end, double rnd )
         {
             if (end - start <= 1) return;
@@ -154,6 +152,7 @@ namespace Randio_2 {
             Teragen(heightmap, start, (start + end) / 2, rnd);
         }
 
+        //Smooths out an interval
         void Smooth( double[] heightmap, int range, int iteration )
         {
             for (int j = 0; j < iteration; j++)
@@ -168,27 +167,12 @@ namespace Randio_2 {
 
         }
 
+        //Array copy
         void ArrCPYdim( double[] source, double[,] destination, int dimension )
         {
             for (int i = 0; i < source.Length; i++)
                 destination[dimension, i] = source[i];
         }
         #endregion
-
-        #region Nested classes
-        //If you need to crate any additional classes, nest them here.
-        #endregion
     }
 }
-
-
-/* 
- * For geometry, use the GeometryHelper class
- * Drawing can be simplified by making use of what's in the GrapicsHelper
- * If you needed to work with text, StringHelper is here for you
- * And AlgorithmHelper is here to provide you with random and stuff
- * - for the sake of consistency, don't spawn new Random instances. Use AlgorithmHelper.GetRandom(int min, int max) or GetBiasedRandom (if you want your randoms to be more dense towards one end of the spectrum)
- * Feel free to add your own methods to the helper classes, if you think they might be useful for more than just creating this background
- * For reference, check ShapesBG or LSystemBG
- * Good luck!
- */

@@ -5,8 +5,10 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Linq;
 
 namespace Randio_2 {
+    //Tile - main building part of the map - Background, Blocks, 
     class Tile {
         #region Public variables
+        //Environment types (fifferent algorithm for each) + Screen (plain color without blocks)
         public enum TileType {
             LSystem,
             City,
@@ -37,6 +39,7 @@ namespace Randio_2 {
         #endregion
 
         #region Public methods
+        //Default ctor
         public Tile(GraphicsDevice graphicsDevice, Map map, TileType type, Rectangle coords, int index) {
             this.map = map;
 
@@ -47,15 +50,18 @@ namespace Randio_2 {
             wblocks = coords.Width / Block.Width;
             hblocks = coords.Height / Block.Height;
 
+            //Generate a color palette and randomize it's colors
             int gens = AlgorithmHelper.GetRandom(16, 33);
             int gskip = AlgorithmHelper.GetRandom(0, gens - 8);
             Palette = ColorHelper.Generate(gens).Skip(gskip).ToArray();
             
+            //Darken all palette colors by 50%
             for (int p = 0; p < Palette.Length; ++p)
             {
                 Palette[p] = ColorHelper.ChangeColorBrightness(Palette[p], -0.5f);
             }
 
+            //Initialize the background
             if (Type == TileType.LSystem)
                 Background = new LSystemBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height, Palette);
             else if (Type == TileType.City)
@@ -64,55 +70,46 @@ namespace Randio_2 {
                 Background = new MountainsBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height, Palette);
             else if (Type == TileType.Screen)
                 Background = new ScreenBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height, Palette);
-            /*else if (Type == TileType.Shapes)
-                Background = new ShapesBG(graphicsDevice, new SpriteBatch(graphicsDevice), Coords.Width, Coords.Height, Palette);*/
-            /*else
-            {
-                throw new NotSupportedException("This is not supposed to happen. Ever.");
-            }*/
 
             CreateTileTexture(graphicsDevice);
             CreateBlockTexture(graphicsDevice);
             CreateBlocks();
 
+            //Don't generate NPCs automatically when a Screen is displayed
             if (Type != TileType.Screen)
-            {
-                CreateEntities(graphicsDevice); //separate into CreateNPCs and CreateEnemies?
-            }
+                CreateEntities(graphicsDevice);
 
         }
 
-        public void Update(GameTime gameTime) {
-
-        }
-
+        //Draws Tile background and Blocks
         public void Draw(SpriteBatch spriteBatch) {
             spriteBatch.Draw(TileTexture, Coords, Color.White);
             DrawBlocks(spriteBatch);
         }
-#endregion
+        #endregion
 
         #region Private methods
+        //Sets the tile texture
         private void CreateTileTexture(GraphicsDevice graphicsDevice)
         {
             TileTexture = Background.Texture;
-            //GraphicsHelper.OutlineRectangleSide(TileTexture, Color.Black, 4, true, false, true, false);
         }
 
+        //Set block textures
         private void CreateBlockTexture(GraphicsDevice graphicsDevice) {
             BlockTexture = Background.BlockTexture;
             BlockTopmostTexture = Background.BlockTopmostTexture;
         }
 
+        //Creates 1-10 NPCs on this tile
         private void CreateEntities(GraphicsDevice graphicsDevice) {
             //temporary testing code
-            int npcCount = AlgorithmHelper.GetRandom(1, 17);
+            int npcCount = AlgorithmHelper.GetRandom(1, 11);
             for (int i = 0; i < npcCount; ++i) {
                 int w = AlgorithmHelper.GetRandom(24, 57); //16-49 small, 24-57 medium
                 int h = AlgorithmHelper.GetRandom(24, 57); //32-65 big
                 Vector2 position = new Vector2(Coords.X + AlgorithmHelper.GetRandom(0, map.Width - w + 1), AlgorithmHelper.GetRandom(0, map.Height - h + 1));
 
-                //BALANCE THIS
                 int additionalBase = AlgorithmHelper.GetRandom(Index, 2 * Index);
                 int addHP = AlgorithmHelper.GetRandom(additionalBase / 2, 2 * additionalBase);
                 float addStr = AlgorithmHelper.GetRandom((float)additionalBase / 4, additionalBase);
@@ -125,6 +122,7 @@ namespace Randio_2 {
             }        
         }
 
+        //Randomly places blocks on the tile. No check iwhether 
         private void CreateBlocks() {
             Blocks = new Block[wblocks, hblocks];
             bool[,] blockGrid = new bool[wblocks, hblocks];
@@ -134,15 +132,14 @@ namespace Randio_2 {
                 for (int h = 0; h < hblocks; ++h) {
                     blockGrid[w, h] = false;
 
-                    //generate solid ground
+                    //Generate solid ground
                     if (h > GroundLevel)
                     {
                         blockGrid[w, h] = true;
                         continue;
                     }
 
-                    //todo: maybe add holes in the ground? (trenches, etc.)
-
+                    //Only add blocks other than ground when not a Screen tile
                     if (Type != TileType.Screen)
                     {
                         if (w < 4 || w > wblocks - 5)
@@ -211,6 +208,7 @@ namespace Randio_2 {
             }
         }
 
+        //Draw Blocks to screen
         private void DrawBlocks(SpriteBatch spriteBatch) {
             //Draw blocks
             for (int y = 0; y < Coords.Height/Block.Height; ++y) {
@@ -222,10 +220,10 @@ namespace Randio_2 {
                         int nY = (int)(Coords.Y + y * Block.Size.Y);
                         // Draw it in screen space.
                         var texture = block.Texture == null ? block.TopmostTexture : block.Texture; //draw topmost blocks with a different texture (if needed)
-
                         spriteBatch.Draw(texture, new Rectangle(nX, nY, Block.Width, Block.Height), Color.White); //or use this.BlockTexture?
-                        if (Game.debugEnabled)
-                        spriteBatch.DrawString(Game.font, x + "," + y, new Vector2(nX+2, nY+3), Color.Black, 0f, Vector2.Zero, 0.4f, SpriteEffects.None, 0);
+
+                        if (Game.DebugEnabled) //Draws block coordinates on the block if debug mode is enabled
+                            spriteBatch.DrawString(Game.font, x + "," + y, new Vector2(nX+2, nY+3), Color.Black, 0f, Vector2.Zero, 0.4f, SpriteEffects.None, 0);
                     }
                 }
             }

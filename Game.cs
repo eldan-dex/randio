@@ -1,51 +1,46 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.Collections.Generic;
 
 namespace Randio_2 {
-    /// <summary>
-    /// This is the main type for your game.
-    /// </summary>
+    //Main Game class. Contains all the basic logic (Initialize, Update, Draw, most important objects, etc.)
     class Game : Microsoft.Xna.Framework.Game {
         #region Public variables
-        public const int WIDTH = 1280; //1280 small, 1280 medium, 1296 big
-        public const int HEIGHT = 720; //704 small, 1280 medium, 720 big
+        public const int WIDTH = 1280;
+        public const int HEIGHT = 720;
         public static SpriteFont font;
-        public static bool endIntro = false;
+        
         public static Stats stats;
         public static Dialogue Dialogue;
         public static Loading Loading;
+
+        public static bool DebugEnabled = false;
+        public static bool endIntro = false; //hack
         #endregion
 
         #region Private variables
         private GraphicsDeviceManager graphics;
         private SpriteBatch levelSpriteBatch;
         private SpriteBatch osdSpriteBatch;
-        private SpriteFont debugFont;
-        private SpriteBatch testSB; //testing only
-        private Texture2D testBG; //testing only
-
         private Map map;
         private Camera camera;
         private KeyboardState keyboardState;
-        
-        
+
+        private string playerName = "";
+
+
         //"O" - toggle debug
-        public static bool debugEnabled = false; //public because... eh.
         private bool oEnabled = false;
 
         //"P" - play next frame (in debug mode)
         private bool nextFrame = false;
-        private bool pEnabled = false; //for the P button
+        private bool pEnabled = false;
 
         //"L" - reset player
         private bool lEnabled = false;
 
         //"ESC" - end level/game
         private bool escEnabled = false;
-
-        private string playerName = "";
         #endregion
 
         #region Public methods
@@ -56,12 +51,7 @@ namespace Randio_2 {
         #endregion
 
         #region Protected methods
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
+        //Initializes renderer, camera and creates the first map object (intro screen)
         protected override void Initialize() {
             graphics.PreferredBackBufferWidth = WIDTH; //X
             graphics.PreferredBackBufferHeight = HEIGHT; //Y
@@ -69,86 +59,67 @@ namespace Randio_2 {
 
             camera = new Camera(GraphicsDevice.Viewport);
 
-            playerName = StringHelper.GenerateName(1); //only generate player name once, our player will be the same all the time.
+            playerName = StringHelper.GenerateName(1); //only generate player name once, our player will have the same name during the whole game
             CreateMap(true);
 
             base.Initialize();
         }
 
-        /// <summary>
-        /// LoadContent will be called once per game and is the place to load
-        /// all of your content.
-        /// </summary>
+        //Initializes spritebatches and font
         protected override void LoadContent() {
-            // Create a new SpriteBatch, which can be used to draw textures.
             levelSpriteBatch = new SpriteBatch(GraphicsDevice);
             osdSpriteBatch = new SpriteBatch(GraphicsDevice);
-            debugFont = Content.Load<SpriteFont>("debug"); //there will be some osd in the final game, but the font will not be stored externally
-            font = Content.Load<SpriteFont>("font"); //this will be loaded dynamically
-            testSB = new SpriteBatch(GraphicsDevice); //remove this
-            //testBG = new ShapesBG(GraphicsDevice, testSB, WIDTH, HEIGHT).Texture; //remove this
-            //testBG = new LSystemBG(GraphicsDevice, testSB, WIDTH, HEIGHT).Texture; //remove this
-            //testBG = new CityBG(GraphicsDevice, testSB, WIDTH, HEIGHT).Texture; //remove this
-            //testBG = new MountainsBG(GraphicsDevice, testSB, WIDTH, HEIGHT).Texture; //remove this
+            font = Content.Load<SpriteFont>("font"); //this should be loaded dynamically
         }
 
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// game-specific content.
-        /// </summary>
-        protected override void UnloadContent() {
-            
-        }
-
-        /// <summary>
-        /// Allows the game to run logic such as updating the world,
-        /// checking for collisions, gathering input, and playing audio.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        //Main update routine. Updates keyboardStatus and calls update methods of all game objects.
+        //Handles switching between "screens" (intro/game/outro)
         protected override void Update(GameTime gameTime) {
+            //When a Dialogue is shown, game freezes and we focus only on dialogue action buttons
             if (Dialogue != null)
-            {
                 ProcessDialogueInputs();
-            }
+
             else
             {
                 ProcessInputs();
 
-                //For step-by-step physics
-                if ((debugEnabled && nextFrame) || !debugEnabled)
+                //Debugging mode enables step-by-step physics
+                if ((DebugEnabled && nextFrame) || !DebugEnabled)
                 {
                     map.Update(gameTime, keyboardState);
                     nextFrame = false;
                 }
 
+                //Intro screen ended, start game
+                if (endIntro)
+                {
+                    endIntro = false;
+                    CreateMap(false);
+                }
+
+                //Player reached end of game map, show outro screen
                 if (map.ReachedExit)
                 {
                     stats = new Stats(map.Player.Stats);
                     CreateMap(true, false);
                     StringHelper.Reset();
                 }
-
-                if (endIntro) //switch from intro to normal game
-                {
-                    endIntro = false;
-                    CreateMap(false);
-                }
             }
 
             base.Update(gameTime);
         }
 
-        /// <summary>
-        /// This is called when the game should draw itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        //Main draw routine. Calls draw methods of all game objects
         protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            //Draws background, blocks, entities, items, etc.
             DrawLevel(gameTime);
-            DrawOSDs();
-            Dialogue?.Draw(gameTime, levelSpriteBatch); //Draw dialogue if enabled
 
+            //Draws all shown text
+            DrawOSDs();
+
+            Dialogue?.Draw(gameTime, levelSpriteBatch); //Draw dialogue if enabled
             Loading?.Draw(gameTime, levelSpriteBatch); //Draw loading screen if enabled
 
             base.Draw(gameTime);
@@ -161,8 +132,7 @@ namespace Randio_2 {
             var viewMatrix = camera.GetViewMatrix();
             levelSpriteBatch.Begin(transformMatrix: viewMatrix);
 
-            //levelSpriteBatch.Draw(testBG, new Rectangle(0, 0, WIDTH, HEIGHT), Color.White); //uncomment this for background testing
-            map.Draw(gameTime, levelSpriteBatch); //comment this out for background testing
+            map.Draw(gameTime, levelSpriteBatch);
 
             levelSpriteBatch.End();
         }
@@ -170,21 +140,25 @@ namespace Randio_2 {
         private void DrawOSDs()
         {
             osdSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
-            if (debugEnabled)
+
+            //Draw debug info
+            if (DebugEnabled)
             {
-                osdSpriteBatch.DrawString(debugFont, "DEBUG ENABLED", new Vector2(10, 10), Color.Red);
-                osdSpriteBatch.DrawString(debugFont, "Player X: " + map.Player.Position.X + "     Player Y: " + map.Player.Position.Y + "\nDirection: " + (map.Player.Direction == 1 ? "right" : "left") + "\nCurrentTile: " + map.Player.CurrentTile + "\nHP: " + map.Player.HP.ToString() + "/" + map.Player.MaxHP.ToString() + ", Speed: " + map.Player.Speed.ToString() + "\nStrength: " + map.Player.Strength.ToString() + ", Defense: " + map.Player.Defense.ToString(), new Vector2(10, 30), Color.Red);
+                osdSpriteBatch.DrawString(font, "DEBUG ENABLED", new Vector2(10, 10), Color.Red);
+                osdSpriteBatch.DrawString(font, "Player X: " + map.Player.Position.X + "     Player Y: " + map.Player.Position.Y + "\nDirection: " + (map.Player.Direction == 1 ? "right" : "left") + "\nCurrentTile: " + map.Player.CurrentTile + "\nHP: " + map.Player.HP.ToString() + "/" + map.Player.MaxHP.ToString() + ", Speed: " + map.Player.Speed.ToString() + "\nStrength: " + map.Player.Strength.ToString() + ", Defense: " + map.Player.Defense.ToString(), new Vector2(10, 30), Color.Red);
             }
 
-            if (map.quests != null)
+            //Draw quests
+            if (map.Quests != null)
             {
-                Vector2 questPosition = (debugEnabled ? new Vector2(10, 120) : new Vector2(10, 10));
-                string status = map.quests.QuestsStatus();
-                GraphicsHelper.DrawRectangle(map.quests.Background, new Color(180, 180, 180));
-                osdSpriteBatch.Draw(map.quests.Background, new Rectangle((int)questPosition.X - 5, (int)questPosition.Y - 5, map.quests.Background.Width, map.quests.Background.Height), Color.White * 0.8f);
+                Vector2 questPosition = (DebugEnabled ? new Vector2(0, 120) : new Vector2(0, 10));
+                string status = map.Quests.QuestsStatus();
+                GraphicsHelper.FillRectangle(map.Quests.Background, new Color(180, 180, 180));
+                osdSpriteBatch.Draw(map.Quests.Background, new Rectangle((int)questPosition.X - 5, (int)questPosition.Y - 5, map.Quests.Background.Width, map.Quests.Background.Height), Color.White * 0.8f);
                 osdSpriteBatch.DrawString(font, status, questPosition, ColorHelper.ChangeColorBrightness(ColorHelper.InvertColor(map.GetTileByIndex(map.Player.CurrentTile).Palette[0]), -0.6f));
             }
 
+            //Draw button info, current tile and current item
             var tu = map.GetTileByIndex(map.Player.CurrentTile);
             Color invColor = ColorHelper.BlackWhiteContrasting(tu.Palette[1]);
             osdSpriteBatch.DrawString(font, "Current tile: " + map.Player.CurrentTile, new Vector2(100, 660), invColor, 0f, Vector2.Zero, 0.8f, SpriteEffects.None, 0f);
@@ -193,32 +167,40 @@ namespace Randio_2 {
             osdSpriteBatch.End();
         }
 
+        //Initializes a new map (intro/game/outro)
         private void CreateMap(bool createScreenInstead, bool isIntro = true) {
+            //Screen = intro/outro
             if (createScreenInstead)
-            {
                 map = new Screen(GraphicsDevice, camera, WIDTH, HEIGHT, playerName, isIntro);
-            }
 
+            //Map = game itself
             else
                 map = new Map(GraphicsDevice, camera, WIDTH * 10, HEIGHT, playerName);
             
         }
 
+        //Processes all keyboard inputs
         private void ProcessInputs() {
             keyboardState = Keyboard.GetState();
 
+            //ESC
+            //Intro - skip intro
+            //Game - exit game, show outro
+            //Outro - terminate program
             if (keyboardState.IsKeyDown(Keys.Escape))
             {
                 if (escEnabled)
                 {
                     var palette = map.GetTileByIndex(map.Player.CurrentTile).Palette;
-                    Dialogue = new Dialogue(GraphicsDevice, map, "Do you want to quit the game?", DialogueActionEscape);
+                    bool startDialogue = map.GetType() == typeof(Screen) && ((Screen)map).IsIntro;
+                    Dialogue = new Dialogue(GraphicsDevice, map, (startDialogue ? "Start your adventure now?" : "Do you want to quit the game?"), DialogueActionEscape);
                     escEnabled = false;
                 }
             }
             else
                 escEnabled = true;
 
+            //L - reset player to the beginning of the current tile
             if (keyboardState.IsKeyDown(Keys.L))
             {
                 if (lEnabled) {
@@ -229,19 +211,21 @@ namespace Randio_2 {
             else
                 lEnabled = true;
 
-            //"O" key enables/disables debugging features
+            //O - enable/disable debug mode
             if (keyboardState.IsKeyDown(Keys.O)) {
                 if (oEnabled)
                 {
                     oEnabled = false;
-                    debugEnabled = !debugEnabled;
+                    DebugEnabled = !DebugEnabled;
                 }
             }
             else
                 oEnabled = true;
             
-            //Enter the land of debugging
-            if (debugEnabled) {
+            //Only available in debug mode
+            //P - enables game updates (physics) for one cycle
+            //Arrow keys - move the camera manually
+            if (DebugEnabled) {
                 //"P" key for step-by-step physics
                 if (keyboardState.IsKeyDown(Keys.P) && pEnabled) {
                     pEnabled = false;
@@ -259,16 +243,19 @@ namespace Randio_2 {
             }
         }
 
+        //Processes keyboard inputs when a dialogue is shown
         private void ProcessDialogueInputs()
         {
             keyboardState = Keyboard.GetState();
 
+            //J - accept
             if (keyboardState.IsKeyDown(Keys.J))
             {
                 Dialogue.Action?.Invoke();
                 Dialogue = null;
             }
 
+            //K, ESC - decline
             if (keyboardState.IsKeyDown(Keys.K) || (keyboardState.IsKeyDown(Keys.Escape) && escEnabled))
             {
                 Dialogue.CancelAction?.Invoke();
@@ -280,17 +267,24 @@ namespace Randio_2 {
                 escEnabled = true;
         }
 
+        //When ESC is pressed and the "skip/quit" dialogue is confirmed, performs the desired action
         private void DialogueActionEscape()
         {
             if (map.GetType() == typeof(Screen))
             {
+                //Intro - skip to game
                 if (((Screen)map).IsIntro)
+                {
                     endIntro = true;
+                    Loading = new Loading(GraphicsDevice, map, "Game is now loading...");
+                }
                 else
+                    //Outro - terminate program
                     Exit();
             }
 
             else
+                //Game - show outro screen
                 map.ReachedExit = true;
         }
         #endregion

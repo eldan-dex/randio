@@ -6,6 +6,7 @@
 - Refactoring
 
 IDEAS:
+- Re-add player as a possible target for Kill quests?
 - LOGO!
 - show HP and stats (+ held item properties?)
 - entity fill as type indicator (boss has black slant lines, etc.)

@@ -1,13 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Randio_2
 {
+    //Item - holds ability bonuses, also can be a quest object (bring item X to Y)
     class Item
     {
         #region Public enums
+        //Item types (bonus types)
         public enum ItemType
         {
             HP,
@@ -23,39 +24,25 @@ namespace Randio_2
         {
             get { return position; }
         }
-        protected Vector2 position;
+        private Vector2 position;
 
-        //is this needed for an Item?
-        public Rectangle BoundingRectangle //this is the LOCAL bounding rectangle (relative to the current tile)
-        {
-            get
-            {
-                Tile t = map.GetTileByIndex(CurrentTile);
-                float newX = Position.X - t.Coords.Left; //this should work
-                return new Rectangle((int)newX, (int)Position.Y, Width, Height);
-            }
-        }
-
-        public ItemType Type { get; protected set; }
-        public Texture2D Texture { get; protected set; }
-        public ItemProperties Properties { get; protected set; }
-
-        public int CurrentTile { get; protected set; }
-        public int Width { get; protected set; }
-        public int Height { get; protected set; }
-
-        public Entity Owner { get; protected set; }
-        public bool IsPlaced { get; protected set; }
+        public ItemType Type { get; private set; }
+        public Texture2D Texture { get; private set; }
+        public ItemProperties Properties { get; private set; }
+        public int CurrentTile { get; private set; }
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+        public Entity Owner { get; private set; }
+        public bool IsPlaced { get; private set; }
 
         #endregion
 
-        #region Private/Protected variables
-        //Instance variables
-        protected Map map;
-
+        #region Private variables
+        private Map map;
         #endregion
 
         #region Public methods
+        //Default ctor
         public Item(Map map, GraphicsDevice device, ItemType type, int index, Vector2 position, int currentTile, int width, int height, bool placed = true, Entity owner = null, ItemProperties properties = null)
         {
             this.map = map;
@@ -72,11 +59,16 @@ namespace Randio_2
             CreateTexture(device);
         }
 
+        //Checks whether the item is out of the map (and places it back on the map), applies gravity to the item (item falls down)
         public void Update(GameTime gameTime)
         {
+            if (position.Y > Game.HEIGHT)
+                position.Y = 0;
+
             ItemGravity();
         }
 
+        //Draws the item
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             if (IsPlaced) //Only draw the item if it's not held by any entity
@@ -87,6 +79,7 @@ namespace Randio_2
             }
         }
 
+        //Item is being picked up by an entity
         public Item PickUp(Entity picker)
         {
             if (Owner == null)
@@ -97,10 +90,11 @@ namespace Randio_2
                 return this;
             }
 
-            else //this is not supposed to happen, but if it does, item will be given to whoever came first
+            else
                 return null;
         }
 
+        //Put the Item down in the direction the player is looking (and don't put it inside blocks)
         public void PutDown(int Direction)
         {
             //Put down right next to the entity in the direction the entity is looking
@@ -122,6 +116,7 @@ namespace Randio_2
         #endregion
 
         #region Private methods
+        //Initializes Item properties
         private void InitializeItem()
         {
             if (!IsPlaced && Owner == null)
@@ -146,7 +141,7 @@ namespace Randio_2
                     case ItemType.Speed:
                         Properties.Name = "FASTER MOVEMENT";
                         Properties.Adjective = "Fast";
-                        Properties.SpeedBonus = 2f * potence;
+                        Properties.SpeedBonus = (potence - 1f) / 2;
                         break;
                     case ItemType.HP:
                         Properties.Name = "MORE HP";
@@ -157,20 +152,15 @@ namespace Randio_2
             }
         }
 
+        //Creates the item texture (small white square)
         private void CreateTexture(GraphicsDevice device)
         {
-            //if (Type == ItemType.Flop)
-                Texture = CreateFlopTexture(device);
-        }
-
-        private Texture2D CreateFlopTexture(GraphicsDevice device)
-        {
             var texture = new Texture2D(device, Width, Height);
-            GraphicsHelper.DrawRectangle(texture, Color.White);
-            return texture;
+            GraphicsHelper.FillRectangle(texture, Color.White);
+            Texture = texture;
         }
 
-        //ensure item is horizontally aligned with blocks
+        //Ensure item is horizontally aligned with blocks and that it falls down when dropped
         private void ItemGravity()
         {
             if (!map.IsBlock(position + new Vector2(0, Height)))

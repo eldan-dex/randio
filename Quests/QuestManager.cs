@@ -3,31 +3,34 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Randio_2
 {
+    //Manages all current quests
     class QuestManager
     {
         #region Public variables
-        public int Count { get { return Quests.Count; } }
-        public Texture2D Background;
+        public Texture2D Background; //Wite background shown behind quest display
         public List<Quest> Quests { get; private set; }
         #endregion
 
         #region Private variables
-        Map map;
+        private Map map;
         #endregion
 
         #region Public methods
+        //Default ctor
         public QuestManager(Map map)
         { 
             Quests = new List<Quest>();
             this.map = map;
         }
 
+        //Adds a quest which will be managed by this manager
         public void AddQuest(Quest q)
         {
             if (!Quests.Contains(q))
                 Quests.Add(q);
         }
 
+        //Get status text from all quests and merge it into one displayable string
         public string QuestsStatus()
         {
             string result = "";
@@ -59,6 +62,7 @@ namespace Randio_2
             return result.Substring(0, result.Length-1);
         }
 
+        //Run a completion check for all managed quests
         public void Update()
         {
             foreach (Quest q in Quests)

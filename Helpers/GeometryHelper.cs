@@ -2,9 +2,11 @@
 using Microsoft.Xna.Framework;
 
 namespace Randio_2 {
+    //Contains methods to assist with geometry-related problems - intersections, angle conversions, etc.
     class GeometryHelper
     {
         #region Public methods
+        //Returns the depth of an intersection of two rectangles (0 if they don't intersect)
         public static Vector2 GetIntersectionDepth(Rectangle rectA, Rectangle rectB) {
             // Calculate half sizes.
             float halfWidthA = rectA.Width / 2.0f;
@@ -32,24 +34,20 @@ namespace Randio_2 {
             return new Vector2(depthX, depthY);
         }
 
+        //Convert an angle to a vector
         public static Vector2 AngleToVector(double angle) {
             return new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle));
         }
 
+        //Convert degrees to radians
         public static double DegToRad(double angle) {
             return (Math.PI / 180) * angle;
         }
 
+        //Calculate distance of two vectors
         public static int VectorDistance(Vector2 a, Vector2 b)
         {
             return (int)(Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y));
-        }
-
-        public static Rectangle TileToGlobalCoordinates(Rectangle tileCoords, Tile tile)
-        {
-            if (tileCoords == null || tile == null)
-                return new Rectangle(); //exception?
-            return new Rectangle(tileCoords.X + tile.Coords.X, tileCoords.Y + tile.Coords.Y, tileCoords.Width, tileCoords.Height);
         }
         #endregion
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Randio_2
 {
+    //Manages events, updating and timing
     class EventManager<T>
     {
         #region Private variables
@@ -11,19 +12,22 @@ namespace Randio_2
         #endregion
 
         #region Public variables
+        //Default ctor
         public EventManager()
         {
             events = new List<Event<T>>();
             next = null;
         }
 
+        //Adds an event to the manager
         public void AddEvent(Event<T> action)
         {
             events.Add(action);
             PrepareNextEvent();
         }
 
-        public void PrepareNextEvent() //find next scheuduled event
+        //Goes through all events, finds the nearest one and prepares it for execution
+        public void PrepareNextEvent()
         {
             Event<T> nearestEvent = null;
             DateTime eventTime = DateTime.Now.AddYears(1); //this can cause issues if an event is set to happen more than 1 year in the future. but why would anybody want to do that?
@@ -40,6 +44,7 @@ namespace Randio_2
             next = nearestEvent;
         }
 
+        //Update the manager (check times and possibly fire an event). Called in the main update loop
         public void Update()
         {
             if (next != null && next.fireTime <= DateTime.Now)

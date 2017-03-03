@@ -1,12 +1,12 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 
 namespace Randio_2 {
-    //Thanks to ReyeMe for contributing this background
+    //City - houses distributed across the tile
     class CityBG : Background {
         #region Public methods
+        //Default ctor
         public CityBG( GraphicsDevice device, SpriteBatch batch, int width, int height, Color[] palette)
         {
             this.palette = palette;
@@ -15,6 +15,7 @@ namespace Randio_2 {
             BlockTopmostTexture = BlockTexture;
         }
 
+        //Generates the background texture
         public void CreateBackgroundTexture( GraphicsDevice device, SpriteBatch batch, int width, int height)
         {
             Texture = new RenderTarget2D(device, width, height);
@@ -51,12 +52,12 @@ namespace Randio_2 {
             foreach (House building in buildings) {
                 //draw house
                 RenderTarget2D house = new RenderTarget2D(device, building.dimensions.Width, building.dimensions.Height);
-                GraphicsHelper.DrawRectangle(house, palette[building.zIndex+2]);
+                GraphicsHelper.FillRectangle(house, palette[building.zIndex+2]);
                 batch.Draw(house, building.dimensions, Color.White);
                 foreach (Window window in building.windows) {
                     //draw windows on house
                     RenderTarget2D house_window = new RenderTarget2D(device, window.dimensions.Width, window.dimensions.Height);
-                    GraphicsHelper.DrawRectangle(house_window, ColorHelper.ChangeColorBrightness(Color.Multiply(window.color, (0.5f * building.zIndex) + 1f), darkenBy));
+                    GraphicsHelper.FillRectangle(house_window, ColorHelper.ChangeColorBrightness(Color.Multiply(window.color, (0.5f * building.zIndex) + 1f), darkenBy));
                     batch.Draw(house_window, window.dimensions, Color.White);
                 }
             }
@@ -65,19 +66,21 @@ namespace Randio_2 {
             device.SetRenderTarget(null);
         }
 
+        //Generates texture of individual blocks
         public void CreateBlockTexture( GraphicsDevice device, SpriteBatch batch, int width, int height )
         {
             //Base color
             Color diffuse = Color.PaleTurquoise;
 
             var texture = new Texture2D(device, width, height);
-            GraphicsHelper.DrawRectangle(texture, palette[1]);
+            GraphicsHelper.FillRectangle(texture, palette[1]);
 
             BlockTexture = texture;
         }
         #endregion
 
         #region Nested classes
+        //Individual house properties
         class House {
             public Rectangle dimensions;
             public int zIndex;     
@@ -95,6 +98,7 @@ namespace Randio_2 {
             }
         }
 
+        //Individual colored windows on houses
         class Window {
             public Rectangle dimensions;
             public Color color;

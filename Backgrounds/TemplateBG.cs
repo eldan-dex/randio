@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Randio_2
 {
+    //Template class for implementing new Backgrounds
     class TemplateBG : Background
     {
         #region Private variables
@@ -11,6 +12,7 @@ namespace Randio_2
         #endregion
 
         #region Public methods
+        //Default ctor
         public TemplateBG(GraphicsDevice device, SpriteBatch batch, int width, int height)
         {
             CreateBackgroundTexture(device, batch, width, height);
@@ -18,6 +20,7 @@ namespace Randio_2
             CreateTopmostBlockTexture(device, batch, Block.Width, Block.Height);
         }
 
+        //Generates the background texture
         public void CreateBackgroundTexture(GraphicsDevice device, SpriteBatch batch, int width, int height)
         {
             Texture = new RenderTarget2D(device, width, height);
@@ -34,6 +37,7 @@ namespace Randio_2
             device.SetRenderTarget(null);
         }
 
+        //Generates texture of individual blocks
         public void CreateBlockTexture(GraphicsDevice device, SpriteBatch batch, int width, int height)
         {
             var texture = new Texture2D(device, width, height);
@@ -43,7 +47,7 @@ namespace Randio_2
             BlockTexture = texture;
         }
 
-        //This function will generate a separate texture for all blocks, which are the topmost of a stack of blocks.
+        //Generates a separate texture for blocks which are the topmost of a stack of blocks
         public void CreateTopmostBlockTexture(GraphicsDevice device, SpriteBatch batch, int width, int height)
         {
             BlockTopmostTexture = BlockTexture; //Leave this here for topmost bloks to be identical to normal blocks. Replace with own texture generation to make them different.

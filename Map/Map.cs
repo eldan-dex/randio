@@ -6,78 +6,77 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace Randio_2 {
+    //Game map - contains player, NPCs, individual tiles with backgrounds and blocks, items and everyting else seen in the game
     class Map {
         #region Public variables  
-        public Player Player { get; protected set; }
-        public bool ReachedExit { get; set; }
         public int Width { get; protected set; }
         public int Height { get; protected set; }
-        public int TileCount { get { return (tiles==null) ? 1 : tiles.Count; } }
+        public int TileCount { get { return (tiles == null) ? 1 : tiles.Count; } }
+        public bool ReachedExit { get; set; }
+        public Player Player { get; protected set; }  
         public List<NPC> NPCs { get; protected set; }
-
-        public EventManager<Entity> entityEvents;
-        public QuestManager quests;
-        public List<Zone> questZones;
-        public Zone exitZone;
-        public Screen mapScreen; //screen for intro/outro stuff
+        public EventManager<Entity> EntityEvents { get; protected set; }
+        public QuestManager Quests { get; protected set; }
         #endregion
 
-        #region Private variables
+        #region Protected variables
         protected List<Tile> tiles;
         protected Camera camera;
         protected List<Item> items;
+        protected Zone exitZone;
+        protected List<Zone> questZones;
         #endregion
 
         #region Public methods
+        //Default ctor, used when inherited by Screen
         public Map(int width, int height)
         {
             Width = width;
             Height = height;
         }
 
+        //Standard ctor used when creating a regular Map instance
         public Map(GraphicsDevice graphicsDevice, Camera camera, int width, int height, string playerName) {
             this.camera = camera;
             Width = width;
             Height = height;
 
             NPCs = new List<NPC>();
+            EntityEvents = new EventManager<Entity>();
 
             CreatePlayer(graphicsDevice, playerName);
             CreateTiles(graphicsDevice);
-            CreateEventManagers();
             CreateItems(graphicsDevice);
             CreateQuests(graphicsDevice);
-            //CreateExitZone(graphicsDevice); exit zones are now disabled, exitting level via Esc or when all quests are completed
 
+            //Game is now loaded, disable the loading screen
             if (Game.Loading != null)
                 Game.Loading = null;
         }
 
+        //Updates player, NPCs, Events, Items, Quests and moves the camera
         public virtual void Update(GameTime gameTime, KeyboardState keyboardState) {
             Player.Update(gameTime, keyboardState);
             UpdateNPCs(gameTime);
             UpdateEvents();
             UpdateItems(gameTime);
             UpdateQuests();
-            //CheckExitZone();
 
             MoveCamera();
 
+            //Reset player if player left the game area (fell down, etc)
             if (CheckOutOfMap((int)Player.Position.Y) == -1) {
-                //player fell down, reset player
                 ResetPlayer();
             }
         }
 
+        //Draws all tiles, quest zones, NPCs, player, items and exit zones (only in intro/outro)
         public virtual void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
-            List<NPC> visibleNPCs = new List<NPC>();
             foreach (Tile t in GetVisibleTiles())
                 t.Draw(spriteBatch);
 
             foreach (Zone z in questZones)
-            {
                 z.Draw(spriteBatch);
-            }
 
             exitZone?.Draw(spriteBatch);
 
@@ -101,23 +100,25 @@ namespace Randio_2 {
             else return 0; //y is within the map
         }
 
-        //returns a tile which contains the given X coordinate
-        public Tile GetTileForX(int x) => tiles.FirstOrDefault(t => t.Coords.Left <= x && t.Coords.Right > x);
+        //Returns a tile which contains the given X coordinate
+        public Tile GetTileForX(int x)
+            => tiles.FirstOrDefault(t => t.Coords.Left <= x && t.Coords.Right > x);
 
-        //returns tile with the corresponding index
+        //Returns a tile with the corresponding index
         public Tile GetTileByIndex(int index) {
             if (index >= 0 && index < tiles.Count)
                 return tiles[index];
             return null;
         }
 
+        //Resets the player and camera to the start of the current tile
         public void ResetPlayer()
         {
             Player.Reset();
             CameraToPlayer();
         }
 
-        //translate global position into an offset from the left boundary of the given tile
+        //Translate the global position into an offset from the left boundary of the given tile
         public Vector2 GlobalToTileCoordinates(Vector2 global, int tileIndex)
         {
             var tile = GetTileByIndex(tileIndex);
@@ -128,16 +129,26 @@ namespace Randio_2 {
             return new Vector2(global.X - tile.Coords.X, global.Y);
         }
 
+        //Translate tile coordinates to global coordinates
+        public Rectangle TileToGlobalCoordinates(Rectangle tileCoords, Tile tile)
+        {
+            if (tileCoords == null || tile == null)
+                return new Rectangle(); //exception?
+            return new Rectangle(tileCoords.X + tile.Coords.X, tileCoords.Y + tile.Coords.Y, tileCoords.Width, tileCoords.Height);
+        }
+
+
+        //Returns all NPCs and Player
         public List<Entity> GetAllEntites() {
             List<Entity> result = new List<Entity>();
 
-            result.Add(Player);
+            //result.Add(Player);
             result.AddRange(NPCs);
 
             return result;
         }
 
-        //returns only items placed on ground (ignores those held by entities)
+        //Returns items placed on ground (ignores those held by entities)
         public List<Item> GetAllItems()
         {
             var result = new List<Item>();
@@ -151,7 +162,8 @@ namespace Randio_2 {
 
             return result;
         }
-
+    
+        //Returns true when a block is present on given coordinates
         public bool IsBlock(Vector2 globalCoords)
         {
             int x = (int)globalCoords.X;
@@ -175,15 +187,18 @@ namespace Randio_2 {
         #endregion
 
         #region Private methods
+        //Initializes player and resets camera to the proper spot
         protected void CreatePlayer(GraphicsDevice graphicsDevice, string name) {
-            Player = new Player(graphicsDevice, this, Vector2.Zero, name); //generate position
+            Player = new Player(graphicsDevice, this, Vector2.Zero, name);
             CameraToPlayer();
         }
 
+        //Centers the camera to the player
         protected void CameraToPlayer() {
             camera.CenterXTo(new Rectangle((int)Player.Position.X, (int)Player.Position.Y, Player.Width, Player.Height));
         }
 
+        //Camera "follows" the player - when the player is within some given distance from an edge of the screen, camera moves to keep him in frame
         protected void MoveCamera() {
             float leftEdge = camera.Position.X;
             float rightEdge = leftEdge + Game.WIDTH;
@@ -200,18 +215,14 @@ namespace Randio_2 {
             }
         }
 
+        //Initializes all tiles we see ingame
         private void CreateTiles(GraphicsDevice graphicsDevice) {
-            if (Width % Block.Width > 0 || Height % Block.Height > 0)
-                throw new ArgumentException("Map dimensions must be divisible by Block dimensions!");
-
             tiles = new List<Tile>();
 
-            //Temporary algorithm, will be upgraded
             int minWidth = Game.WIDTH;
             int maxWidth = 3 * Game.WIDTH;
             int totalWidth = 0;
             int tileIndex = 0;
-            //int nextType = -1; don't repeat tiles of similar type intentionally
 
             while (totalWidth < Width) {
                 //Generate a random width for the next tile, but keep it divisible by Block.Width
@@ -227,23 +238,8 @@ namespace Randio_2 {
                         newWidth = 4096; //This breaks the purprose of the whole algorithm, because the next tile might be too small. But it fixes the crashing.
                 }
 
-                Tile.TileType type;
-
-                //Generate TileType
-                //Generate two similar tiles next to each other
-                /*if (nextType == -1)
-                {
-                    type = (Tile.TileType)AlgorithmHelper.GetRandom(0, Tile.TileTypeCount);
-                    nextType = (int)type;
-                }
-                else
-                {
-                    type = (Tile.TileType)nextType;
-                    nextType = -1;
-                }*/
-
-                //Generate tiles normally
-                type = (Tile.TileType)AlgorithmHelper.GetRandom(0, Tile.TileTypeCount);
+                //Picka  random TileType
+                var type = (Tile.TileType)AlgorithmHelper.GetRandom(0, Tile.TileTypeCount);
 
                 //Create and add Tile
                 tiles.Add(new Tile(graphicsDevice, this, type, new Rectangle(totalWidth, 0, newWidth, Height), tileIndex));
@@ -253,20 +249,18 @@ namespace Randio_2 {
             }
         }
 
-        protected void CreateEventManagers()
-        {
-            entityEvents = new EventManager<Entity>();
-        }
-
+        //Initializes quests
         private void CreateQuests(GraphicsDevice device)
         {
-            quests = new QuestManager(this);
+            Quests = new QuestManager(this);
             questZones = new List<Zone>();
 
+            //How many quests will this level have (1-3)
             int count = AlgorithmHelper.GetRandom(1, 4);
             List<Quest.QuestType> usedTypes = new List<Quest.QuestType>();
             for (int i = 0; i < count; ++i)
             {
+                //Only add one of each quest type
                 Quest.QuestType type;
                 do
                     type = (Quest.QuestType)AlgorithmHelper.GetRandom(0, Quest.QuestTypeCount);
@@ -278,6 +272,7 @@ namespace Randio_2 {
                 List<Item> itemFetchList = null;
                 List<Zone> zones = null;
 
+                //Kill quest - picks 1-4 NPCs and player's task is to kill them all
                 if (type == Quest.QuestType.KillTargets)
                 {
                     name = "Kill ";
@@ -295,6 +290,7 @@ namespace Randio_2 {
                     }
                 }
 
+                //Fetch quest - picks 1 or 2 items which player has to put down inside a specific area
                 else if (type == Quest.QuestType.FetchIitems)
                 {
                     name = "Bring ";
@@ -308,17 +304,15 @@ namespace Randio_2 {
                     for (int j = 0; j < itemCount; ++j)
                     {
                         Item item;
-
                         do
-                        {
                             item = items[AlgorithmHelper.GetRandom(0, items.Count)];
-                        }
                         while (itemFetchList.Contains(item));
                         
                         itemFetchList.Add(item);
                     }
                 }
 
+                //Reach quest - randomly select 1 - 4 empty blocks and task the player with reaching them
                 else if (type == Quest.QuestType.ReachBlock)
                 {
                     name = "Reach orange areas located in these tiles: ";
@@ -332,27 +326,30 @@ namespace Randio_2 {
                     }
                 }
 
-                quests.AddQuest(new Quest(this, type, name, targets, itemFetchList, zones));
+                Quests.AddQuest(new Quest(this, type, name, targets, itemFetchList, zones));
             }
 
             CreateQuestBackground(device, usedTypes);
         }
 
+        //Computes proper size for the half-transparent white background that makes quest text more readable
         protected void CreateQuestBackground(GraphicsDevice device, List<Quest.QuestType> usedTypes)
         {
             int longest = 0;
-            quests.Update();
-            foreach (Quest q in quests.Quests)
+            Quests.Update();
+            foreach (Quest q in Quests.Quests)
             {
                 if (q.Name.Length > longest)
                     longest = q.Name.Length;
             }
-            quests.Background = new Texture2D(device, longest * 18 + 20, quests.Count * 20 + 3);
+            Quests.Background = new Texture2D(device, longest * 18 + 20, Quests.Quests.Count * 20 + 3);
         }
 
-        protected Zone GetNewZone(GraphicsDevice device, Color zoneColor)
+
+        //Returns a new Zone placed randomly on the map
+        protected Zone GetNewZone(GraphicsDevice device, Color zoneColor, Tile selectedTile = null)
         {
-            Tile tile = tiles[AlgorithmHelper.BiasedRandom(0, tiles.Count-1, 1.3)];
+            Tile tile = (selectedTile == null) ? tiles[AlgorithmHelper.BiasedRandom(0, tiles.Count - 1, 1.3)] : selectedTile;
             int xblocks = tile.Coords.Width / Block.Width;
             int yblocks = tile.Coords.Height / Block.Height;
 
@@ -361,12 +358,13 @@ namespace Randio_2 {
 
             for (int x = 1; x < xblocks; ++x)
             {
-                for (int y = 1; y < tile.GroundLevel; ++y)
+                for (int y = 1; y < tile.GroundLevel+1; ++y)
                 {
-                    int rand = AlgorithmHelper.GetRandom(0, (xblocks * yblocks) / 10);
-                    if (rand % 42 == 0 && tile.Blocks[x, y] != null)
+                    int rand = AlgorithmHelper.GetRandom(0, (xblocks * yblocks) / 20);
+                    if (rand % 24 <= 3 && tile.Blocks[x, y] != null && x < tile.Blocks.GetLength(0) && y < tile.Blocks.GetLength(1))
                     {
                         rand = AlgorithmHelper.GetRandom(0, 5);
+                        //Allways check whether adjacent tiles are empty -> whether the the Zone is to be created is not completely enclosed by blocks
                         if (rand == 1 && tile.Blocks[x, y - 1] == null && tile.Blocks[x, y] != null && (tile.Blocks[x - 1, y - 1] == null || tile.Blocks [x + 1, y - 1] == null))
                         {
                             valX.Add(x);
@@ -398,99 +396,62 @@ namespace Randio_2 {
             return new Zone(device, new Rectangle(tile.Coords.X + valX[rnd] * Block.Width, tile.Coords.Y + valY[rnd] * Block.Height, Block.Width, Block.Height), zoneColor);
         }
 
-        protected Zone GetCloseZone(GraphicsDevice device, Color zoneColor)
-        {
-            var tile = GetTileByIndex(0);
-            int xblocks = tile.Coords.Width / Block.Width;
-            int yblocks = tile.Coords.Height / Block.Height;
-
-            int selX = -1;
-            int selY = -1;
-
-            while (selX == -1)
-            {
-                for (int x = 1; x < xblocks; ++x)
-                {
-                    for (int y = 1; y < tile.GroundLevel; ++y)
-                    {
-                        int rand = AlgorithmHelper.GetRandom(0, (xblocks * yblocks) / 10);
-                        if (rand % 42 == 0 && tile.Blocks[x, y] != null)
-                        {
-                            rand = AlgorithmHelper.GetRandom(0, 5);
-                            if (rand == 1 && tile.Blocks[x, y - 1] == null && (tile.Blocks[x - 1, y - 1] == null || tile.Blocks[x + 1, y - 1] == null))
-                            {
-                                selX = x;
-                                selY = y - 1;
-                            }
-                            else if (rand == 2 && tile.Blocks[x, y + 1] == null && (tile.Blocks[x - 1, y + 1] == null || tile.Blocks[x + 1, y + 1] == null))
-                            {
-                                selX = x;
-                                selY = y + 1;
-                            }
-                            else if (rand == 3 && tile.Blocks[x - 1, y] == null && tile.Blocks[x - 2, y] == null)
-                            {
-                                selX = x - 1;
-                                selY = y;
-                            }
-                            else if (rand == 4 && tile.Blocks[x + 1, y] == null && tile.Blocks[x + 2, y] == null)
-                            {
-                                selX = x + 1;
-                                selY = y;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return new Zone(device, new Rectangle(tile.Coords.X + selX * Block.Width, tile.Coords.Y + selY * Block.Height, Block.Width, Block.Height), zoneColor);
-        }
-
+        //Initialize items
         private void CreateItems(GraphicsDevice device)
         {
             items = new List<Item>();
-            int count = AlgorithmHelper.GetRandom(1, 2 * TileCount); //how many items there will be in the game
+            //Find a spot where no block is present to create the item
+            int count = AlgorithmHelper.GetRandom(1, 2 * TileCount);
             int nextX = AlgorithmHelper.GetRandom(0, Width / count);
             for (int i = 0; i < count; ++i)
             {
-                //set nextY by looking for a space without any tiles
                 var tile = GetTileForX(nextX);
                 var tileX = (int)GlobalToTileCoordinates(new Vector2(nextX, 0), tile.Index).X;
-                int tileIndexX = tileX / Block.Width; //tweak this, might not be accurate
-                int tileBase = tile.Coords.Left;
+                int blockIndexX = tileX / Block.Width;
+                int tileBaseX = tile.Coords.Left;
                 List<int> availableY = new List<int>();
+
                 for(int y = 0; y < tile.GroundLevel; ++y)
                 {
-                    if (tile.Blocks[tileIndexX, y] == null)
+                    if (tile.Blocks[blockIndexX, y] == null)
                         availableY.Add(y);  
                 }
                 if (availableY.Count > 0)
                 {
                     int selectedY = availableY[AlgorithmHelper.GetRandom(0, availableY.Count)];
+                    //Random item type
                     Item.ItemType type = (Item.ItemType)AlgorithmHelper.GetRandom(0, Item.TypeCount);
 
-                    Item item = new Item(this, device, type, i, new Vector2(tileBase + tileIndexX*Block.Width, selectedY*Block.Height), tile.Index, 16, 16);
+                    Item item = new Item(this, device, type, i, new Vector2(tileBaseX + blockIndexX*Block.Width, selectedY*Block.Height), tile.Index, 16, 16);
                     items.Add(item);
                 }
-
+                //Move a little further and repeat
                 nextX += AlgorithmHelper.GetRandom(16, Width / count);
             }
         }
 
+        //Initializes an exit zone (for leaving intro/outro screens)
         protected void CreateExitZone(GraphicsDevice device)
         {
-            exitZone = GetCloseZone(device, Color.Red);
+            exitZone = GetNewZone(device, Color.Red, GetTileByIndex(0));
         }
 
-        //Updates Tiles and NPCs on them
+        //Updates Tiles and all NPCs on them
         protected void UpdateNPCs(GameTime gameTime) {
             List<NPC> toRemove = new List<NPC>();
 
             foreach (NPC n in NPCs) { 
                 n.Update(gameTime);
-                if (CheckOutOfMap((int)n.Position.Y) == -1 || !n.Alive)
+
+                //Reset any entity which falls down from the map
+                if (CheckOutOfMap((int)n.Position.Y) == -1 && n.Alive)
+                    n.Reset();
+
+                if(!n.Alive)
                     toRemove.Add(n);
             }
 
+            //Removes dead NPCs
             foreach (NPC n in toRemove)
             {
                 if (NPCs.Contains(n))
@@ -498,31 +459,26 @@ namespace Randio_2 {
             }
 }
 
+        //Updates all events linked to entities (damage animations, attack timers)
         protected void UpdateEvents()
         {
-            entityEvents.Update();
+            EntityEvents.Update();
         }
 
+        //Updates items (physics, etc.)
         protected void UpdateItems(GameTime gameTime)
         {
             foreach (Item i in items)
                 i.Update(gameTime);
         }
 
+        //Updates quests (completion, status texts)
         protected void UpdateQuests()
         {
-            quests.Update();
+            Quests.Update();
         }
-
-        //If player reached the exit zone, exit game and show outro screen
-        private void CheckExitZone()
-        {
-            var block = exitZone.Coords;
-            var newPlayerRect = GeometryHelper.TileToGlobalCoordinates(Player.BoundingRectangle, GetTileByIndex(Player.CurrentTile));
-            if (GeometryHelper.GetIntersectionDepth(block, newPlayerRect) != Vector2.Zero)
-                ReachedExit = true;
-        }
-
+        
+        //Returns current tile and tiles around it if there is a possibility that they might be visible too
         private Tile[] GetVisibleTiles() {
             List<Tile> visibleTiles = new List<Tile>();
 
@@ -550,7 +506,7 @@ namespace Randio_2 {
 
             Tile other = GetTileForX((int)rightBound);
 
-            //hackaround, because GetTileForX returns null on the last coordinate
+            //GetTileForX returns null on the last coordinate, we konw that this is the last tile
             if (rightBound == Width)
                 other = GetTileByIndex(tiles.Count - 1);
 
@@ -559,7 +515,8 @@ namespace Randio_2 {
 
             return visibleTiles.ToArray();
         }
-
+    
+        //Returns all NPCs currently present on visible tiles
         private NPC[] GetVisibleNPCs()
         {
             var visibleTiles = GetVisibleTiles();

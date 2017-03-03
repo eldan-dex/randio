@@ -1,22 +1,22 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace Randio_2 {
+    //Player class, inherits Entity. Contains Player controls, properties and interactions
     class Player : Entity {
 
         #region Public varaibles
         public Vector2 Origin { get; private set; }
         public int SafeMargin { get; private set; } //how close to the border can player go before the camera starts moving;
-        public const int PlayerWidth = 37; //32 small, 48big
-        public const int PlayerHeight = 37; //32 small, 48big
+        public const int PlayerWidth = 37; //3px smaller than blocks to better fit into holes and for better maneuvering
+        public const int PlayerHeight = 37;
         public Stats Stats;
         #endregion
 
         #region Private variables
         // Input configuration
-        private const Keys jumpButton = Keys.W; //keys will be assigned randomly
+        private const Keys jumpButton = Keys.W;
         private const Keys leftButton = Keys.A;
         private const Keys rightButton = Keys.D;
         private const Keys slowButton = Keys.LeftShift;
@@ -28,6 +28,7 @@ namespace Randio_2 {
         #endregion
 
         #region Public methods
+        //Default ctor
         public Player(GraphicsDevice graphicsDevice, Map map, Vector2 position, string name) : base(map, position, 0, PlayerWidth, PlayerHeight) {        
             CurrentTile = 0;
             Origin = position;
@@ -41,55 +42,46 @@ namespace Randio_2 {
             UpdateOutlineColor();
         }
 
+        //Updates the player first based on keyboard inputs, then as a generic entity
         public void Update(GameTime gameTime, KeyboardState keyboardState) {
             if (!Alive)
-            {
                 map.ResetPlayer();
-            }
 
             GetInput(keyboardState);
-            Update(gameTime);
-        }
-
-        public void Reset() {
-            //Respawn player on the tile where he died
-            //This might not be desirable in the finished game
-            position = Origin + new Vector2(map.GetTileByIndex(CurrentTile).Coords.Left, 0);
-
-            Alive = true;
-            HP = MaxHP;
-            UpdateOutlineColor();
+            Update(gameTime); //Entity.Update()
         }
         #endregion
 
         #region Private methods
+        //Creates player texture (blue with an arrow in the middle)
         private Texture2D CreateTexture(GraphicsDevice graphicsDevice, int width, int height) {
             var texture = new Texture2D(graphicsDevice, width, height);
 
-            //Temporary placeholder code, will call texture generation here
-            GraphicsHelper.DrawRectangle(texture, Color.Blue);
+            GraphicsHelper.FillRectangle(texture, Color.Blue);
             GraphicsHelper.DrawArrow(1, texture, Color.Black);
             outlineWidth = 3;
 
             return texture;
         }
 
+        //Initializes player stats (those different from generic Entity stats)
         private void InitStats()
         {
-            //atm player is a little faster and jumps higher and faster than an average entity
+            //Player is a little faster and jumps higher and faster than an average entity
             MaxMoveSpeed = 1750.0f;
-            MaxJumpTime = 0.35f; //0.35f small
-            JumpLaunchVelocity = -3500.0f; //-3500 small
+            MaxJumpTime = 0.35f;
+            JumpLaunchVelocity = -3500.0f;
 
-            //atm only HP is higher than an average entity
+            //Only HP is higher than an average entity
             DefaultHP = 10;
             DefaultStrength = 1;
             DefaultDefense = 0;
 
             IsPlayer = true;
             Stats = new Stats();
-    }
+        }
 
+        //Parses keyboard input
         private void GetInput(KeyboardState keyboardState) {
             movement = 0.0f;
             var speed = 1.0f;
@@ -104,6 +96,7 @@ namespace Randio_2 {
 
             isJumping = keyboardState.IsKeyDown(jumpButton);
 
+            //Player is attacking
             if (keyboardState.IsKeyDown(actionButtonA))
             {
                 if (!AkeyDown)
@@ -113,7 +106,7 @@ namespace Randio_2 {
                         Attack();
                         //Prevent key-spamming
                         CanAttack = false;
-                        map.entityEvents.AddEvent(new Event<Entity>(100, delegate (Entity e) { e.CanAttack = true; }, this));
+                        map.EntityEvents.AddEvent(new Event<Entity>(100, delegate (Entity e) { e.CanAttack = true; }, this));
                     }
                     AkeyDown = true;
                 }
@@ -121,6 +114,7 @@ namespace Randio_2 {
             else
                 AkeyDown = false;
 
+            //Item interaction
             if (keyboardState.IsKeyDown(actionButtonB))
             {
                 if (!BkeyDown)
@@ -133,6 +127,7 @@ namespace Randio_2 {
                 BkeyDown = false;
         }
 
+        //Attack action
         private void Attack()
         {
             Entity nearest = GetFirstEntityInSight(Direction, Range);
@@ -140,6 +135,7 @@ namespace Randio_2 {
                 nearest.TakeDamage(this, Strength);
         }
 
+        //Item pickup/drop action
         private void PickDropItem()
         {
             Item nearest = GetFirstItemInSight(Direction, Range);

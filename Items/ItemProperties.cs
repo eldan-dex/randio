@@ -1,5 +1,6 @@
 ﻿namespace Randio_2
 {
+    //Item properties, separated from Item itself so that Items can have interchangable properties
     class ItemProperties
     {
         #region Public variables
@@ -14,6 +15,7 @@
         #endregion
 
         #region Public methods
+        //Default ctor
         public ItemProperties(string name = "?", string adjective = "", int hp = 0, int strength = 0, int armor = 0, int speed = 0)
         {
             Name = name;

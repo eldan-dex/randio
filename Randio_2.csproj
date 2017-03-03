@@ -27,7 +27,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\$(MonoGamePlatform)\$(Platform)\$(Configuration)\</OutputPath>
     <DefineConstants>TRACE;WINDOWS</DefineConstants>
@@ -39,6 +39,9 @@
     </ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup />
+  <PropertyGroup>
+    <NoWin32Manifest>true</NoWin32Manifest>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="Backgrounds\MountainsBG.cs" />
     <Compile Include="Entities\Stats.cs" />
@@ -70,7 +73,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Quests\QuestManager.cs" />
     <Compile Include="Quests\Quest.cs" />
-    <Compile Include="Backgrounds\ShapesBG.cs" />
     <Compile Include="Helpers\StringHelper.cs" />
     <Compile Include="Backgrounds\TemplateBG.cs" />
     <Compile Include="Map\Level\Tile.cs" />
