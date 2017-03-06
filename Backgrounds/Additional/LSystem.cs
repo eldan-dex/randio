@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Randio_2
 {
-    //Helper class for LSystemBG, implements L-Systems and drawing turtle
+    //Helper class for LSystemBG, implements L-System basics
     class LSystem
     {
         #region Public variables

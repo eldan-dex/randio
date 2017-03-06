@@ -127,6 +127,7 @@ namespace Randio_2 {
         #endregion
 
         #region Private methods
+        //Draws the map with correct camera transformation
         private void DrawLevel(GameTime gameTime)
         {
             var viewMatrix = camera.GetViewMatrix();
@@ -137,6 +138,7 @@ namespace Randio_2 {
             levelSpriteBatch.End();
         }
 
+        //Displays all onscreen text
         private void DrawOSDs()
         {
             osdSpriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
