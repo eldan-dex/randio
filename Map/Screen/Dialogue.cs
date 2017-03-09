@@ -24,8 +24,7 @@ namespace Randio_2
         #region Public methods
         //Inherited ctor
         public Dialogue()
-        {
-
+        { 
         }
 
         //Default ctor

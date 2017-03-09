@@ -153,9 +153,9 @@ namespace Randio_2 {
 
             if (changeDir == 50) //2% chance that direction will be changed
             {
-                if (randX < 3)
+                if (randX < 4)
                     horizontalDirection = -1;
-                else if (randX > 6)
+                else if (randX > 8)
                     horizontalDirection = 1;
                 else
                     horizontalDirection = 0;

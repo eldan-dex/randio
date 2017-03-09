@@ -8,7 +8,7 @@ using Microsoft.Xna.Framework.Input;
 namespace Randio_2 {
     //Game map - contains player, NPCs, individual tiles with backgrounds and blocks, items and everyting else seen in the game
     class Map {
-        #region Public variables  
+        #region Public variables
         public int Width { get; protected set; }
         public int Height { get; protected set; }
         public int TileCount { get { return (tiles == null) ? 1 : tiles.Count; } }
@@ -137,17 +137,6 @@ namespace Randio_2 {
             return new Rectangle(tileCoords.X + tile.Coords.X, tileCoords.Y + tile.Coords.Y, tileCoords.Width, tileCoords.Height);
         }
 
-
-        //Returns all NPCs and Player
-        public List<Entity> GetAllEntites() {
-            List<Entity> result = new List<Entity>();
-
-            //result.Add(Player);
-            result.AddRange(NPCs);
-
-            return result;
-        }
-
         //Returns items placed on ground (ignores those held by entities)
         public List<Item> GetAllItems()
         {
@@ -238,7 +227,7 @@ namespace Randio_2 {
                         newWidth = 4096; //This breaks the purprose of the whole algorithm, because the next tile might be too small. But it fixes the crashing.
                 }
 
-                //Picka  random TileType
+                //Pick a random TileType
                 var type = (Tile.TileType)AlgorithmHelper.GetRandom(0, Tile.TileTypeCount);
 
                 //Create and add Tile
@@ -277,7 +266,7 @@ namespace Randio_2 {
                 {
                     name = "Kill ";
                     targets = new List<Entity>();
-                    var entities = GetAllEntites();
+                    var entities = NPCs;
                     int enemyCount = AlgorithmHelper.GetRandom(1, Math.Min(5, entities.Count));
                     for (int j = 0; j < enemyCount; ++j)
                     {

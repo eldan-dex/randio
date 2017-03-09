@@ -3,8 +3,6 @@
 
 - NPCs group at the end of the level - why?
 
-- Refactoring
-
 IDEAS:
 - Re-add player as a possible target for Kill quests?
 - LOGO!

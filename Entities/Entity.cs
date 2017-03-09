@@ -224,7 +224,7 @@ namespace Randio_2 {
         public List<Entity> GetEntitiesInSight(int xRange, int yRange)
         {
             List<Entity> inSight = new List<Entity>();
-            List<Entity> allEntites = map.GetAllEntites();
+            List<NPC> allEntites = map.NPCs;
 
             foreach (Entity e in allEntites)
             {

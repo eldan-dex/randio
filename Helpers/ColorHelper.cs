@@ -44,6 +44,21 @@ namespace Randio_2
 
             return new Color((int)red, (int)green, (int)blue, color.A);
         }
+
+        //Generates a color palette with a given color count
+        public static IEnumerable<Color> Generate(int numOfColors)
+        {
+            var points = new Points(numOfColors);
+
+            foreach (var point in points)
+            {
+                var rgb = RYB.ToRgb(point[0], point[1], point[2]);
+                yield return new Color(
+                    (int)Math.Floor(255 * rgb[0]),
+                    (int)Math.Floor(255 * rgb[1]),
+                    (int)Math.Floor(255 * rgb[2]));
+            }
+        }
         #endregion
 
         #region Support classes
@@ -168,21 +183,6 @@ namespace Randio_2
             IEnumerator IEnumerable.GetEnumerator()
             {
                 return GetEnumerator();
-            }
-        }
-
-        //Generates a color palette with a given color count
-        public static IEnumerable<Color> Generate(int numOfColors)
-        {
-            var points = new Points(numOfColors);
-
-            foreach (var point in points)
-            {
-                var rgb = RYB.ToRgb(point[0], point[1], point[2]);
-                yield return new Color(
-                    (int)Math.Floor(255 * rgb[0]),
-                    (int)Math.Floor(255 * rgb[1]),
-                    (int)Math.Floor(255 * rgb[2]));
             }
         }
     }

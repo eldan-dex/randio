@@ -8,12 +8,11 @@ namespace Randio_2 {
     //Tile - main building part of the map - Background, Blocks, 
     class Tile {
         #region Public variables
-        //Environment types (fifferent algorithm for each) + Screen (plain color without blocks)
+        //Environment types (different algorithm for each) + Screen (plain color without blocks)
         public enum TileType {
             LSystem,
             City,
             Mountains,
-            Shapes, //this one is currently disabled
             Screen = 998,
             Invalid = 999
         }
