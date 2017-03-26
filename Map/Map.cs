@@ -350,7 +350,7 @@ namespace Randio_2 {
                 for (int y = 1; y < tile.GroundLevel+1; ++y)
                 {
                     int rand = AlgorithmHelper.GetRandom(0, (xblocks * yblocks) / 20);
-                    if (rand % 24 <= 3 && tile.Blocks[x, y] != null && x < tile.Blocks.GetLength(0) && y < tile.Blocks.GetLength(1))
+                    if (rand % 24 <= 3 && tile.Blocks[x, y] != null && x+1 < tile.Blocks.GetLength(0) && y+1 < tile.Blocks.GetLength(1))
                     {
                         rand = AlgorithmHelper.GetRandom(0, 5);
                         //Allways check whether adjacent tiles are empty -> whether the the Zone is to be created is not completely enclosed by blocks
@@ -359,7 +359,7 @@ namespace Randio_2 {
                             valX.Add(x);
                             valY.Add(y - 1);
                         }
-                        else if (rand == 2 && tile.Blocks[x, y + 1] == null && tile.Blocks[x, y + 2] != null && (tile.Blocks[x - 1, y + 1] == null || tile.Blocks[x + 1, y + 1] == null))
+                        else if (rand == 2 && tile.Blocks[x, y + 1] == null && tile.Blocks.GetLength(1) > y + 2 && tile.Blocks[x, y + 2] != null && (tile.Blocks[x - 1, y + 1] == null || tile.Blocks[x + 1, y + 1] == null))
                         {
                             valX.Add(x);
                             valY.Add(y + 1);
@@ -369,7 +369,7 @@ namespace Randio_2 {
                             valX.Add(x - 1);
                             valY.Add(y);
                         }
-                        else if (rand == 4 && tile.Blocks[x + 1, y] == null && tile.Blocks[x + 1, y + 1] != null && tile.Blocks[x + 2, y] == null)
+                        else if (rand == 4 && tile.Blocks[x + 1, y] == null && tile.Blocks[x + 1, y + 1] != null && tile.Blocks.GetLength(0) > x + 2 && tile.Blocks[x + 2, y] == null)
                         {
                             valX.Add(x + 1);
                             valY.Add(y);

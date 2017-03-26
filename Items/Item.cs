@@ -141,7 +141,7 @@ namespace Randio_2
                     case ItemType.Speed:
                         Properties.Name = "FASTER MOVEMENT";
                         Properties.Adjective = "Fast";
-                        Properties.SpeedBonus = (potence - 1f) / 2;
+                        Properties.SpeedBonus = (potence - 1f) / 3;
                         break;
                     case ItemType.HP:
                         Properties.Name = "MORE HP";

@@ -235,6 +235,29 @@ namespace Randio_2 {
                 isJumping = true;
                 movement = horizontalDirection * 1f;
             }
+
+            CheckSidewaysMovement(movement);
+        }
+
+        private void CheckSidewaysMovement(float movement)
+        {
+            Entity entity;
+
+            if (movement == 0)
+                return;
+
+            else if (movement < 0)
+                entity = GetFirstEntityInSight(0, Width);
+
+            else
+                entity = GetFirstEntityInSight(1, Width);
+
+            if (entity != null)
+            {
+                var depth = GeometryHelper.GetIntersectionDepth(BoundingRectangle, entity.BoundingRectangle);
+                if (depth.X > 0)
+                    movement = 0;
+            }
         }
 
         //Check whether player is within range from this NPC

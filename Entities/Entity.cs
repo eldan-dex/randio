@@ -144,6 +144,7 @@ namespace Randio_2 {
         {
             //Defense property decreases damage taken
             var realDamage = (int)(damage - Defense);
+
             if (realDamage > 0)
             {
                 HP -= realDamage;
@@ -224,11 +225,13 @@ namespace Randio_2 {
         public List<Entity> GetEntitiesInSight(int xRange, int yRange)
         {
             List<Entity> inSight = new List<Entity>();
-            List<NPC> allEntites = map.NPCs;
+            List<Entity> allEntites = new List<Entity>();
+            allEntites.AddRange(map.NPCs);
+            allEntites.Add(map.Player);
 
             foreach (Entity e in allEntites)
             {
-                if (e != this && Math.Abs(e.Position.X - Position.X) <= xRange && Math.Abs(e.Position.Y - Position.Y) <= yRange)
+                if (e != this && Math.Abs(e.Position.X - Position.X) <= xRange + e.Width && Math.Abs(e.Position.Y - Position.Y) <= yRange + e.Height)
                 {
                     inSight.Add(e);
                 }
@@ -418,8 +421,9 @@ namespace Randio_2 {
             position.X = (float)Math.Round(position.X);
 
             //X axis collisions
-            TerrainCollisionsXY(true);
-            EntityCollisionsXY(true);
+            int sideBlocked = TerrainCollisionsXY(true);
+            if (sideBlocked == 0)
+                EntityCollisionsXY(true);
 
             //Move along the Y axis
             position.Y += velocity.Y * Speed * elapsed;
@@ -458,14 +462,15 @@ namespace Randio_2 {
         }
 
         //Check for collisions on one axis (X or Y) at a time and resolve them
-        private void TerrainCollisionsXY(bool doCollisionX, Tile nextTile = null) {
+        private int TerrainCollisionsXY(bool doCollisionX, Tile nextTile = null) {
+            int result = 0;
             Tile tile = map.GetTileForX((int)position.X);
 
             if (nextTile != null)
                 tile = nextTile;
 
             if (tile == null)
-                return;
+                return result;
 
             Vector2 entityTilePos = map.GlobalToTileCoordinates(position, tile.Index);
             Rectangle bounds = new Rectangle((int)entityTilePos.X, (int)entityTilePos.Y, Width, Height);
@@ -510,11 +515,11 @@ namespace Randio_2 {
 
                         Vector2 depth = GeometryHelper.GetIntersectionDepth(bounds, otherElement);
                         if (depth != Vector2.Zero) {
-
                             //In the first call, we check for X-axis collisions
                             if (doCollisionX) {
                                 position = new Vector2(Position.X + depth.X, Position.Y);
                                 bounds = BoundingRectangle;
+                                result = (int)depth.X;
                             }
 
                             //In the second call, we do the Y-axis
@@ -527,7 +532,7 @@ namespace Randio_2 {
                                 }
 
                                 //We hit a box above us, we're jumping
-                                else if ((bounds.Bottom > otherElement.Bottom) && (bounds.Top < otherElement.Bottom)) {
+                                else if ((bounds.Bottom > otherElement.Bottom+1) && (bounds.Top < otherElement.Bottom)) {
                                     position = new Vector2(Position.X, Position.Y + depth.Y);
                                     jumpTime = MaxJumpTime; //we reached the apex of our jump        
                                     bounds = BoundingRectangle;
@@ -548,16 +553,17 @@ namespace Randio_2 {
             {
                 var next = map.GetTileByIndex(CurrentTile + 1);
                 if (next != null)
-                    TerrainCollisionsXY(doCollisionX, next);
+                    result = TerrainCollisionsXY(doCollisionX, next);
             }
             else if (leftBlockX == 0 && CurrentTile > 0 && nextTile == null && IsPlayer)
             {
                 var next = map.GetTileByIndex(CurrentTile - 1);
                 if (next != null)
-                    TerrainCollisionsXY(doCollisionX, next);
+                    result = TerrainCollisionsXY(doCollisionX, next);
             }
 
             oldBottom = bounds.Bottom;
+            return result;
         }
 
         //Check for collisions with other entities
@@ -570,7 +576,6 @@ namespace Randio_2 {
                 Vector2 depth = GeometryHelper.GetIntersectionDepth(bounds, e.BoundingRectangle);
                 if (depth != Vector2.Zero)
                 {
-
                     if (doCollisionX)
                     {
                         position = new Vector2(Position.X + depth.X, Position.Y);
