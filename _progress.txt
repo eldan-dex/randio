@@ -1,5 +1,9 @@
 ﻿PROGRESS LOG
 
+26.3
+* Final and cleaned up code
+* Final documentation
+- Some issues are still present, see _todo.txt
 
 22.2
 + Loading screen

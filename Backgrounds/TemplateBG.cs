@@ -64,7 +64,6 @@ namespace Randio_2
     }
 }
 
-
 /* 
  * For geometry, use the GeometryHelper class
  * Drawing can be simplified by making use of what's in the GrapicsHelper
