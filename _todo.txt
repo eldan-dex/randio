@@ -13,5 +13,3 @@ IDEAS:
 
 LAST REVISION:
 - šipka, která ukazuje směr questu (třeba místo čísla tilu, do kterého mám jít)
-
-- NPC se občas bugnou skrz texturu, je možné i bugnout skrz texturu hráče - tweaknout systém kolizí
