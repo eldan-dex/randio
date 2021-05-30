@@ -1,6 +1,6 @@
 # Randio
 ## 2D adventura založená na pseudonáhodném generování
-### Matěj Havránek, maturitní práce z IVT na AG, 2017
+### Maturitní práce z IVT, 2017
 
 
 ## 1. Uživatelská dokumentace
